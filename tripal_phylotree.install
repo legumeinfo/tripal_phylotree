@@ -1,0 +1,110 @@
+<?php
+/**
+ * @file
+ * Installation of the phylotree module
+ */
+
+/**
+ * Implements hook_disable().
+ *
+ * @ingroup tripal_phylotree
+ */
+function tripal_phylotree_disable() {
+  // TODO?
+}
+
+/**
+ * Implementation of hook_requirements().
+ *
+ * @ingroup tripal_phylotree
+ */
+function tripal_phylotree_requirements($phase) {
+  $requirements = array();
+  if ($phase == 'install') {
+    // make sure chado is installed
+    if (!$GLOBALS["chado_is_installed"]) {
+      $requirements ['tripal_phylotree'] = array(
+        'title' => "tripal_phylotree",
+        'value' => "ERROR: Chado must be installed before this module can be enabled",
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+  }
+  return $requirements;
+}
+
+/**
+ * Implementation of hook_install().
+ *
+ * @ingroup tripal_phylotree
+ */
+function tripal_phylotree_install() {
+  // TODO?
+}
+
+/**
+ * Implementation of hook_uninstall().
+ *
+ * @ingroup tripal_phylotree
+ */
+function tripal_phylotree_uninstall() {
+  // TODO?
+}
+
+/**
+ * Implementation of hook_schema().
+ * Standard tripal linker table between a node and a phylotree record.
+ * @ingroup tripal_phylotree
+ */
+function tripal_phylotree_schema() {
+  $schema['chado_phylotree'] = array(
+    'fields' => array(
+      'vid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'phylotree_id' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0
+      )
+    ),
+    'indexes' => array(
+      'chado_phylotree_idx1' => array('phylotree_id')
+    ),
+    'unique keys' => array(
+      'chado_phylotree_uq1' => array('nid', 'vid'),
+      'chado_phylotree_uq2' => array('vid')
+    ),
+    'primary key' => array('nid'),
+  );
+  return $schema;
+}
+
+/**
+ * Adds new CV's used by this module
+ *
+ * @ingroup tripal_phylotree
+ */
+function tripal_phylotree_add_cvs(){
+  // the CVs were already loaded into our chado instance, so
+  // should I skip adding them here?
+}
+
+/**
+ * Adds cvterms needed for the phylotree module
+ *
+ * @ingroup tripal_phylotree
+ */
+function tripal_phylotree_add_cvterms() {
+   // the CVs were already loaded into our chado instance, so
+  // should I skip adding them here?
+}
