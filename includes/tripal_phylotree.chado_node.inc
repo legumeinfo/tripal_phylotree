@@ -134,14 +134,8 @@ function chado_phylotree_load($nodes) {
       continue;
     }
 
-    $values = array('phylotree_id' => $phylotree_id);
-    $options = array( 'include_fk' =>
-       array( 'analysis_id' => 1,  'type_id' => 1, 'dbxref_id' => 1));
-    
-    $phylotree = chado_generate_var('phylotree', $values, $options);
-
-    // the comment field is a text field so we need to expand it
-    $phylotree = chado_expand_var($phylotree, 'field', 'phylotree.comment');
+    $phylotree = chado_generate_var('phylotree',
+                                     array('phylotree_id' => $phylotree_id));
 
     $nodes[$nid]->phylotree = $phylotree;
 
@@ -251,10 +245,18 @@ function tripal_phylotree_node_view($node, $view_mode, $langcode) {
     if ($view_mode == 'full') {
 
       $node->content['tripal_phylotree_base'] = array(
-        '#markup' => theme('tripal_phylotree_base', array('node' => $node)),
+        '#markup' => theme('tripal_phylotree_base',
+                           array('node' => $node)),
         '#tripal_toc_id'    => 'base',
-        '#tripal_toc_title' => 'Overview',
+        '#tripal_toc_title' => 'Tree Overview',
         '#weight' => -100,
+      );
+      $node->content['tripal_phylotree_references'] = array(
+        '#markup' => theme('tripal_phylotree_references',
+                           array('node' => $node)),
+        '#tripal_toc_id'    => 'dbxref',
+        '#tripal_toc_title' => 'Cross References',
+        '#weight' => -90,
       );
 
       /*

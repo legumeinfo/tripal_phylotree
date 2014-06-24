@@ -3,7 +3,7 @@ $variables['display_submitted'] = FALSE;
 
 /**
  * @file
- * Integrates the Chado Phylotree module with Drupal Nodes
+ * Integrates the Chado Phylotree module with Drupal Nodes & Views
  */
 
 /**
@@ -51,6 +51,49 @@ function tripal_phylotree_permission() {
 function tripal_phylotree_menu() {
   $items = array();
 
+  // administration landing page. currently has no content but is
+  // apparently required for the Sync and Help links to work.
+  $items['admin/tripal/extension/tripal_phylotree'] = array(
+    'title' => 'Phylotrees',
+    'description' => 'Phylogenetic trees & gene families',
+    'page callback' => 'tripal_phylotree_admin_phylotrees_listing',
+    'access arguments' => array('administer tripal phylotree'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  // help menu 
+  $items['admin/tripal/extension/tripal_phylotree/help'] = array(
+    'title' => 'Help',
+    'description' => 'Basic Description of Tripal Phylotree Module Functionality',
+    'page callback' => 'theme',
+    'page arguments' => array('tripal_phylotree_help'),
+    'access arguments' => array('administer tripal phylotree'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10
+  );
+
+  // configuration menu item
+  $items['admin/tripal/extension/tripal_phylotree/configuration'] = array(
+    'title' => 'Settings',
+    'description' => 'Configure the Tripal Phylotree module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tripal_phylotree_admin'),
+    'access arguments' => array('administer tripal phylotree'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 5
+  );
+
+  // sync menu item (will be rendered as a tab by tripal)
+  $items['admin/tripal/extension/tripal_phylotree/sync'] = array(
+    'title' => ' Sync',
+    'description' => 'Create pages on this site for phylotrees stored in Chado',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('chado_node_sync_form', 'tripal_phylotree', 'chado_phylotree'),
+    'access arguments' => array('administer tripal phylotree'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2
+  );
+
   // create a route for viewing json of phylotree and all it's phylonodes
    $items['chado_phylotree/%/json'] = array(
     'page callback' => 'phylotree_json',
@@ -65,58 +108,26 @@ function tripal_phylotree_menu() {
     'access arguments' => array('access chado_phylotree content'),
    );
    
-  $items['admin/tripal/extension/tripal_phylotree'] = array(
-    'title' => 'Phylotrees',
-    'description' => 'Phylogenetic trees & gene families',
-    'page callback' => 'tripal_phylotree_admin_phylotrees_listing',
-    'access arguments' => array('administer tripal phylotree'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
-  $items['admin/tripal/extension/tripal_phylotree/help'] = array(
-    'title' => 'Help',
-    'description' => 'Basic Description of Tripal Phylotree Module Functionality',
-    'page callback' => 'theme',
-    'page arguments' => array('tripal_phylotree_help'),
-    'access arguments' => array('administer tripal phylotree'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 10
-  );
-
-  $items['admin/tripal/extension/tripal_phylotree/configuration'] = array(
-    'title' => 'Settings',
-    'description' => 'Configure the Tripal Phylotree module',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('tripal_phylotree_admin'),
-    'access arguments' => array('administer tripal phylotree'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 5
-  );
-  
-  $items['admin/tripal/extension/tripal_phylotree/sync'] = array(
-    'title' => ' Sync',
-    'description' => 'Create pages on this site for phylotrees stored in Chado',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('chado_node_sync_form', 'tripal_phylotree', 'chado_phylotree'),
-    'access arguments' => array('administer tripal phylotree'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 2
-  );
-
   return $items;
 }
 
 // generate json counting features per organism in this gene tree
 function phylotree_organism_json($phylotree_id) {
-  
-  $sql = 'SELECT n.phylonode_id, n.label as node_name, '.
-    'f.name as feature_name, f.organism_id, '.
-    'o.organism_id, o.genus, o.species, o.common_name ' .
-    'FROM chado.phylonode n '.
-    'LEFT JOIN chado.feature f ON n.feature_id = f.feature_id ' .
-    'LEFT JOIN chado.organism o ON f.organism_id = o.organism_id '.
-    'where  n.phylotree_id = :phylotree_id AND n.feature_id is not NULL';
 
+  /* query using inner join, to exclude phylonodes without feature info
+     e.g. the ncbi taxonony tree */
+  $sql = 'SELECT n.phylonode_id, n.label AS node_name, '.
+    'f.name as feature_name, '.
+    'o.organism_id, o.genus, o.species, o.common_name, ' .
+    'cvt.name as cvterm_name, cvt.definition as cvterm_definition '.
+    'FROM chado.phylonode n '.
+    'LEFT OUTER JOIN chado.cvterm cvt ON n.type_id = cvt.cvterm_id '.
+    'INNER JOIN chado.feature f ON n.feature_id = f.feature_id ' .
+    'INNER JOIN chado.organism o ON f.organism_id = o.organism_id '.
+    'WHERE n.phylotree_id = :phylotree_id';
+
+//  dd($sql);
+  
   $args = array(':phylotree_id' => $phylotree_id);
   $result = chado_query( $sql, $args );
 
@@ -146,28 +157,29 @@ function phylotree_organism_json($phylotree_id) {
 // generate json describing the tree structure with links to the features
 function phylotree_json($phylotree_id) {
 
-  $sql = 'SELECT n.phylonode_id, n.parent_phylonode_id, n.label as name, n.distance, '.
-    'f.name as feature_name,'.
+  $sql = 'SELECT n.phylonode_id, n.parent_phylonode_id, n.label as name, '.
+    'n.distance, f.name as feature_name, '.
     'cvt.name as cvterm_name, cvt.definition as cvterm_definition '.
     'FROM chado.phylonode n '.
-    'LEFT OUTER JOIN chado.feature f ON n.feature_id = f.feature_id ' .
     'LEFT OUTER JOIN chado.cvterm cvt ON n.type_id = cvt.cvterm_id '.
-    'where n.phylotree_id = :phylotree_id';
+    'LEFT OUTER JOIN chado.feature f ON n.feature_id = f.feature_id ' .
+    'WHERE n.phylotree_id = :phylotree_id';
+  dd($sql);
   
   $args = array(':phylotree_id' => $phylotree_id);
   $result = chado_query( $sql, $args );
 
   // fetch all the phylonodes into an assoc array
-  $rootPhylonode = null;
+  $root_phylonode = array();
   foreach ($result as $r) {
     if($r->name == null) {
       $r->name = sprintf('distance: %.3f', $r->distance);
     }
     $phylonodes[ $r->phylonode_id ] = $r;
     $phylonodes[ $r->phylonode_id ]->children = array();
-    if( $rootPhylonode == null && $r->parent_phylonode_id == null) {
-      $rootPhylonode = $r;
-      $rootPhylonode->name = 'root';
+    if( $root_phylonode == null && $r->parent_phylonode_id == null) {
+      $root_phylonode = $r;
+      $root_phylonode->name = 'root';
     }
   }
 
@@ -189,13 +201,12 @@ function phylotree_json($phylotree_id) {
 
   // sort the children array by distance!
   foreach( $phylonodes as $key => $pn ) {
-    usort($pn->children, 'phylonodeDistanceComparator');
+    usort($pn->children, 'phylonode_distance_comparator');
   }
-  
-  drupal_json_output($rootPhylonode);
+  drupal_json_output($root_phylonode);
 }
 
-function phylonodeDistanceComparator($a, $b) {
+function phylonode_distance_comparator($a, $b) {
   return ($a->distance < $b->distance) ? -1 : 1;
 }
 
@@ -215,6 +226,24 @@ function tripal_phylotree_views_api() {
   );
 }
 
+
+/**
+ * Implements hook_search_biological_data_views().
+ *
+ * Adds the described views to the "Search Data" Page created by Tripal Views
+ */
+function tripal_phylotree_search_biological_data_views() {
+  return array(
+    'tripal_phylotree_user_phylotrees' => array(
+      'machine_name' => 'tripal_phylotree_user_phylotrees',
+      'human_name' => 'Phylotrees',
+      'description' => 'Gene trees, species trees, etc.',
+      'link' => 'chado/phylotree'
+    ),
+  );
+}
+
+
 /**
  *  Implements hook_theme().
  *
@@ -225,11 +254,22 @@ function tripal_phylotree_views_api() {
  * @ingroup tripal_phylotree
  */
 function tripal_phylotree_theme($existing, $type, $theme, $path) {
-  
+  $core_path = drupal_get_path('module', 'tripal_core');
   $items = array(
+     'node__chado_phylotree' => array(
+      'template' => 'node--chado-generic',
+      'render element' => 'node',
+      'base hook' => 'node',
+      'path' => "$core_path/theme/templates",
+    ),
     'tripal_phylotree_base' => array(
       'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_base',
+      'path' => "$path/theme/templates",
+    ),
+     'tripal_phylotree_references' => array(
+        'variables' => array('node' => NULL),
+      'template' => 'tripal_phylotree_references',
       'path' => "$path/theme/templates",
     ),
   );

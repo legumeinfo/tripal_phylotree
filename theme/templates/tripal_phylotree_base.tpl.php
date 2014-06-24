@@ -1,3 +1,7 @@
+<!-- this div is used by tripal to create a vertical tabs named by
+   $node->content (created via _node_view) -->
+<div class="tripal_phylotree-data-block-desc tripal-data-block-desc"></div>
+
 <?php
 
 /* this template depends on d3js, but not putting it into
@@ -6,64 +10,11 @@ getting loaded *on every request*. */
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.4.8/d3.min.js','external');
 
 $phylotree = $variables['node']->phylotree;
-$headers = array();
-$rows = array();
 
-$rows[] = array(
-  array(
-    'data' => 'Name',
-    'header' => TRUE,
-  ),
-  $phylotree->name
-);
+$path_to_theme = path_to_theme();
 
-$rows[] = array(
-  array(
-    'data' => 'DbxRef',
-    'header' => TRUE,
-  ),
-  sprintf('accession: %s %s %s (%s %s id=%d)',
-	  $phylotree->dbxref_id->accession,
-	  $phylotree->dbxref_id->version,
-	  $phylotree->dbxref_id->description,
-	  $phylotree->dbxref_id->db_id->name,
-	  $phylotree->dbxref_id->db_id->description,
-	  $phylotree->dbxref_id->db_id->db_id)
-);
-
-$rows[] = array(
-  array(
-    'data' => 'Data Source',
-    'header' => TRUE,
-  ),
-  sprintf('phylotree_id = %d <a href="?q=chado_phylotree/%d/json" target="new">[view json]</a>
-             <a href="?q=chado_phylotree_organisms/%d/json" target="new">[view organism json]</a>',
-	  $phylotree->phylotree_id,
-	  $phylotree->phylotree_id,
-	  $phylotree->phylotree_id)
-);
-
-// the $table array contains the headers and rows array as well as other
-// options for controlling the display of the table.  Additional
-// documentation can be found here:
-// https://api.drupal.org/api/drupal/includes%21theme.inc/function/theme_table/7
-$table = array(
-  'header' => $headers,
-  'rows' => $rows,
-  'attributes' => array(
-    'id' => 'tripal_phylotree-table-base',
-    'class' => 'tripal-data-table'
-  ),
-  'sticky' => FALSE,
-  'caption' => '',
-  'colgroups' => array(),
-  'empty' => '',
-);
-
-print theme_table($table);
-
- 
 ?>
+
 <style>
 
  .node rect {
@@ -89,7 +40,7 @@ path.link {
 
 <div id="phylotree-organisms-graph">
   <!-- d3js will add to this div, and remove the loader gif -->
-  <img src="<?php print(path_to_theme()); ?>/image/ajax-loader.gif"
+  <img src="<?php print $path_to_theme; ?>/image/ajax-loader.gif"
        class="ajax-loader"/>
 </div>
 
@@ -132,15 +83,24 @@ var diagonal = d3.svg.diagonal()
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
  d3.json(dataUrl, function(error, data) {
+   if(error) {
+     console.log(error);
+     return;
+   }
+   
    data.x0 = 0;
    data.y0 = 0;
+   
    update(root = data);
    $('.ajax-loader').remove();
+   
  });
 
+ // update is a separate function because it will be called when
+ // nodes are expanded or collapsed.
 function update(source) {
-   
-  // Compute the flattened node list. TODO use d3.layout.hierarchy.
+
+   // Compute the flattened node list. TODO use d3.layout.hierarchy.
   var nodes = tree.nodes(root);
 
   var height = Math.max(500, nodes.length * barHeight + margin.top + margin.bottom);
@@ -234,6 +194,7 @@ function update(source) {
     d.x0 = d.x;
     d.y0 = d.y;
   });
+  
 }
 
 // Toggle children on click.
@@ -254,7 +215,6 @@ function color(d) {
 
  /// jquery document.ready
 });
-
  
  })(jQuery);
  
@@ -283,7 +243,7 @@ function color(d) {
  var width = 600,
      height = 300,
      format = d3.format(",d"),
-     fill = d3.scale.category10();
+     fill = d3.scale.category20();
  
  var bubble = d3.layout.pack()
      .sort(null)
@@ -294,8 +254,16 @@ function color(d) {
      .attr("height", height +'px')
      .attr("class", "bubble");
  
- d3.json(dataurl2, function(data) {
-
+ d3.json(dataurl2, function(error,data) {
+   if(error) {
+     console.log(error);
+     return;
+   }
+   if(! data || data.length == 0) {
+     // this may occur if there  is no organism data! (e.g. ncbi taxon tree)
+     $('#phylotree-organisms-graph').hide();
+     return;
+   }
    var min = d3.min(data, function(d) {
      return d.value;
    });
@@ -310,18 +278,18 @@ function color(d) {
     */
    
       var node = vis.selectAll("g.node")
-		 .data(bubble.nodes( { 'children' : data } )
-			     .filter(function(d) { return !d.children; }))
-		 .enter().append("svg:g")
-		 .attr("class", "node")
-		 .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+		    .data(bubble.nodes( { 'children' : data } )
+				.filter(function(d) { return !d.children; }))
+		    .enter().append("svg:g")
+		    .attr("class", "node")
+		    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
  
    node.append("svg:title")
        .text(function(d) { return d.name + ": " + format(d.value); });
  
    node.append("svg:circle")
        .attr("r", function(d) {
-     console.log(d);
+//     console.log(d);
      return d.r;
 //     return radiusScale(d.value);
    })
