@@ -154,11 +154,12 @@ function phylotree_organism_json($phylotree_id) {
   drupal_json_output($result);
 }
 
-// generate json describing the tree structure with links to the features
+// generate json describing the tree structure
+// TODO: write json schema and implement schema endpoint
 function phylotree_json($phylotree_id) {
 
   $sql = 'SELECT n.phylonode_id, n.parent_phylonode_id, n.label as name, '.
-    'n.distance, f.name as feature_name, '.
+    'n.distance as length, f.feature_id, f.name as feature_name, '.
     'cvt.name as cvterm_name, cvt.definition as cvterm_definition '.
     'FROM chado.phylonode n '.
     'LEFT OUTER JOIN chado.cvterm cvt ON n.type_id = cvt.cvterm_id '.
@@ -169,45 +170,45 @@ function phylotree_json($phylotree_id) {
   $args = array(':phylotree_id' => $phylotree_id);
   $result = chado_query( $sql, $args );
 
-  // fetch all the phylonodes into an assoc array
-  $root_phylonode = array();
-  foreach ($result as $r) {
-    if($r->name == null) {
-      $r->name = sprintf('distance: %.3f', $r->distance);
-    }
-    $phylonodes[ $r->phylonode_id ] = $r;
-    $phylonodes[ $r->phylonode_id ]->children = array();
-    if( $root_phylonode == null && $r->parent_phylonode_id == null) {
-      $root_phylonode = $r;
-      $root_phylonode->name = 'root';
-    }
-  }
-
-  /*
-    this is an alternate method of generating json, but it's much too verbose
-  $values = array( 'phylotree_id' => $phylotree_id);
-  $phylonodes = chado_generate_var('phylonode', $values);
-  */
-
-  // build json like flare.json from the d3js examples (name; children... etc)
+  // fetch all the phylonodes into an assoc array indexed by
+  // phylonode_id.  convert into from resultset record to array,
+  // fixing datatypes. chado_query returns numeric as string and fun
+  // stuff like that.
+  $phylonodes = array();
+  $root_phylonode_ref = null;
   
-  //populate the children[] arrays for each 
-  foreach( $phylonodes as $key => $pn ) {
-    if($pn->parent_phylonode_id != null) {
-      $parent = $phylonodes[ $pn->parent_phylonode_id ];
-      $parent->children[] = $pn;
+  foreach ($result as $r) {
+    $phylonode_id = (int) $r->phylonode_id;
+    $node = array(
+      'phylonode_id' => $phylonode_id,
+      'parent_phylonode_id' => (int) $r->parent_phylonode_id,
+      'name' => $r->name,
+      'length' => (double) $r->length,
+      'feature_id' => (int) $r->feature_id,
+      'feature_name' => $r->feature_name,
+      'cvterm_name' => $r->cvterm_name,
+      'cvterm_definition' => $r->cvterm_definition,
+    );
+    $phylonodes[$phylonode_id] = $node;
+  }
+  
+  //populate the branchset[] arrays for each node
+  foreach( $phylonodes as $key => &$node ) {
+    if($node['parent_phylonode_id'] !== 0) {
+      $parent_ref = &$phylonodes[ $node['parent_phylonode_id'] ]; // get
+      $parent_ref['branchset'][] = &$node; // append node refernce to branchset
+    }
+    else {
+      $root_phylonode_ref = &$node;
     }
   }
-
-  // sort the children array by distance!
-  foreach( $phylonodes as $key => $pn ) {
-    usort($pn->children, 'phylonode_distance_comparator');
-  }
-  drupal_json_output($root_phylonode);
+  
+  // dump datastructure as json to browser. drupal sets the mime-type correctly.
+  drupal_json_output( $root_phylonode_ref );
 }
 
 function phylonode_distance_comparator($a, $b) {
-  return ($a->distance < $b->distance) ? -1 : 1;
+  return ($a->length < $b->length) ? -1 : 1;
 }
 
 
@@ -270,6 +271,16 @@ function tripal_phylotree_theme($existing, $type, $theme, $path) {
      'tripal_phylotree_references' => array(
         'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_references',
+      'path' => "$path/theme/templates",
+     ),
+     'tripal_phylotree_organisms' => array(
+        'variables' => array('node' => NULL),
+      'template' => 'tripal_phylotree_organisms',
+      'path' => "$path/theme/templates",
+    ),
+     'tripal_phylotree_radial' => array(
+        'variables' => array('node' => NULL),
+      'template' => 'tripal_phylotree_radial',
       'path' => "$path/theme/templates",
     ),
   );

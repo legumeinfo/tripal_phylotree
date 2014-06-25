@@ -248,17 +248,32 @@ function tripal_phylotree_node_view($node, $view_mode, $langcode) {
         '#markup' => theme('tripal_phylotree_base',
                            array('node' => $node)),
         '#tripal_toc_id'    => 'base',
-        '#tripal_toc_title' => 'Tree Overview',
+        '#tripal_toc_title' => 'Phylogram',
         '#weight' => -100,
       );
+      $node->content['tripal_phylotree_radial'] = array(
+        '#markup' => theme('tripal_phylotree_radial',
+                           array('node' => $node)),
+        '#tripal_toc_id'    => 'circ_dendrogram',
+        '#tripal_toc_title' => 'Circular Dendrogram',
+        '#weight' => -95,
+      );
+      $node->content['tripal_phylotree_organisms'] = array(
+        '#markup' => theme('tripal_phylotree_organisms',
+                           array('node' => $node)),
+        '#tripal_toc_id'    => 'organisms',
+        '#tripal_toc_title' => 'Organisms',
+        '#weight' => -90,
+      );
+   
       $node->content['tripal_phylotree_references'] = array(
         '#markup' => theme('tripal_phylotree_references',
                            array('node' => $node)),
         '#tripal_toc_id'    => 'dbxref',
         '#tripal_toc_title' => 'Cross References',
-        '#weight' => -90,
+        '#weight' => 0,
       );
-
+    
       /*
       $node->content['tripal_phylotree_comment'] = array(
         '#markup' => theme('tripal_phylotree_comment', array('node' => $node)),
