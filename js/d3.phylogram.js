@@ -44,13 +44,15 @@
       height
         Height of the vis, will attempt to set a default based on the height
         of the container.
+      fill
+        Function for generating fill color for leaf nodes.
       vis
         Pre-constructed d3 vis.
       tree
         Pre-constructed d3 tree layout.
       children
         Function for retrieving an array of children given a node. Default is
-        to assume each node has an attribute called "branchset"
+        to assume each node has an attribute called "children"
       diagonal
         Function that creates the d attribute for an svg:path. Defaults to a
         right-angle diagonal.
@@ -156,30 +158,14 @@ if (!d3) { throw "d3 wasn't included!"};
     }
     return coordAngle
   }
-  
-  d3.phylogram.styleTreeNodes = function(vis) {
-    vis.selectAll('g.leaf.node')
-      .append("svg:circle")
-        .attr("r", 4.5)
-        .attr('stroke',  'yellowGreen')
-        .attr('fill', 'greenYellow')
-        .attr('stroke-width', '2px');
-    
-    vis.selectAll('g.root.node')
-      .append('svg:circle')
-        .attr("r", 4.5)
-        .attr('fill', 'steelblue')
-        .attr('stroke', '#369')
-        .attr('stroke-width', '2px');
-  }
-  
+
   function scaleBranchLengths(nodes, w) {
     // Visit all nodes and adjust y pos width distance metric
     var visitPreOrder = function(root, callback) {
       callback(root)
       if (root.children) {
         for (var i = root.children.length - 1; i >= 0; i--){
-          visitPreOrder(root.children[i], callback)
+          visitPreOrder(root.children[i], callback);
         };
       }
     }
@@ -196,18 +182,20 @@ if (!d3) { throw "d3 wasn't included!"};
     return yscale
   }
   
-  
   d3.phylogram.build = function(selector, nodes, options) {
     options = options || {}
     var w = options.width || d3.select(selector).style('width') || d3.select(selector).attr('width'),
         h = options.height || d3.select(selector).style('height') || d3.select(selector).attr('height'),
         w = parseInt(w),
         h = parseInt(h);
+    var fill = options.fill || function(node) {
+      return 'cyan';
+    };
     var tree = options.tree || d3.layout.cluster()
       .size([h, w])
       .sort(function(node) { return node.children ? node.children.length : -1; })
       .children(options.children || function(node) {
-        return node.branchset
+        return node.children;
       });
     var diagonal = options.diagonal || d3.phylogram.rightAngleDiagonal();
     var vis = options.vis || d3.select(selector).append("svg:svg")
@@ -272,8 +260,22 @@ if (!d3) { throw "d3 wasn't included!"};
           }
         })
         .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
-      
-    d3.phylogram.styleTreeNodes(vis)
+
+    // style the root node
+     vis.selectAll('g.root.node')
+      .append('svg:circle')
+        .attr("r", 6)
+        .attr('fill', 'dimgrey')
+        .attr('stroke', 'black')
+      .attr('stroke-width', '2px');
+
+    // style the leaf nodes
+     vis.selectAll('g.leaf.node')
+      .append("svg:circle")
+        .attr("r", 6)
+        .attr('stroke', 'dimgrey')
+        .attr('fill', function(d) { return fill(d); })
+      .attr('stroke-width', '2px');
     
     if (!options.skipLabels) {
       vis.selectAll('g.inner.node')
@@ -300,7 +302,12 @@ if (!d3) { throw "d3 wasn't included!"};
   }
   
   d3.phylogram.buildRadial = function(selector, nodes, options) {
-    options = options || {}
+    options = options || {};
+    
+    var fill = options.fill || function(node) {
+      return 'cyan';
+    };
+    
     var w = options.width || d3.select(selector).style('width') || d3.select(selector).attr('width'),
         r = w / 2,
         labelWidth = options.skipLabels ? 10 : options.labelWidth || 120;
@@ -315,13 +322,14 @@ if (!d3) { throw "d3 wasn't included!"};
       .size([360, r - labelWidth])
       .sort(function(node) { return node.children ? node.children.length : -1; })
       .children(options.children || function(node) {
-        return node.branchset
+        return node.children;
       })
       .separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; });
     
     var phylogram = d3.phylogram.build(selector, nodes, {
       vis: vis,
       tree: tree,
+      fill : fill,
       skipBranchLengthScaling: true,
       skipTicks: true,
       skipLabels: options.skipLabels,

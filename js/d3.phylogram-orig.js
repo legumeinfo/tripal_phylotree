@@ -212,7 +212,7 @@ if (!d3) { throw "d3 wasn't included!"};
     var diagonal = options.diagonal || d3.phylogram.rightAngleDiagonal();
     var vis = options.vis || d3.select(selector).append("svg:svg")
         .attr("width", w + 300)
-        .attr("height", h + 30)
+      .attr("height", h + 30)
       .append("svg:g")
         .attr("transform", "translate(20, 20)");
     var nodes = tree(nodes);
@@ -345,7 +345,6 @@ if (!d3) { throw "d3 wasn't included!"};
         .attr("text-anchor", function(d) { return d.x < 180 ? "end" : "start"; })
         .attr("transform", function(d) { return d.x < 180 ? null : "rotate(180)"; });
     }
-    
     return {tree: tree, vis: vis}
   }
 }());
