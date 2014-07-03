@@ -123,11 +123,14 @@ function chado_phylotree_update($node) {
  * @ingroup tripal_phylotree
  */
 function chado_phylotree_load($nodes) {
+  dd('chado_phylotree_load');
 
+  // uid may apparently be a nid, or vid depending how tripal calls
+  // this function!  (and how the default view was implemented)
   foreach ($nodes as $nid => $node) {
-    // get the feature details from chado
+    
     $phylotree_id = chado_get_id_from_nid('phylotree', $node->nid);
-
+    
     // if the nid does not have a matching record then skip this node.
     // this can happen with orphaned nodes.
     if (!$phylotree_id) {
@@ -141,6 +144,8 @@ function chado_phylotree_load($nodes) {
 
     // Now get the title
     $node->title = chado_get_node_title($node);
+
+    dd($phylotree);
   }
 }
 
@@ -240,69 +245,47 @@ function chado_phylotree_node_access($node, $op, $account) {
  * @ingroup tripal_phylotree
  */
 function tripal_phylotree_node_view($node, $view_mode, $langcode) {
-  switch ($node->type) {
-  case 'chado_phylotree':
-    if ($view_mode == 'full') {
-
-      $node->content['tripal_phylotree_base'] = array(
-        '#markup' => theme('tripal_phylotree_base',
-                           array('node' => $node)),
-        '#tripal_toc_id'    => 'base',
-        '#tripal_toc_title' => 'Phylogram',
-        '#weight' => -100,
-      );
-      $node->content['tripal_phylotree_radial'] = array(
-        '#markup' => theme('tripal_phylotree_radial',
-                           array('node' => $node)),
-        '#tripal_toc_id'    => 'circ_dendrogram',
-        '#tripal_toc_title' => 'Circular Dendrogram',
-        '#weight' => -95,
-      );
-      $node->content['tripal_phylotree_organisms'] = array(
-        '#markup' => theme('tripal_phylotree_organisms',
-                           array('node' => $node)),
-        '#tripal_toc_id'    => 'organisms',
-        '#tripal_toc_title' => 'Organisms',
-        '#weight' => -90,
-      );
-   
-      $node->content['tripal_phylotree_references'] = array(
-        '#markup' => theme('tripal_phylotree_references',
-                           array('node' => $node)),
-        '#tripal_toc_id'    => 'dbxref',
-        '#tripal_toc_title' => 'Cross References',
-        '#weight' => 0,
-      );
-    
-      /*
-      $node->content['tripal_phylotree_comment'] = array(
-        '#markup' => theme('tripal_phylotree_comment', array('node' => $node)),
-        '#tripal_toc_id'    => 'comment',
-        '#tripal_toc_title' => 'Comment',
-        '#weight' => -50,
-      );
-      $node->content['tripal_phylotree_dbxref'] = array(
-        '#markup' => theme('tripal_phylotree_dbxref', array('node' => $node)),
-        '#tripal_toc_id'    => 'dbxref',
-        '#tripal_toc_title' => 'Reference',
-        '#weight' => -20,
-      );
-       $node->content['tripal_phylotree_phylonodes'] = array(
-        '#markup' => theme('tripal_phylotree_phylonodes', array('node' => $node)),
-        '#tripal_toc_id'    => 'phylonodes',
-        '#tripal_toc_title' => 'phylonodes',
-        '#weight' => -10,
-      );
-      */
-    }
-    
-    if ($view_mode == 'teaser') {
-      $node->content['tripal_phylotree_teaser'] = array(
-        '#markup' => theme('tripal_phylotree_teaser', array('node' => $node)),
-      );
-    }
+  
+  if($node->type != 'chado_phylotree') { return; }
+  
+  switch($view_mode) {
+  case 'full':
+    $node->content['tripal_phylotree_base'] = array(
+      '#markup' => theme('tripal_phylotree_base',
+      array('node' => $node)),
+      '#tripal_toc_id'    => 'base',
+      '#tripal_toc_title' => 'Phylogram',
+      '#weight' => -100,
+    );
+    $node->content['tripal_phylotree_radial'] = array(
+      '#markup' => theme('tripal_phylotree_radial',
+      array('node' => $node)),
+      '#tripal_toc_id'    => 'circ_dendrogram',
+      '#tripal_toc_title' => 'Circular Dendrogram',
+      '#weight' => -95,
+    );
+    $node->content['tripal_phylotree_organisms'] = array(
+      '#markup' => theme('tripal_phylotree_organisms',
+      array('node' => $node)),
+      '#tripal_toc_id'    => 'organisms',
+      '#tripal_toc_title' => 'Organisms',
+      '#weight' => -90,
+    );
+    $node->content['tripal_phylotree_references'] = array(
+      '#markup' => theme('tripal_phylotree_references',
+      array('node' => $node)),
+      '#tripal_toc_id'    => 'dbxref',
+      '#tripal_toc_title' => 'Cross References',
+      '#weight' => 0,
+    );
     break;
-  }
+    
+  case 'teaser':
+    $node->content['tripal_phylotree_teaser'] = array(
+      '#markup' => theme('tripal_phylotree_teaser', array('node' => $node)),
+    );
+    break;
+    }
 }
 
 /**

@@ -94,16 +94,9 @@ function tripal_phylotree_menu() {
     'weight' => 2
   );
 
-  // create a route for viewing json of phylotree and all it's phylonodes
+  // create a route for viewing json of all phylonodes having this phylotree_id
    $items['chado_phylotree/%/json'] = array(
     'page callback' => 'phylotree_json',
-    'page arguments' => array(1),
-    'access arguments' => array('access chado_phylotree content'),
-   );
-
-   // create a route for viewing json of phylotree organism data
-   $items['chado_phylotree_organisms/%/json'] = array(
-    'page callback' => 'phylotree_organism_json',
     'page arguments' => array(1),
     'access arguments' => array('access chado_phylotree content'),
    );
@@ -111,61 +104,20 @@ function tripal_phylotree_menu() {
   return $items;
 }
 
-// generate json counting features per organism in this gene tree
-function phylotree_organism_json($phylotree_id) {
-
-  /* query using inner join, to exclude phylonodes without feature info
-     e.g. the ncbi taxonony tree */
-  $sql = 'SELECT n.phylonode_id, n.label AS node_name, '.
-    'f.name as feature_name, '.
-    'o.organism_id, o.genus, o.species, o.common_name, ' .
-    'cvt.name as cvterm_name, cvt.definition as cvterm_definition '.
-    'FROM chado.phylonode n '.
-    'LEFT OUTER JOIN chado.cvterm cvt ON n.type_id = cvt.cvterm_id '.
-    'INNER JOIN chado.feature f ON n.feature_id = f.feature_id ' .
-    'INNER JOIN chado.organism o ON f.organism_id = o.organism_id '.
-    'WHERE n.phylotree_id = :phylotree_id';
-
-//  dd($sql);
-  
-  $args = array(':phylotree_id' => $phylotree_id);
-  $result = chado_query( $sql, $args );
-
-  $data = array();
-  foreach ($result as $r) {
-    if(! array_key_exists($r->organism_id, $data)) {
-      $data[$r->organism_id] = array (
-        'organism_id' => $r->organism_id,
-        'value' => 1,
-        'name' => sprintf('%s %s', $r->genus, $r->species),
-        'children' => null,
-      );
-    }
-    else {
-      $data[$r->organism_id]['value'] ++;
-    }
-  }
-
-  $result = array();
-  foreach($data as $key => $value) {
-    $result[] = $value;
-  }
-  
-  drupal_json_output($result);
-}
-
-// generate json describing the tree structure
-// TODO: write json schema and implement schema endpoint
+// generate json describing the tree structure of all nodes in this tree.
+// TODO: write json schema and implement schema endpoint, or just for docs?
 function phylotree_json($phylotree_id) {
 
-  $sql = 'SELECT n.phylonode_id, n.parent_phylonode_id, n.label as name, '.
-    'n.distance as length, f.feature_id, f.name as feature_name, '.
-    'cvt.name as cvterm_name, cvt.definition as cvterm_definition '.
+  $sql = 'SELECT n.phylonode_id, n.parent_phylonode_id, n.label AS name, '.
+    'n.distance AS length, f.feature_id, f.name AS feature_name, '.
+    'cvt.name AS cvterm_name, cvt.definition AS cvterm_definition, '.
+    'o.organism_id, o.abbreviation, o.common_name, o.genus, o.species '.
     'FROM chado.phylonode n '.
     'LEFT OUTER JOIN chado.cvterm cvt ON n.type_id = cvt.cvterm_id '.
     'LEFT OUTER JOIN chado.feature f ON n.feature_id = f.feature_id ' .
+    'LEFT OUTER JOIN chado.organism o on f.organism_id = o.organism_id '.
     'WHERE n.phylotree_id = :phylotree_id';
-  dd($sql);
+//  dd($sql);
   
   $args = array(':phylotree_id' => $phylotree_id);
   $result = chado_query( $sql, $args );
@@ -188,15 +140,20 @@ function phylotree_json($phylotree_id) {
       'feature_name' => $r->feature_name,
       'cvterm_name' => $r->cvterm_name,
       'cvterm_definition' => $r->cvterm_definition,
+      'organism_id' => (int) $r->organism_id,
+      'abbreviation' => $r->abbreviation,
+      'common_name' => $r->common_name,
+      'genus' => $r->genus,
+      'species' => $r->species
     );
     $phylonodes[$phylonode_id] = $node;
   }
   
-  //populate the branchset[] arrays for each node
+  //populate the children[] arrays for each node
   foreach( $phylonodes as $key => &$node ) {
     if($node['parent_phylonode_id'] !== 0) {
       $parent_ref = &$phylonodes[ $node['parent_phylonode_id'] ]; // get
-      $parent_ref['branchset'][] = &$node; // append node refernce to branchset
+      $parent_ref['children'][] = &$node; // append node refernce to children
     }
     else {
       $root_phylonode_ref = &$node;
@@ -227,7 +184,6 @@ function tripal_phylotree_views_api() {
   );
 }
 
-
 /**
  * Implements hook_search_biological_data_views().
  *
@@ -235,15 +191,14 @@ function tripal_phylotree_views_api() {
  */
 function tripal_phylotree_search_biological_data_views() {
   return array(
-    'tripal_phylotree_user_phylotrees' => array(
-      'machine_name' => 'tripal_phylotree_user_phylotrees',
+    'tripal_phylotree_default_view_code' => array(
+      'machine_name' => 'tripal_phylotree_default_view_code',
       'human_name' => 'Phylotrees',
       'description' => 'Gene trees, species trees, etc.',
       'link' => 'chado/phylotree'
     ),
   );
 }
-
 
 /**
  *  Implements hook_theme().
@@ -281,6 +236,11 @@ function tripal_phylotree_theme($existing, $type, $theme, $path) {
      'tripal_phylotree_radial' => array(
         'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_radial',
+      'path' => "$path/theme/templates",
+    ),
+     'tripal_phylotree_teaser' => array(
+        'variables' => array('node' => NULL),
+      'template' => 'tripal_phylotree_teaser',
       'path' => "$path/theme/templates",
     ),
   );
