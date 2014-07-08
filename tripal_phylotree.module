@@ -98,7 +98,7 @@ function tripal_phylotree_menu() {
    $items['chado_phylotree/%/json'] = array(
     'page callback' => 'phylotree_json',
     'page arguments' => array(1),
-    'access arguments' => array('access chado_phylotree content'),
+    'access callback' => TRUE // allow all anonymous http clients
    );
    
   return $items;
