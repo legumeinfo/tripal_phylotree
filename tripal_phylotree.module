@@ -117,7 +117,6 @@ function phylotree_json($phylotree_id) {
     'LEFT OUTER JOIN chado.feature f ON n.feature_id = f.feature_id ' .
     'LEFT OUTER JOIN chado.organism o on f.organism_id = o.organism_id '.
     'WHERE n.phylotree_id = :phylotree_id';
-//  dd($sql);
   
   $args = array(':phylotree_id' => $phylotree_id);
   $result = chado_query( $sql, $args );

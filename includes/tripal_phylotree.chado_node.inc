@@ -86,7 +86,6 @@ function chado_phylotree_insert($node) {
   if (!property_exists($node, 'phylotree_id')) {
     // we aren't supporting editing for phylotrees, yet, so didn't
     // implement inserting of phylotree here!
-    dd('error: node missing phylotree_id' + $node);
   }
   else {
     $phylotree_id = $node->phylotree_id;
@@ -123,8 +122,6 @@ function chado_phylotree_update($node) {
  * @ingroup tripal_phylotree
  */
 function chado_phylotree_load($nodes) {
-  dd('chado_phylotree_load');
-
   // uid may apparently be a nid, or vid depending how tripal calls
   // this function!  (and how the default view was implemented)
   foreach ($nodes as $nid => $node) {
@@ -144,8 +141,6 @@ function chado_phylotree_load($nodes) {
 
     // Now get the title
     $node->title = chado_get_node_title($node);
-
-    dd($phylotree);
   }
 }
 
