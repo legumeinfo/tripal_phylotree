@@ -4,11 +4,16 @@
 
 <script>
  <?php
+ $path_to_theme = path_to_theme();
+ 
  // write a js var having URL of json data source for charting
  $phylotree = $variables['node']->phylotree; 
- print sprintf('var phylogramJsonUrl = "?q=chado_phylotree/%d/json";',
-               $phylotree->phylotree_id );
+ printf('var phylogramJsonUrl = "?q=chado_phylotree/%d/json";',
+       $phylotree->phylotree_id );
+// write a js var with path to our theme, for use below by javascript functions.
+ printf('var pathToTheme = "%s";', $path_to_theme);
  ?>
+ 
 </script>
 
 <div id="phylogram">
@@ -29,7 +34,7 @@ tripal_phylotree.info scripts[] because that results in the script
 getting loaded *on every drupal request*! */
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.4.8/d3.min.js','external');
 
-drupal_add_js( path_to_theme() . '/js/d3.phylogram.js' );
-drupal_add_js( path_to_theme() . '/js/organism-bubble-plot.js' );
-drupal_add_js( path_to_theme() . '/js/phylotree.js' );
+drupal_add_js( $path_to_theme . '/js/d3.phylogram.js');
+drupal_add_js( $path_to_theme . '/js/organism-bubble-plot.js');
+drupal_add_js( $path_to_theme . '/js/phylotree.js');
 ?>
