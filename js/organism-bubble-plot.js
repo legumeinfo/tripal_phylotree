@@ -10,7 +10,9 @@ options : {  fill : color function for each node,
 
 function organismBubblePlot( selector, data, options ) {
   
-  /* flatten the tree structure to sum organisms */
+  /* flatten the tree structure to sum organisms. the bubble layout
+   * expects a name property, but the organismColor function expects
+   * the abbreviation property to exist as well. */
   var organisms = {};
   var countOrganisms = function(node, i, arr) {
     if (node.organism_id) {
@@ -18,6 +20,7 @@ function organismBubblePlot( selector, data, options ) {
 	organisms[ node.organism_id ] = {
 	  'organism_id' : node.organism_id,
 	  'name' : node.abbreviation,
+	  'abbreviation' : node.abbreviation,
 	  'value' : 1
 	};
       }
