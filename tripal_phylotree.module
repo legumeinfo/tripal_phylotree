@@ -1,5 +1,4 @@
 <?php
-$variables['display_submitted'] = FALSE;
 
 /**
  * @file
@@ -104,8 +103,14 @@ function tripal_phylotree_menu() {
   return $items;
 }
 
-// generate json describing the tree structure of all nodes in this tree.
-// TODO: write json schema and implement schema endpoint, or just for docs?
+/**
+ * phylotree_json
+ *
+ * @param int $phylotree_id
+ * @return string json
+ * @ingroup tripal_phylotree
+ */
+
 function phylotree_json($phylotree_id) {
 
   $sql = 'SELECT n.phylonode_id, n.parent_phylonode_id, n.label AS name, '.
@@ -163,11 +168,6 @@ function phylotree_json($phylotree_id) {
   drupal_json_output( $root_phylonode_ref );
 }
 
-function phylonode_distance_comparator($a, $b) {
-  return ($a->length < $b->length) ? -1 : 1;
-}
-
-
 /**
  * Implements hook_views_api().
  *
@@ -185,8 +185,9 @@ function tripal_phylotree_views_api() {
 
 /**
  * Implements hook_search_biological_data_views().
- *
  * Adds the described views to the "Search Data" Page created by Tripal Views
+ *
+ * @ingroup tripal_phylotree
  */
 function tripal_phylotree_search_biological_data_views() {
   return array(
@@ -257,3 +258,6 @@ function tripal_phylotree_help ($path, $arg) {
     return theme('tripal_phylotree_help', array());
   }
 }
+
+// hack to suppress the 'Submitted by...' info drupal adds to nodes
+$variables['display_submitted'] = FALSE;
