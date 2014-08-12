@@ -7,5 +7,3 @@ function tripal_phylotree_menu_local_tasks_alter (&$data, $router_item, $root_pa
     $data['tabs'][0]['count'] = 0;
   }
 }
-
-

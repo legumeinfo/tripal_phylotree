@@ -1,0 +1,4 @@
+/* hide the 'read more' link which drupal insists on generating */
+li.node-readmore {
+    display: none!important;
+}
