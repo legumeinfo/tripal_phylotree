@@ -9,7 +9,7 @@
  * Implements hook_node_info().
  *
  * Provide information to drupal about the node types that we're creating
- * in this module
+ * in this module. 
  *
  * @ingroup tripal_phylotree
  */
@@ -41,198 +41,6 @@ function tripal_phylotree_node_info() {
   return $nodes;
 }
 
-/**
- *  Implements hook_form().
- *
- * When editing or creating a new node of type 'chado_phylotree' we need
- *  a form.  This function creates the form that will be used for this.
- *
- * @ingroup tripal_phylotree
- */
-function chado_phylotree_form($node, &$form_state) {
-  $form = array();
-  // TODO!
-  return $form;
-}
-
-/**
- * Implements hook_validate().
- *
- * Validates submission of form when adding or updating a phylotree node
- *
- * @ingroup tripal_phylotree
- */
-function chado_phylotree_validate($node, $form, &$form_state) {
-  // removed, because not supporting editing or inserting from the gui yet.
-}
-
-/**
- *  Implements hook_insert().
- *
- *  When a new chado_phylotree node is created we also need to add
- *  information to our chado_phylotree table.  This function is called
- *  on insert of a new node of type 'chado_phylotree' and inserts the
- *  necessary information.
- *
- * @ingroup tripal_phylotree
- */
-function chado_phylotree_insert($node) {
-  
-  // if there is an phylotree_id in the $node object then this must
-  // be a sync so we can skip adding the phylotree as it is already
-  // there, although we do need to proceed with the rest of the
-  // insert
-    
-  if (!property_exists($node, 'phylotree_id')) {
-    // we aren't supporting editing for phylotrees, yet, so didn't
-    // implement inserting of phylotree here!
-  }
-  else {
-    $phylotree_id = $node->phylotree_id;
-  }
-
-  // Make sure the entry for this phylotree doesn't already exist in the
-  // chado_phylotree table if it doesn't exist then we want to add it.
-  $check_org_id = chado_get_id_from_nid('phylotree', $node->nid);
-  if (!$check_org_id) {
-    $record = new stdClass();
-    $record->nid = $node->nid;
-    $record->vid = $node->vid;
-    $record->phylotree_id = $phylotree_id;
-    drupal_write_record('chado_phylotree', $record);
-  }
-}
-
-/**
- * Implements hook_update().
- *
- * @ingroup tripal_phylotree
- */
-function chado_phylotree_update($node) {
-    // we aren't supporting editing for phylotrees, yet, so didn't
-    // implement updating of phylotree here!
-}
-
-/**
- *  Implements hook_load().
- *
- *  When a node is requested by the user this function is called to allow us
- *  to add auxiliary data to the node object.
- *
- * @ingroup tripal_phylotree
- */
-function chado_phylotree_load($nodes) {
-  // uid may apparently be a nid, or vid depending how tripal calls
-  // this function!  (and how the default view was implemented)
-  foreach ($nodes as $nid => $node) {
-    
-    $phylotree_id = chado_get_id_from_nid('phylotree', $node->nid);
-    
-    // if the nid does not have a matching record then skip this node.
-    // this can happen with orphaned nodes.
-    if (!$phylotree_id) {
-      continue;
-    }
-
-    $phylotree = chado_generate_var('phylotree',
-                                     array('phylotree_id' => $phylotree_id));
-
-    $nodes[$nid]->phylotree = $phylotree;
-
-    // Now get the title
-    $node->title = chado_get_node_title($node);
-  }
-}
-
-/**
- * Implements hook_delete().
- *
- * Delete data from drupal and chado databases when a node is deleted
- *
- * @ingroup tripal_phylotree
- */
-function chado_phylotree_delete(&$node) {
-
-  $phylotree_id = chado_get_id_from_nid('phylotree', $node->nid);
-
-  // if we don't have a phylotree id for this node then this isn't a node of
-  // type chado_phylotree or the entry in the chado_phylotree table was lost.
-  if (!$phylotree_id) {
-    return;
-  }
-
-  // Remove data from {chado_phylotree}, {node} and {node_revisions} tables of
-  // drupal database
-  $sql_del = "DELETE FROM {chado_phylotree} WHERE nid = :nid AND vid = :vid";
-  db_query($sql_del, array(':nid' => $node->nid, ':vid' => $node->vid));
-  $sql_del = "DELETE FROM {node_revision} WHERE nid = :nid AND vid = :vid";
-  db_query($sql_del, array(':nid' => $node->nid, ':vid' => $node->vid));
-  $sql_del = "DELETE FROM {node} WHERE nid = :nid AND vid = :vid";
-  db_query($sql_del, array(':nid' => $node->nid, ':vid' => $node->vid));
-
-  // Remove data from phylotree and phylotreeprop tables of chado
-  // database as well
-  
-//  chado_query("DELETE FROM {phylotreeprop} WHERE phylotree_id = :phylotree_id", array(':phylotree_id' => $phylotree_id));
-  
-  chado_query("DELETE FROM {phylotree} WHERE phylotree_id = :phylotree_id", array(':phylotree_id' => $phylotree_id));
-  
-}
-
-/**
- * Implement hook_node_access().
- *
- * This hook allows node modules to limit access to the node types they define.
- *
- *  @param $node
- *  The node on which the operation is to be performed, or, if it does not yet exist, the
- *  type of node to be created
- *
- *  @param $op
- *  The operation to be performed
- *
- *  @param $account
- *  A user object representing the user for whom the operation is to be performed
- *
- *  @return
- *  If the permission for the specified operation is not set then return FALSE. If the
- *  permission is set then return NULL as this allows other modules to disable
- *  access.  The only exception is when the $op == 'create'.  We will always
- *  return TRUE if the permission is set.
- *
- * @ingroup tripal_phylotree
- */
-function chado_phylotree_node_access($node, $op, $account) {
-  $node_type = $node;
-  if (is_object($node)) {
-    $node_type = $node->type;
-  }
-
-  if($node_type == 'chado_phylotree') {
-    if ($op == 'create') {
-      if (!user_access('create chado_phylotree content', $account)) {
-        return NODE_ACCESS_DENY;
-      }
-      return NODE_ACCESS_ALLOW;
-    }
-    if ($op == 'update') {
-      if (!user_access('edit chado_phylotree content', $account)) {
-        return NODE_ACCESS_DENY;
-      }
-    }
-    if ($op == 'delete') {
-      if (!user_access('delete chado_phylotree content', $account)) {
-        return NODE_ACCESS_DENY;
-      }
-    }
-    if ($op == 'view') {
-      if (!user_access('access chado_phylotree content', $account)) {
-        return NODE_ACCESS_DENY;
-      }
-    }
-    return NODE_ACCESS_IGNORE;
-  }
-}
 
 /**
  * Implements hook_node_view(). Acts on all content types
@@ -358,7 +166,256 @@ function tripal_phylotree_node_update($node) {
  *
  * Defines a default title format for the Chado Node API to set the titles on
  * Chado phylotree nodes based on chado fields.
+ *
+ * @ingroup tripal_phylotree
  */
 function chado_phylotree_chado_node_default_title_format() {
   return '[phylotree.name]';
+}
+
+/**
+ *  Implements hook_insert().
+ *
+ *  When a new chado_phylotree node is created we also need to add
+ *  information to our chado_phylotree table.  This function is called
+ *  on insert of a new node of type 'chado_phylotree' and inserts the
+ *  necessary information.
+ *
+ * @ingroup tripal_phylotree
+ */
+function chado_phylotree_insert($node) {
+  
+  // if there is an phylotree_id in the $node object then this must
+  // be a sync so we can skip adding the phylotree as it is already
+  // there, although we do need to proceed with the rest of the
+  // insert
+    
+  if (!property_exists($node, 'phylotree_id')) {
+    // we aren't supporting editing for phylotrees, yet, so didn't
+    // implement inserting of phylotree here!
+  }
+  else {
+    $phylotree_id = $node->phylotree_id;
+  }
+
+  // Make sure the entry for this phylotree doesn't already exist in the
+  // chado_phylotree table if it doesn't exist then we want to add it.
+  $check_org_id = chado_get_id_from_nid('phylotree', $node->nid);
+  if (!$check_org_id) {
+    $record = new stdClass();
+    $record->nid = $node->nid;
+    $record->vid = $node->vid;
+    $record->phylotree_id = $phylotree_id;
+    drupal_write_record('chado_phylotree', $record);
+  }
+}
+
+/**
+ *  Implements hook_load().
+ *
+ *  When a node is requested by the user this function is called to allow us
+ *  to add auxiliary data to the node object.
+ *
+ * @ingroup tripal_phylotree
+ */
+function chado_phylotree_load($nodes) {
+  // uid may apparently be a nid, or vid depending how tripal calls
+  // this function!  (and how the default view was implemented)
+  foreach ($nodes as $nid => $node) {
+    
+    $phylotree_id = chado_get_id_from_nid('phylotree', $node->nid);
+    
+    // if the nid does not have a matching record then skip this node.
+    // this can happen with orphaned nodes.
+    if (!$phylotree_id) {
+      continue;
+    }
+    $phylotree = chado_generate_var('phylotree',
+                                     array('phylotree_id' => $phylotree_id));
+    $nodes[$nid]->phylotree = $phylotree;
+    // Now get the title
+    $node->title = chado_get_node_title($node);
+  }
+}
+
+/**
+ * Implements hook_delete().
+ *
+ * Delete data from drupal and chado databases when a node is deleted
+ *
+ * @ingroup tripal_phylotree
+ */
+function chado_phylotree_delete(&$node) {
+
+  $phylotree_id = chado_get_id_from_nid('phylotree', $node->nid);
+
+  // if we don't have a phylotree id for this node then this isn't a node of
+  // type chado_phylotree or the entry in the chado_phylotree table was lost.
+  if (!$phylotree_id) {
+    return;
+  }
+
+  // Remove data from {chado_phylotree}, {node} and {node_revisions} tables of
+  // drupal database
+  $sql_del = "DELETE FROM {chado_phylotree} WHERE nid = :nid AND vid = :vid";
+  db_query($sql_del, array(':nid' => $node->nid, ':vid' => $node->vid));
+  $sql_del = "DELETE FROM {node_revision} WHERE nid = :nid AND vid = :vid";
+  db_query($sql_del, array(':nid' => $node->nid, ':vid' => $node->vid));
+  $sql_del = "DELETE FROM {node} WHERE nid = :nid AND vid = :vid";
+  db_query($sql_del, array(':nid' => $node->nid, ':vid' => $node->vid));
+
+  // Remove data from phylotree and phylotreeprop tables of chado
+  // database as well
+  
+  chado_query("DELETE FROM {phylotree} WHERE phylotree_id = :phylotree_id", array(':phylotree_id' => $phylotree_id));
+  
+}
+
+/**
+ * Implement hook_node_access().
+ *
+ * This hook allows node modules to limit access to the node types they define.
+ *
+ *  @param $node
+ *  The node on which the operation is to be performed, or, if it does not yet exist, the
+ *  type of node to be created
+ *
+ *  @param $op
+ *  The operation to be performed
+ *
+ *  @param $account
+ *  A user object representing the user for whom the operation is to be performed
+ *
+ *  @return
+ *  If the permission for the specified operation is not set then return FALSE. If the
+ *  permission is set then return NULL as this allows other modules to disable
+ *  access.  The only exception is when the $op == 'create'.  We will always
+ *  return TRUE if the permission is set.
+ *
+ * @ingroup tripal_phylotree
+ */
+function chado_phylotree_node_access($node, $op, $account) {
+  
+  $node_type = $node;
+  if (is_object($node)) {
+    $node_type = $node->type;
+  }
+
+  if($node_type == 'chado_phylotree') {
+    if ($op == 'create') {
+      if (!user_access('create chado_phylotree content', $account)) {
+        return NODE_ACCESS_DENY;
+      }
+      return NODE_ACCESS_ALLOW;
+    }
+    if ($op == 'update') {
+      if (!user_access('edit chado_phylotree content', $account)) {
+        return NODE_ACCESS_DENY;
+      }
+    }
+    if ($op == 'delete') {
+      if (!user_access('delete chado_phylotree content', $account)) {
+        return NODE_ACCESS_DENY;
+      }
+    }
+    if ($op == 'view') {
+      if (!user_access('access chado_phylotree content', $account)) {
+        return NODE_ACCESS_DENY;
+      }
+    }
+    return NODE_ACCESS_IGNORE;
+  }
+}
+
+/**
+ * phylotree_json
+ *  Get json representation of a phylotree id. See menu item for JSON service 
+ *  endpoint.
+ *
+ * @param int $phylotree_id
+ * @return string json
+ * @ingroup tripal_phylotree
+ */
+function phylotree_json($phylotree_id) {
+  
+  $sql = 'SELECT n.phylonode_id, n.parent_phylonode_id, n.label AS name, '.
+    'n.distance AS length, f.feature_id, f.name AS feature_name, '.
+    'cvt.name AS cvterm_name, cvt.definition AS cvterm_definition, '.
+    'o.organism_id, o.abbreviation, o.common_name, o.genus, o.species '.
+    'FROM chado.phylonode n '.
+    'LEFT OUTER JOIN chado.cvterm cvt ON n.type_id = cvt.cvterm_id '.
+    'LEFT OUTER JOIN chado.feature f ON n.feature_id = f.feature_id ' .
+    'LEFT OUTER JOIN chado.organism o on f.organism_id = o.organism_id '.
+    'WHERE n.phylotree_id = :phylotree_id';
+  
+  $args = array(':phylotree_id' => $phylotree_id);
+  $result = chado_query( $sql, $args );
+
+  // fetch all the phylonodes into an assoc array indexed by
+  // phylonode_id.  convert into from resultset record to array,
+  // fixing datatypes. chado_query returns numeric as string and fun
+  // stuff like that.
+  $phylonodes = array();
+  $root_phylonode_ref = null;
+  
+  foreach ($result as $r) {
+    $phylonode_id = (int) $r->phylonode_id;
+    $node = array(
+      'phylonode_id' => $phylonode_id,
+      'parent_phylonode_id' => (int) $r->parent_phylonode_id,
+      'name' => $r->name,
+      'length' => (double) $r->length,
+      'feature_id' => (int) $r->feature_id,
+      'feature_name' => $r->feature_name,
+      'cvterm_name' => $r->cvterm_name,
+      'cvterm_definition' => $r->cvterm_definition,
+      'organism_id' => (int) $r->organism_id,
+      'abbreviation' => $r->abbreviation,
+      'common_name' => $r->common_name,
+      'genus' => $r->genus,
+      'species' => $r->species
+    );
+    $phylonodes[$phylonode_id] = $node;
+  }
+  
+  //populate the children[] arrays for each node
+  foreach( $phylonodes as $key => &$node ) {
+    if($node['parent_phylonode_id'] !== 0) {
+      $parent_ref = &$phylonodes[ $node['parent_phylonode_id'] ]; // get
+      $parent_ref['children'][] = &$node; // append node refernce to children
+    }
+    else {
+      $root_phylonode_ref = &$node;
+    }
+  }
+  // dump datastructure as json to browser. drupal sets the mime-type correctly.
+  drupal_json_output( $root_phylonode_ref );
+}
+
+/**
+ * phylotree_feature_summary
+ *  Get array of feature counts by organism. key = organism
+ *  abbreviation. value = number of features for this phylotree having
+ *  this organism.
+ *
+ * @param int phylotree_id
+ * @return array
+ * @ingroup tripal_phylotree
+ */
+function phylotree_feature_summary($phylotree_id) {
+  
+  $sql = 'SELECT o.abbreviation, COUNT(o.abbreviation) AS count '.
+    'FROM chado.phylonode n '.
+    'LEFT OUTER JOIN chado.feature f ON n.feature_id = f.feature_id '.
+    'LEFT OUTER JOIN chado.organism o ON f.organism_id = o.organism_id '.
+    'WHERE n.phylotree_id = :phylotree_id '.
+    'AND n.feature_id IS NOT NULL '.
+    'GROUP BY o.abbreviation';
+  $args = array(':phylotree_id' => $phylotree_id);
+  $result = chado_query($sql, $args);
+  $summary = array();
+  foreach($result as $r) {
+    $summary[$r->abbreviation] = $r->count;
+  }
+  return $summary;
 }
