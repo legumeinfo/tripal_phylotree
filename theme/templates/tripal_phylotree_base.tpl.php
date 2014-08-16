@@ -8,7 +8,7 @@
  
  // write a js var having URL of json data source for charting
  $phylotree = $variables['node']->phylotree; 
- printf('var phylogramJsonUrl = "?q=chado_phylotree/%d/json";',
+ printf('var phylotreeDataURL = "?q=chado_phylotree/%d/json";',
        $phylotree->phylotree_id );
 // write a js var with path to our theme, for use below by javascript functions.
  printf('var pathToTheme = "%s";', $path_to_theme);
