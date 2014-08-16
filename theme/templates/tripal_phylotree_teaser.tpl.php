@@ -13,7 +13,7 @@ $feature_count = 0;
     <?php
     foreach($summary as $organism_abbrev => $count) {
       echo $organism_abbrev, ' ';
-      ++$feature_count;
+      $feature_count += $count;
     }
     ?>
     (<?php echo $feature_count ?> features)
