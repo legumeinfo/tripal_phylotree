@@ -1,12 +1,10 @@
 <?php
 /*
- there must be a better way of representing cross references in tripal.
- right now every tripal module pretty much duplicates dbxref template code.
- see my question here:
- http://sourceforge.net/p/gmod/mailman/message/32481909/
+ * cross references template
  */
 
-$phylotree = $variables['node']->phylotree;
+$node = $variables['node'];
+$phylotree = $node->phylotree;
 
 $header = array('Database', 'Accession', 'Link Out');
 
