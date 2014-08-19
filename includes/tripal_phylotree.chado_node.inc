@@ -338,15 +338,24 @@ function chado_phylotree_node_access($node, $op, $account) {
  */
 function phylotree_json($phylotree_id) {
   
-  $sql = 'SELECT n.phylonode_id, n.parent_phylonode_id, n.label AS name, '.
-    'n.distance AS length, f.feature_id, f.name AS feature_name, '.
-    'cvt.name AS cvterm_name, cvt.definition AS cvterm_definition, '.
-    'o.organism_id, o.abbreviation, o.common_name, o.genus, o.species '.
-    'FROM chado.phylonode n '.
-    'LEFT OUTER JOIN chado.cvterm cvt ON n.type_id = cvt.cvterm_id '.
-    'LEFT OUTER JOIN chado.feature f ON n.feature_id = f.feature_id ' .
-    'LEFT OUTER JOIN chado.organism o on f.organism_id = o.organism_id '.
-    'WHERE n.phylotree_id = :phylotree_id';
+  $sql = <<<SQL
+
+   SELECT n.phylonode_id, n.parent_phylonode_id, n.label AS name,
+   n.distance AS length, f.feature_id, f.name AS feature_name,
+   cvt.name AS cvterm_name, cvt.definition AS cvterm_definition,
+   o.organism_id, o.abbreviation, o.common_name, o.genus, o.species,
+   cf.nid AS feature_node_id
+
+   FROM chado.phylonode n
+   LEFT OUTER JOIN chado.cvterm cvt ON n.type_id = cvt.cvterm_id
+   LEFT OUTER JOIN chado.feature f ON n.feature_id = f.feature_id
+   LEFT OUTER JOIN chado_feature cf ON cf.feature_id = f.feature_id
+   LEFT OUTER JOIN chado.organism o ON f.organism_id = o.organism_id
+
+   WHERE n.phylotree_id = :phylotree_id
+
+SQL;
+
   
   $args = array(':phylotree_id' => $phylotree_id);
   $result = chado_query( $sql, $args );
@@ -373,7 +382,8 @@ function phylotree_json($phylotree_id) {
       'abbreviation' => $r->abbreviation,
       'common_name' => $r->common_name,
       'genus' => $r->genus,
-      'species' => $r->species
+      'species' => $r->species,
+      'feature_node_id' => (int) $r->feature_node_id,
     );
     $phylonodes[$phylonode_id] = $node;
   }
