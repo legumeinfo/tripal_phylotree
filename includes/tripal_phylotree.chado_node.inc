@@ -54,32 +54,34 @@ function tripal_phylotree_node_view($node, $view_mode, $langcode) {
   switch($view_mode) {
   case 'full':
     $node->content['tripal_phylotree_base'] = array(
-      '#markup' => theme('tripal_phylotree_base',
-      array('node' => $node)),
+      '#markup' => theme('tripal_phylotree_base', array('node' => $node)),
       '#tripal_toc_id'    => 'base',
       '#tripal_toc_title' => 'Phylogram',
       '#weight' => -100,
     );
     $node->content['tripal_phylotree_radial'] = array(
-      '#markup' => theme('tripal_phylotree_radial',
-      array('node' => $node)),
-      '#tripal_toc_id'    => 'circ_dendrogram',
+      '#markup' => theme('tripal_phylotree_radial', array('node' => $node)),
+      '#tripal_toc_id'    => 'phylotree_circ_dendrogram',
       '#tripal_toc_title' => 'Circular Dendrogram',
       '#weight' => -95,
     );
     $node->content['tripal_phylotree_organisms'] = array(
-      '#markup' => theme('tripal_phylotree_organisms',
-      array('node' => $node)),
-      '#tripal_toc_id'    => 'organisms',
+      '#markup' => theme('tripal_phylotree_organisms', array('node' => $node)),
+      '#tripal_toc_id'    => 'phylotree_organisms',
       '#tripal_toc_title' => 'Organisms',
       '#weight' => -90,
     );
-    $node->content['tripal_phylotree_references'] = array(
-      '#markup' => theme('tripal_phylotree_references',
-      array('node' => $node)),
-      '#tripal_toc_id'    => 'dbxref',
-      '#tripal_toc_title' => 'Cross References',
-      '#weight' => 0,
+    $node->content['tripal_phylotree_go'] = array(
+      '#markup' => theme('tripal_phylotree_go', array('node' => $node)),
+      '#tripal_toc_id'    => 'phylotree_go',
+      '#tripal_toc_title' => 'Gene Ontology',
+      '#weight' => -80,
+    );
+    $node->content['tripal_phylotree_context'] = array(
+      '#markup' => theme('tripal_phylotree_context', array('node' => $node)),
+      '#tripal_toc_id'    => 'phylotree_context',
+      '#tripal_toc_title' => 'Context Viewer',
+      '#weight' => -70,
     );
     break;
     

@@ -147,35 +147,53 @@ function tripal_phylotree_search_biological_data_views() {
 function tripal_phylotree_theme($existing, $type, $theme, $path) {
   $core_path = drupal_get_path('module', 'tripal_core');
   $items = array(
-     'node__chado_phylotree' => array(
+    // built-in theme
+    'node__chado_phylotree' => array(
       'template' => 'node--chado-generic',
       'render element' => 'node',
       'base hook' => 'node',
       'path' => "$core_path/theme/templates",
     ),
+    // base template for this page (default tab) includes the phylogram 
     'tripal_phylotree_base' => array(
       'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_base',
       'path' => "$path/theme/templates",
     ),
-     'tripal_phylotree_references' => array(
-        'variables' => array('node' => NULL),
+    // partial for cross references tab
+    'tripal_phylotree_references' => array(
+      'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_references',
       'path' => "$path/theme/templates",
-     ),
-     'tripal_phylotree_organisms' => array(
-        'variables' => array('node' => NULL),
+    ),
+    // partial for organisms tab
+    'tripal_phylotree_organisms' => array(
+      'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_organisms',
       'path' => "$path/theme/templates",
     ),
-     'tripal_phylotree_radial' => array(
-        'variables' => array('node' => NULL),
+    // partial for phylotree radial view
+    'tripal_phylotree_radial' => array(
+      'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_radial',
       'path' => "$path/theme/templates",
     ),
-     'tripal_phylotree_teaser' => array(
-        'variables' => array('node' => NULL),
+    // partial for teaser view
+    'tripal_phylotree_teaser' => array(
+      'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_teaser',
+      'path' => "$path/theme/templates",
+    ),
+    // partial for gene ontology word cloud
+    'tripal_phylotree_go' => array(
+      'variables' => array('node' => NULL),
+      'template' => 'tripal_phylotree_go',
+      'path' => "$path/theme/templates",
+    ),
+    // partial for context viewer
+    'tripal_phylotree_context' => array(
+      'variables' => array('node' => NULL),
+      'template' => 'tripal_phylotree_context',
       'path' => "$path/theme/templates",
     ),
   );
