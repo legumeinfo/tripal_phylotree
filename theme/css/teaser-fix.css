@@ -1,4 +1,10 @@
-/* hide the 'read more' link which drupal insists on generating */
+g.highlight {
+    background-color: yellow;
+}
+
+/* fix for drupal's "teaser" template style.  hide the 'read more'
+ * link which drupal insists on generating 
+ */
 li.node-readmore {
     display: none!important;
 }

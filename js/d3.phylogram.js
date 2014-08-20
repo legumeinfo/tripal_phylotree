@@ -1,4 +1,7 @@
 /*
+  (modified version of d3.phylogram.js... agr@ncgr.org retaining
+  attribution/copyright per below)
+
   d3.phylogram.js http://bl.ocks.org/kueda/1036776
 
   Wrapper around a d3-based phylogram (tree where branch lengths are scaled)
@@ -188,9 +191,13 @@ if (!d3) { throw "d3 wasn't included!"};
         h = options.height || d3.select(selector).style('height') || d3.select(selector).attr('height'),
         w = parseInt(w),
         h = parseInt(h);
-    var fill = options.fill || function(node) {
+    var fill = options.fill || function(d) {
       return 'cyan';
     };
+    var nodeMouseOver = options.nodeMouseOver || function(d) {};
+    var nodeMouseOut = options.nodeMouseOut || function(d) {};
+    var nodeMouseDown = options.nodeMouseDown || function(d) {};
+    
     var tree = options.tree || d3.layout.cluster()
       .size([h, w])
       .sort(function(node) { return node.children ? node.children.length : -1; })
@@ -264,17 +271,20 @@ if (!d3) { throw "d3 wasn't included!"};
     // style the root node
      vis.selectAll('g.root.node')
       .append('svg:circle')
-        .attr("r", 6)
-        .attr('fill', 'dimgrey')
-        .attr('stroke', 'black')
+      .attr("r", 6)
+      .attr('fill', 'dimgrey')
+      .attr('stroke', 'black')
       .attr('stroke-width', '2px');
 
-    // style the leaf nodes
-     vis.selectAll('g.leaf.node')
+    // style the leaf nodes and add js event handlers
+    vis.selectAll('g.leaf.node')
+      .on('click', nodeMouseDown)
+      .on('mouseover', nodeMouseOver)
+      .on('mouseout', nodeMouseOut)
       .append("svg:circle")
-        .attr("r", 6)
-        .attr('stroke', 'dimgrey')
-        .attr('fill', function(d) { return fill(d); })
+      .attr("r", 6)
+      .attr('stroke', 'dimgrey')
+      .attr('fill', fill)
       .attr('stroke-width', '2px');
     
     if (!options.skipLabels) {
@@ -307,6 +317,10 @@ if (!d3) { throw "d3 wasn't included!"};
     var fill = options.fill || function(node) {
       return 'cyan';
     };
+
+    var nodeMouseOver = options.nodeMouseOver || function(d) {};
+    var nodeMouseOut = options.nodeMouseOut || function(d) {};
+    var nodeMouseDown = options.nodeMouseDown || function(d) {};
     
     var w = options.width || d3.select(selector).style('width') || d3.select(selector).attr('width'),
         r = w / 2,
@@ -325,11 +339,14 @@ if (!d3) { throw "d3 wasn't included!"};
         return node.children;
       })
       .separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; });
-    
+
     var phylogram = d3.phylogram.build(selector, nodes, {
       vis: vis,
       tree: tree,
       fill : fill,
+      nodeMouseOver : nodeMouseOver,
+      nodeMouseOut : nodeMouseOut,
+      nodeMouseDown : nodeMouseDown,
       skipBranchLengthScaling: true,
       skipTicks: true,
       skipLabels: options.skipLabels,
