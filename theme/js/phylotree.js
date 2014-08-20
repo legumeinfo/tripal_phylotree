@@ -82,8 +82,7 @@
       });
     };
 
-    
-    $.getJSON(pathToTheme +'/js/legume-colors.json', function(colorData) {
+    $.getJSON(pathToTheme +'/theme/js/legume-colors.json', function(colorData) {
       legumeColors = colorData;
       $.getJSON(phylotreeDataURL, function(treeData) {
 	displayData(treeData);
