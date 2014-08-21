@@ -160,42 +160,31 @@ function tripal_phylotree_theme($existing, $type, $theme, $path) {
       'template' => 'tripal_phylotree_base',
       'path' => "$path/theme/templates",
     ),
-    // partial for cross references tab
-    'tripal_phylotree_references' => array(
-      'variables' => array('node' => NULL),
-      'template' => 'tripal_phylotree_references',
-      'path' => "$path/theme/templates",
-    ),
-    // partial for organisms tab
+    // partial for organisms block
     'tripal_phylotree_organisms' => array(
       'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_organisms',
       'path' => "$path/theme/templates",
     ),
-    // partial for phylotree radial view
+    // partial for phylotree radial blick
     'tripal_phylotree_radial' => array(
       'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_radial',
       'path' => "$path/theme/templates",
     ),
+    // partial for cross references blick
+    'tripal_phylotree_references' => array(
+      'variables' => array('node' => NULL),
+      'template' => 'tripal_phylotree_references',
+      'path' => "$path/theme/templates",
+    ),    
     // partial for teaser view
     'tripal_phylotree_teaser' => array(
       'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_teaser',
       'path' => "$path/theme/templates",
     ),
-    // partial for gene ontology word cloud
-    'tripal_phylotree_go' => array(
-      'variables' => array('node' => NULL),
-      'template' => 'tripal_phylotree_go',
-      'path' => "$path/theme/templates",
-    ),
-    // partial for context viewer
-    'tripal_phylotree_context' => array(
-      'variables' => array('node' => NULL),
-      'template' => 'tripal_phylotree_context',
-      'path' => "$path/theme/templates",
-    ),
+    
   );
   return $items;
 }

@@ -36,9 +36,9 @@
   <div><a id="phylonode_organism_link" href="" tabindex="-1"></a></div>
   
   <!-- these links are for interior nodes only -->
-  <div><a id="phylonode_go_link" href="?block=phylotree_go" tabindex="-1">
+  <div><a id="phylonode_go_link" href="?block=phylotree_go" class="tripal_toc_list_item_link"  tabindex="-1">
     view Gene Ontology</a></div>
-  <div><a id="phylonode_context_link" href="?block=phylotree_context" tabindex="-1">
+  <div><a id="phylonode_context_link" href="?block=phylotree_context" class="tripal_toc_list_item_link" tabindex="-1">
     view Context</a></div>
 </div>
 
