@@ -1,6 +1,6 @@
 /*
-  (modified version of d3.phylogram.js... agr@ncgr.org retaining
-  attribution/copyright per below)
+  (agr@ncgr.org : this is a significantly modified version of
+  d3.phylogram.js....  retaining attribution/copyright per below)
 
   d3.phylogram.js http://bl.ocks.org/kueda/1036776
 
@@ -238,8 +238,8 @@ if (!d3) { throw "d3 wasn't included!"};
           .attr("y", 0)
           .attr("dy", -3)
           .attr("text-anchor", "middle")
-          .attr('font-size', '8px')
-          .attr('fill', '#ccc')
+          .attr('font-size', '9px')
+          .attr('fill', 'grey')
           .text(function(d) { return Math.round(d*100) / 100; });
     }
         
@@ -295,7 +295,7 @@ if (!d3) { throw "d3 wasn't included!"};
           .attr("text-anchor", 'end')
           .attr('font-size', '9px')
           .attr('fill', 'black')
-        .text(function(d) { return d.length.toFixed(4); });
+        //.text(function(d) { return d.length.toFixed(4); }); // hide length
 
       vis.selectAll('g.leaf.node').append("svg:text")
         .attr("dx", 8)
@@ -305,7 +305,8 @@ if (!d3) { throw "d3 wasn't included!"};
         .attr('font-size', '10px')
         .attr('fill', 'black')
         .text(function(d) {
-	  return d.name + ' (' + d.length.toFixed(4) + ')';
+	  // return d.name + ' (' + d.length.toFixed(4) + ')'; // hide length
+	  return d.name;
          });
     }
     return {tree: tree, vis: vis}
