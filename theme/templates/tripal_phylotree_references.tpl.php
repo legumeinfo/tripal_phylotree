@@ -29,7 +29,7 @@ $rows = array(
       $phylotree->dbxref_id->version,
       $phylotree->dbxref_id->description),
     $link_out
-)));
+  )));
 
 $table = array(
   'header' => $header,
@@ -44,3 +44,10 @@ $table = array(
   'empty' => '',
 );
 print theme_table($table);
+
+// allow site admins to see the phylotree id
+if (user_access('view ids')) {
+  print sprintf('<div>phylotree_id = %d</div>',
+		$phylotree->phylotree_id );
+}
+
