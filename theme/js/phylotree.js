@@ -20,6 +20,7 @@
     // callback for mouseover event on graph node d
     var nodeMouseOver = function(d) {
       var el =$(this);
+      el.attr('cursor', 'pointer');
       var circle = el.find('circle');
       circle.attr('fill', 'yellow');
       var txt = el.find('text');
@@ -28,6 +29,7 @@
     // callback for mouseout event on graph node d
     var nodeMouseOut = function(d) {
       var el = $(this);
+      el.attr('cursor', 'default');
       var circle = el.find('circle');
       circle.attr('fill', organismColor(d));
       var txt = el.find('text');
@@ -110,7 +112,10 @@
       organismBubblePlot('#phylotree-organisms', treeData, {
 	'height' : height,
 	'width' : width,
-	'fill' : organismColor
+	'fill' : organismColor,
+	'nodeMouseOver' : nodeMouseOver,
+	'nodeMouseOut' : nodeMouseOut,
+	'nodeMouseDown' : nodeMouseDown
       });
     }
 

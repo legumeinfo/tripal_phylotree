@@ -17,11 +17,16 @@ function organismBubblePlot( selector, data, options ) {
   var countOrganisms = function(node, i, arr) {
     if (node.organism_id) {
       if( ! organisms[ node.organism_id ] ) {
+	// copy only the organisms related metadata, discarding feature info
 	organisms[ node.organism_id ] = {
 	  'organism_id' : node.organism_id,
 	  'name' : node.abbreviation,
 	  'abbreviation' : node.abbreviation,
-	  'value' : 1
+	  'genus' : node.genus,
+	  'species' : node.species,
+	  'common_name' : node.common_name,
+	  'organism_node_id' : node.organism_node_id,
+	  'value' : 1 // count
 	};
       }
       else {
@@ -44,7 +49,10 @@ function organismBubblePlot( selector, data, options ) {
   var fill = options.fill || function(node) {
     return 'cyan';
   };
-
+  var nodeMouseOver = options.nodeMouseOver || function(d) {};
+  var nodeMouseOut = options.nodeMouseOut || function(d) {};
+  var nodeMouseDown = options.nodeMouseDown || function(d) {};
+  
   var w = options.width || d3.select(selector).style('width') || d3.select(selector).attr('width'),
   h = options.height || d3.select(selector).style('height') || d3.select(selector).attr('height'),
   w = parseInt(w),
@@ -66,15 +74,16 @@ function organismBubblePlot( selector, data, options ) {
 	  .filter(function(d) { return !d.children; }))
     .enter().append("svg:g")
     .attr("class", "node")
+    .on('click', nodeMouseDown)
+    .on('mouseover', nodeMouseOver)
+    .on('mouseout', nodeMouseOut)    
     .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
   
   node.append("svg:title")
     .text(function(d) { return d.name + ": " + format(d.value); });
   
   node.append("svg:circle")
-    .attr("r", function(d) {
-      return d.r;
-    })
+    .attr("r", function(d) { return d.r; })
     .style("fill", function(d) { return fill(d); });
   
   node.append("svg:text")
