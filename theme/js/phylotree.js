@@ -103,15 +103,15 @@
 	'nodeMouseDown' : nodeMouseDown
       });
       d3.phylogram.buildRadial('#phylotree-radial-graph', treeData, {
-	'width' : width, 
+	'width' : width, // square graph 
 	'fill' : organismColor,
 	'nodeMouseOver' : nodeMouseOver,
 	'nodeMouseOut' : nodeMouseOut,
 	'nodeMouseDown' : nodeMouseDown
       });
       organismBubblePlot('#phylotree-organisms', treeData, {
-	'height' : height,
-	'width' : width,
+	'height' : width, // square graph
+	'width' : width, 
 	'fill' : organismColor,
 	'nodeMouseOver' : nodeMouseOver,
 	'nodeMouseOut' : nodeMouseOut,
