@@ -1,22 +1,32 @@
-<!-- this div is used by tripal to create a vertical tabs named by
-   $node->content (created via _node_view) -->
-<div class="tripal_phylotree-data-block-desc tripal-data-block-desc"></div>
+<?php
+$path_to_theme = path_to_theme();
+drupal_add_css( $path_to_theme . '/theme/css/phylogram.css');
+$phylotree = $variables['node']->phylotree;
+dd($phylotree);
+?>
 
 <script>
- <?php
- $path_to_theme = path_to_theme();
-
- drupal_add_css( $path_to_theme . '/theme/css/phylogram.css');
- 
- // write a js var having URL of json data source for charting
- $phylotree = $variables['node']->phylotree; 
- printf('var phylotreeDataURL = "?q=chado_phylotree/%d/json";',
-       $phylotree->phylotree_id );
-// write a js var with path to our theme, for use below by javascript functions.
- printf('var pathToTheme = "%s";', $path_to_theme);
- ?>
- 
+<?php
+// write js var having URL of json data source for charting
+printf('var phylotreeDataURL = "?q=chado_phylotree/%d/json";',
+  $phylotree->phylotree_id );
+// write js var with path to our theme, for use below by javascript functions.
+printf('var pathToTheme = "%s";', $path_to_theme);
+?>
 </script>
+
+<div class="tripal_phylotree-data-block-desc tripal-data-block-desc">
+<?php
+/*
+ * note: if the comment field contains newick formatted tree data, then the
+ * database content needs to be updated with a relevant description (per adf)
+ */
+if( ! empty($phylotree->comment) && $phylotree->comment[0] != '(') {
+  // doesnt appear to be newick data starting with paren
+  print $phylotree->comment;
+}
+?>
+</div>
 
 <div id="phylogram">
    <!-- d3js will add svg to this div, and remove the loader gif -->
