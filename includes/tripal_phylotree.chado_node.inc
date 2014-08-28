@@ -77,14 +77,12 @@ function tripal_phylotree_node_view($node, $view_mode, $langcode) {
       '#tripal_toc_title' => 'Cross References',
       '#weight' => -80,
     );
-    /* wip
      $node->content['tripal_phylotree_analysis'] = array(
       '#markup' => theme('tripal_phylotree_analysis', array('node' => $node)),
       '#tripal_toc_id'    => 'phylotree_analysis',
       '#tripal_toc_title' => 'Analysis',
       '#weight' => -70,
     ); 
-    */
     break;
     
   case 'teaser':
@@ -234,12 +232,14 @@ function chado_phylotree_load($nodes) {
     if (!$phylotree_id) {
       continue;
     }
-    $phylotree = chado_generate_var('phylotree',
-    array('phylotree_id' => $phylotree_id));
-    // expand the comment field
+    $phylotree = chado_generate_var(
+      'phylotree',
+      array('phylotree_id' => $phylotree_id));
+    
+    // expand the comment field, tripal omits it by default
     $phylotree = chado_expand_var($phylotree, 'field', 'phylotree.comment');
+    
     $nodes[$nid]->phylotree = $phylotree;
-    // Now get the title
     $node->title = chado_get_node_title($node);
   }
 }

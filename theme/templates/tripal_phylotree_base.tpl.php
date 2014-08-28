@@ -2,9 +2,7 @@
 $path_to_theme = path_to_theme();
 drupal_add_css( $path_to_theme . '/theme/css/phylogram.css');
 $phylotree = $variables['node']->phylotree;
-dd($phylotree);
 ?>
-
 <script>
 <?php
 // write js var having URL of json data source for charting

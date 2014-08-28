@@ -59,8 +59,8 @@ function tripal_phylotree_menu() {
     'access arguments' => array('administer tripal phylotree'),
     'type' => MENU_NORMAL_ITEM,
   );
-  
-  // help menu 
+
+  // help menu
   $items['admin/tripal/extension/tripal_phylotree/help'] = array(
     'title' => 'Help',
     'description' => 'Basic Description of Tripal Phylotree Module Functionality',
@@ -99,7 +99,6 @@ function tripal_phylotree_menu() {
     'page arguments' => array(1),
     'access callback' => TRUE // allow all anonymous http clients
    );
-   
   return $items;
 }
 
@@ -166,25 +165,30 @@ function tripal_phylotree_theme($existing, $type, $theme, $path) {
       'template' => 'tripal_phylotree_organisms',
       'path' => "$path/theme/templates",
     ),
-    // partial for phylotree radial blick
+    // partial for phylotree radial block
     'tripal_phylotree_radial' => array(
       'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_radial',
       'path' => "$path/theme/templates",
     ),
-    // partial for cross references blick
+    // partial for cross references block
     'tripal_phylotree_references' => array(
       'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_references',
       'path' => "$path/theme/templates",
-    ),    
+    ),
+    // partial for cross references block
+    'tripal_phylotree_analysis' => array(
+      'variables' => array('node' => NULL),
+      'template' => 'tripal_phylotree_analysis',
+      'path' => "$path/theme/templates",
+    ),
     // partial for teaser view
     'tripal_phylotree_teaser' => array(
       'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_teaser',
       'path' => "$path/theme/templates",
     ),
-    
   );
   return $items;
 }
