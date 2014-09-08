@@ -348,7 +348,7 @@ function phylotree_json($phylotree_id) {
   SELECT n.phylonode_id, n.parent_phylonode_id, n.label AS name,
   n.distance AS length, f.feature_id, f.name AS feature_name,
   cvt.name AS cvterm_name,
-  o.organism_id, o.common_name, o.genus, o.species,
+  o.organism_id, o.common_name, o.abbreviation, o.genus, o.species,
   cf.nid AS feature_node_id, co.nid AS organism_node_id
   FROM chado.phylonode n
   LEFT OUTER JOIN chado.cvterm cvt ON n.type_id = cvt.cvterm_id
@@ -392,6 +392,7 @@ SQL;
     if($r->organism_id) {
       $node['organism_id'] = (int) $r->organism_id;
       $node['common_name'] = $r->common_name;
+      $node['abbreviation'] = $r->abbreviation;
       $node['genus'] = $r->genus;
       $node['species'] = $r->species;
       $node['organism_node_id'] = (int) $r->organism_node_id;
