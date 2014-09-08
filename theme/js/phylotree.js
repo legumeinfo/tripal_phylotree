@@ -39,7 +39,7 @@
     var nodeMouseDown = function(d) {
       var el = $(this);
       var dialog = $('#phylonode_popup_dialog');
-      var title = d.name  ? d.name + ' options' : 'interior node options';
+      var title = d.name  ? d.name : 'interior node options';
 
       if(d.children) {
 	// interior node
