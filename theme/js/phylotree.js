@@ -9,10 +9,10 @@
     
     var legumeColors = null;
 
-    // function to generate color based on the organism abbreviation
+    // function to generate color based on the organism genus and species
     // on graph node d
     var organismColor = function(d) {
-      var color = legumeColors[d.abbreviation];
+      var color = legumeColors[d.genus + ' ' + d.species];
       if(color) { return color; }
       else { return 'grey'; }
     };

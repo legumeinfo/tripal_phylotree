@@ -1,39 +1,22 @@
 {
   "comment" : "default colors for our most commonly shown legume species. key= the db chado.organism.abbreviation. value = css color code. ---This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/)---. and https://github.com/mbostock/d3/wiki/Ordinal-Scales",
   
-  "G.max" : "#1f77b4",
-  "Glyma" : "#1f77b4",
-  
-  "C.fasciculata" : "#aec7e8",
-  "Chfas" :"#aec7e8",
-  
-  "A.hypogaea" : "#ff7f0e",
-  "Arhyp" : "#ff7f0e",
-  
-  "C.cajan" : "#ffbb78",
-  "Cajca" : "#ffbb78",
-  
-  "C.arietinum" : "#2ca02c",
-  
-  "L.culinaris" : "#98df8a",
-  "L.japonicus" : "#d62728",
-  "L.albus" : "#ff9896",
-  "L.angustifolius" : "#9467bd",
-  
-  "M.sativa" : "#c5b0d5",
-  "Medsa" : "#c5b0d5",
-  
-  "M.truncatula" : "#8c564b",
-  "Medtr" : "#8c564b",
-  
-  "P.coccineus" : "#c49c94",
-  
-  "P.vulgaris" : "#e377c2",
-  "Phavu" : "#e377c2",
-  
-  "P.sativum" :  "#f7b6d2",
-  "T.pratense" : "#7f7f7f",
-  "V.faba" : "#c7c7c7",
-  "V.radiata" : "#bcbd22",
-  "V.unguiculata" : "#dbdb8d"
+  "Glycine max" : "#1f77b4",
+  "Chamaecrista fasciculata" : "#aec7e8",
+  "Arachis hypogaea" : "#ff7f0e",
+  "Cajanus cajan" : "#ffbb78",
+  "Cicer arietinum" : "#2ca02c",
+  "Lens culinaris" : "#98df8a",
+  "Lotus japonicus" : "#d62728",
+  "Lupinus albus" : "#ff9896",
+  "Lupinus angustifolius" : "#9467bd",
+  "Medicago sativa" : "#c5b0d5",
+  "Medicago truncatula" : "#8c564b",
+  "Phaseolus coccineus" : "#c49c94",
+  "Phaseolus vulgaris" : "#e377c2",
+  "Pisum sativum" :  "#f7b6d2",
+  "Trifolium pratense" : "#7f7f7f",
+  "Vicia faba" : "#c7c7c7",
+  "Vigna radiata" : "#bcbd22",
+  "Vigna unguiculata" : "#dbdb8d"
 }
