@@ -6,10 +6,11 @@ $phylotree = $variables['node']->phylotree;
 <script>
 <?php
 // write js var having URL of json data source for charting
-printf('var phylotreeDataURL = "?q=chado_phylotree/%d/json";',
+printf('var phylotreeDataURL = "/chado_phylotree/%d/json";',
   $phylotree->phylotree_id );
 // write js var with path to our theme, for use below by javascript functions.
-printf('var pathToTheme = "%s";', $path_to_theme);
+// prefix path to theme with / because drupal returns it as a relative URL.
+printf('var pathToTheme = "/%s";', $path_to_theme);
 ?>
 </script>
 
@@ -27,8 +28,9 @@ if( ! empty($phylotree->comment) && $phylotree->comment[0] != '(') {
 </div>
 
 <div id="phylogram">
-   <!-- d3js will add svg to this div, and remove the loader gif -->
-  <img src="<?php print path_to_theme(); ?>/image/ajax-loader.gif"
+    <!-- d3js will add svg to this div, and remove the loader gif
+     prefix with / for absolute url -->
+  <img src="/<?php print $path_to_theme ?>/image/ajax-loader.gif"
        class="phylogram-ajax-loader"/>
 </div>
 
