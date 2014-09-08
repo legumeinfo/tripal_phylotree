@@ -1,6 +1,10 @@
 <?php
-$path_to_theme = path_to_theme();
-drupal_add_css( $path_to_theme . '/theme/css/phylogram.css');
+$my_path = path_to_theme();
+if(empty($my_path)) {
+  // on lis-dev, path_to_theme() is returning empty string, just hardcoding it
+  $my_path = 'sites/all/modules/tripal/tripal_phylotree';
+}
+drupal_add_css( $my_path . '/theme/css/phylogram.css');
 $phylotree = $variables['node']->phylotree;
 ?>
 <script>
@@ -10,7 +14,7 @@ printf('var phylotreeDataURL = "/chado_phylotree/%d/json";',
   $phylotree->phylotree_id );
 // write js var with path to our theme, for use below by javascript functions.
 // prefix path to theme with / because drupal returns it as a relative URL.
-printf('var pathToTheme = "/%s";', $path_to_theme);
+printf('var pathToTheme = "/%s";', $my_path);
 ?>
 </script>
 
@@ -30,7 +34,7 @@ if( ! empty($phylotree->comment) && $phylotree->comment[0] != '(') {
 <div id="phylogram">
     <!-- d3js will add svg to this div, and remove the loader gif
      prefix with / for absolute url -->
-  <img src="/<?php print $path_to_theme ?>/image/ajax-loader.gif"
+  <img src="/<?php print $my_path ?>/image/ajax-loader.gif"
        class="phylogram-ajax-loader"/>
 </div>
 
@@ -56,11 +60,13 @@ if( ! empty($phylotree->comment) && $phylotree->comment[0] != '(') {
 /* this template depends on d3js, but i am not putting it into
 tripal_phylotree.info scripts[] because that results in the script
 getting loaded *on every drupal request*! */
-drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.4.8/d3.min.js','external');
+drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.4.8/d3.min.js',
+	      'external');
 
-drupal_add_js( $path_to_theme . '/theme/js/d3.phylogram.js');
-drupal_add_js( $path_to_theme . '/theme/js/organism-bubble-plot.js');
-drupal_add_js( $path_to_theme . '/theme/js/phylotree.js');
+drupal_add_js('/'. $my_path . '/theme/js/d3.phylogram.js');
+drupal_add_js('/'. $my_path . '/theme/js/organism-bubble-plot.js');
+drupal_add_js('/'. $my_path . '/theme/js/phylotree.js');
+
 drupal_add_library('system', 'ui.dialog');
 ?>
 
