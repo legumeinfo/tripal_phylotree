@@ -334,6 +334,32 @@ function chado_phylotree_node_access($node, $op, $account) {
 }
 
 /**
+ * phylotree_by_name
+ *
+ * Lookup tree by name, and redirect to that drupal node. This could
+ * also be done for example by URL aliases, for example using pathauto
+ * module.
+ *
+ * @param int $phylotree_id
+ * @return string json
+ * @ingroup tripal_phylotree
+ */
+function phylotree_by_name($name) {
+    
+    $sql = <<<SQL
+ SELECT cp.nid as node_id 
+ FROM chado.phylotree t
+ LEFT JOIN chado_phylotree cp on cp.phylotree_id = t.phylotree_id
+ WHERE t.name = :name
+SQL;
+
+    $args = array(':name' => $name);
+    $result = chado_query( $sql, $args );
+    $nid = $result->fetchField();
+    drupal_goto("node/$nid");
+}
+
+/**
  * phylotree_json
  *  Get json representation of a phylotree id. See menu item for JSON service 
  *  endpoint.

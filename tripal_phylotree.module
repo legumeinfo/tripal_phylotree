@@ -92,13 +92,20 @@ function tripal_phylotree_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 2
   );
-
-  // create a route for viewing json of all phylonodes having this phylotree_id
+  
+   $items['chado_phylotree/%'] = array(
+    'page callback' => 'phylotree_by_name',
+    'page arguments' => array(1),
+    'access callback' => TRUE // allow all anonymous http clients
+   );
+  
+   // create a route for viewing json of all phylonodes having this phylotree_id
    $items['chado_phylotree/%/json'] = array(
     'page callback' => 'phylotree_json',
     'page arguments' => array(1),
     'access callback' => TRUE // allow all anonymous http clients
    );
+   
   return $items;
 }
 
