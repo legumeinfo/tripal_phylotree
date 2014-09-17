@@ -119,9 +119,12 @@ function tripal_phylotree_menu() {
  * @ingroup tripal_phylotree
  */
 function tripal_phylotree_views_api() {
-  return array(
-    'api' => 3.0,
-  );
+    $path = drupal_get_path('module', 'tripal_phylotree');
+    return array(
+        'api' => 3.0,
+        'path' => $path . '/includes/views',
+        'template path' => $path .'/themes'
+    );
 }
 
 /**
@@ -130,13 +133,14 @@ function tripal_phylotree_views_api() {
  *
  * @ingroup tripal_phylotree
  */
+
 function tripal_phylotree_search_biological_data_views() {
   return array(
-    'tripal_phylotree_default_view_code' => array(
-      'machine_name' => 'tripal_phylotree_default_view_code',
-      'human_name' => 'Phylotrees',
-      'description' => 'Gene trees, species trees, etc.',
-      'link' => 'chado/phylotree'
+      'tripal_phylotree_user_phylotree' => array(
+          'machine_name' => 'tripal_phylotree_user_phylotree',
+          'human_name' => 'Phylotrees',
+          'description' => 'Gene trees, species trees, etc.',
+          'link' => 'chado/phylotree'
     ),
   );
 }
