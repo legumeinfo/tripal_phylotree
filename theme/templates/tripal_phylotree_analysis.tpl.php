@@ -16,13 +16,13 @@ if($analysis) {
       $analysis->name,
       $analysis->description,
       sprintf('%s %s %s %s %s %s %s',
-	      $analysis->program,
-	      $analysis->programversion,
-	      $analysis->algorithm,
-	      $analysis->sourcename,
-	      $analysis->sourceversion,
-	      $analysis->sourceuri,
-	      $analysis->timeexecuted)
+          $analysis->program,
+          $analysis->programversion,
+          $analysis->algorithm,
+          $analysis->sourcename,
+          $analysis->sourceversion,
+          $analysis->sourceuri,
+          $analysis->timeexecuted)
     )));
 }
 else {
@@ -43,4 +43,3 @@ $table = array(
   'empty' => '',
 );
 print theme_table($table);
-

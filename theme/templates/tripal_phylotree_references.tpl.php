@@ -48,6 +48,5 @@ print theme_table($table);
 // allow site admins to see the phylotree id
 if (user_access('view ids')) {
   print sprintf('<div>phylotree_id = %d</div>',
-		$phylotree->phylotree_id );
+        $phylotree->phylotree_id );
 }
-

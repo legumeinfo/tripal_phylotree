@@ -17,20 +17,20 @@ function organismBubblePlot( selector, data, options ) {
   var countOrganisms = function(node, i, arr) {
     if (node.organism_id) {
       if( ! organisms[ node.organism_id ] ) {
-	// copy only the organisms related metadata, discarding feature info
-	organisms[ node.organism_id ] = {
-	  'organism_id' : node.organism_id,
-	  'name' : node.abbreviation,
-	  'abbreviation' : node.abbreviation,
-	  'genus' : node.genus,
-	  'species' : node.species,
-	  'common_name' : node.common_name,
-	  'organism_node_id' : node.organism_node_id,
-	  'value' : 1 // count
-	};
+        // copy only the organisms related metadata, discarding feature info
+        organisms[ node.organism_id ] = {
+          'organism_id' : node.organism_id,
+          'name' : node.abbreviation,
+          'abbreviation' : node.abbreviation,
+          'genus' : node.genus,
+          'species' : node.species,
+          'common_name' : node.common_name,
+          'organism_node_id' : node.organism_node_id,
+          'value' : 1 // count
+        };
       }
       else {
-	organisms[ node.organism_id ]['value']++;
+        organisms[ node.organism_id ]['value']++;
       }
     }
     if(node.children) {
@@ -71,7 +71,7 @@ function organismBubblePlot( selector, data, options ) {
   
   var node = vis.selectAll("g.node")
     .data(bubble.nodes( { 'children': organismsArr } )
-	  .filter(function(d) { return !d.children; }))
+          .filter(function(d) { return !d.children; }))
     .enter().append("svg:g")
     .attr("class", "node")
     .on('click', nodeMouseDown)
