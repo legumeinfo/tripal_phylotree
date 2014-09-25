@@ -271,6 +271,9 @@ if (!d3) { throw "d3 wasn't included!"};
     // style the root node
      vis.selectAll('g.root.node')
       .append('svg:circle')
+      .on('click', nodeMouseDown)
+      .on('mouseover', nodeMouseOver)
+      .on('mouseout', nodeMouseOut)
       .attr("r", 6)
       .attr('fill', 'dimgrey')
       .attr('stroke', 'black')
@@ -286,6 +289,16 @@ if (!d3) { throw "d3 wasn't included!"};
       .attr('stroke', 'dimgrey')
       .attr('fill', fill)
       .attr('stroke-width', '2px');
+
+    vis.selectAll('g.inner.node')
+      .on('click', nodeMouseDown)
+      .on('mouseover', nodeMouseOver)
+      .on('mouseout', nodeMouseOut)
+      .append("svg:circle")
+      .attr("r", 5)
+      .attr('stroke', 'dimgrey')
+      .attr('stroke-width', '2px')
+      .attr('fill', 'white');
     
     if (!options.skipLabels) {
       vis.selectAll('g.inner.node')
@@ -305,8 +318,8 @@ if (!d3) { throw "d3 wasn't included!"};
         .attr('font-size', '10px')
         .attr('fill', 'black')
         .text(function(d) {
-	  // return d.name + ' (' + d.length.toFixed(4) + ')'; // hide length
-	  return d.name;
+          // return d.name + ' (' + d.length.toFixed(4) + ')'; // hide length
+          return d.name;
          });
     }
     return {tree: tree, vis: vis}
@@ -366,8 +379,8 @@ if (!d3) { throw "d3 wasn't included!"};
         .attr('font-size', '10px')
         .attr('fill', 'black')
         .text(function(d) {
-	  return d.name;
-	});
+          return d.name;
+        });
 
       vis.selectAll('g.inner.node text')
         .attr("dx", function(d) { return d.x < 180 ? -6 : 6; })
