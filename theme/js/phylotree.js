@@ -56,6 +56,17 @@
 
       if(d.children) {
         // interior node
+        if(d.phylonode_id) {
+          var link = $('#phylonode_context_link');
+	  //eventually, this link will be replaced with something internal to the site
+          link.attr('href', 'http://test.comparative-legumes.org:8001/chado/context_viewer/' + d.phylonode_id);
+          link.text('view genomic context for children of this subtree');
+          link.show();
+        }
+        else {
+          // this shouldn't happen but ok
+          $('#phylonode_context_link').hide();
+        }
         
         // show dialog content relevant for interior node
         $('#phylonode_go_link').show();
