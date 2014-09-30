@@ -11,10 +11,8 @@ $analysis = $phylotree->analysis_id;
 $rows = array();
 
 if($analysis) {
-  $rows[] = array(
-    array( 'data' => array(
-      $analysis->name,
-      $analysis->description,
+  $analysis = chado_expand_var($analysis, 'field', 'analysis.description');
+  $rows[] = array($analysis->name, $analysis->description, 
       sprintf('%s %s %s %s %s %s %s',
           $analysis->program,
           $analysis->programversion,
@@ -22,8 +20,7 @@ if($analysis) {
           $analysis->sourcename,
           $analysis->sourceversion,
           $analysis->sourceuri,
-          $analysis->timeexecuted)
-    )));
+          $analysis->timeexecuted));
 }
 else {
   // degrade gracefully if no analysis is present
