@@ -60,7 +60,6 @@
           var link = $('#phylonode_context_link');
 	  //eventually, this link will be replaced with something internal to the site
           link.attr('href', 'http://test.comparative-legumes.org:8001/chado/context_viewer/' + d.phylonode_id);
-          link.attr('class', 'simple_link');
           link.text('View Genomic Contexts for genes in this subtree');
           link.show();
         }
