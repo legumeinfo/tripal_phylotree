@@ -8,25 +8,31 @@ $phylotree = $node->phylotree;
 
 $header = array('Database', 'Accession');
 
+$db = sprintf('%s %s',
+     $phylotree->dbxref_id->db_id->name,
+     $phylotree->dbxref_id->db_id->description);
+
+if($phylotree->dbxref_id->db_id->url) {
+  $db_linkout = sprintf('<a href="%s" target="_blank">%s</a>', $phylotree->dbxref_id->db_id->url, $db);
+}
+
 //not really sure about this, but leaving as alex had it for now
 $accession = sprintf('%s %s %s',
       $phylotree->dbxref_id->accession,
       $phylotree->dbxref_id->version,
       $phylotree->dbxref_id->description);
 
-if($phylotree->dbxref_id->db_id->url) {
+if($phylotree->dbxref_id->db_id->urlprefix) {
   $url = sprintf('%s%s',
       $phylotree->dbxref_id->db_id->urlprefix,
       $accession);
-  $linkout = sprintf('<a href="%s" target="_blank">%s</a>', $url, $accession);
+  $item_linkout = sprintf('<a href="%s" target="_blank">%s</a>', $url, $accession);
 }
 
 $rows = array(
   array( 'data' => array(
-    sprintf('%s %s',
-     $phylotree->dbxref_id->db_id->name,
-     $phylotree->dbxref_id->db_id->description),
-    ($linkout ? $linkout : $accession)
+    ($db_linkout ? $db_linkout : $db),
+    ($item_linkout ? $item_linkout : $accession)
   )));
 
 $table = array(
