@@ -2,8 +2,9 @@
   "comment" : "default colors for our most commonly shown legume species. key= the db chado.organism.abbreviation. value = css color code. ---This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/)---. and https://github.com/mbostock/d3/wiki/Ordinal-Scales",
   
   "Glycine max" : "#1f77b4",
-  "Chamaecrista fasciculata" : "#aec7e8",
+  "Arachis duranensis" : "#aec7e8",
   "Arachis hypogaea" : "#ff7f0e",
+  "Arachis ipaensis" : "#bcbd22",
   "Cajanus cajan" : "#ffbb78",
   "Cicer arietinum" : "#2ca02c",
   "Lens culinaris" : "#98df8a",
@@ -17,6 +18,5 @@
   "Pisum sativum" :  "#f7b6d2",
   "Trifolium pratense" : "#7f7f7f",
   "Vicia faba" : "#c7c7c7",
-  "Vigna radiata" : "#bcbd22",
   "Vigna unguiculata" : "#dbdb8d"
 }
