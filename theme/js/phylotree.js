@@ -103,7 +103,7 @@
           link.attr('href', d.organism_node_id ?
                     '?q=node/' + d.organism_node_id : '#');
           link.text('view organism: ' + d.genus + ' '+
-                    d.species + ' (' + d.common_name + ')');
+                    d.species + ( d.common_name ? ' (' + d.common_name + ')' : '' ) );
           link.show();
         } else {
           // there should always be an organism id, but degrade gracefully
