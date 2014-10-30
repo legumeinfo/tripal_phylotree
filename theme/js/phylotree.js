@@ -69,10 +69,12 @@
         }
         
         // show dialog content relevant for interior node
-        $('#phylonode_go_link').show();
+	// go_link not ready for prime time
+        // $('#phylonode_go_link').show();
+        $('#phylonode_go_link').hide();
         $('#phylonode_context_link').show();
         
-        // hide dialog content which is only applicable to lead nodes
+        // hide dialog content which is only applicable to leaf nodes
         $('#phylonode_organism_link').hide();
         $('#phylonode_feature_link').hide();
       }
