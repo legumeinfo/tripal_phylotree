@@ -20,12 +20,11 @@ printf('var pathToTheme = "/%s";', $my_path);
 
 <div class="tripal_phylotree-data-block-desc tripal-data-block-desc">
 <?php
-/*
- * note: if the comment field contains newick formatted tree data, then the
- * database content needs to be updated with a relevant description (per adf)
- */
-if( ! empty($phylotree->comment) && $phylotree->comment[0] != '(') {
-  // doesnt appear to be newick data starting with paren
+print $phylotree->name;
+?>
+<br/>
+<?php
+if( ! empty($phylotree->comment) ) {
   print $phylotree->comment;
 }
 ?>
@@ -47,6 +46,7 @@ if( ! empty($phylotree->comment) && $phylotree->comment[0] != '(') {
 <div id="phylonode_popup_dialog" style="display: none;">
   <!-- these links are for leaf nodes only -->
   <div><a id="phylonode_feature_link" href="" tabindex="-1"></a></div>
+  <div><a id="phylonode_context_search_link" href="" tabindex="-1"></a></div>
   <div><a id="phylonode_organism_link" href="" tabindex="-1"></a></div>
   
   <!-- these links are for interior nodes only -->
