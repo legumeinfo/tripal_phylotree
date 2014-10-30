@@ -46,6 +46,7 @@ if( ! empty($phylotree->comment) ) {
 <div id="phylonode_popup_dialog" style="display: none;">
   <!-- these links are for leaf nodes only -->
   <div><a id="phylonode_feature_link" href="" tabindex="-1"></a></div>
+  <div><a id="phylonode_gene_linkout" href="" tabindex="-1"></a></div>
   <div><a id="phylonode_context_search_link" href="" tabindex="-1"></a></div>
   <div><a id="phylonode_organism_link" href="" tabindex="-1"></a></div>
   

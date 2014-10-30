@@ -94,6 +94,18 @@
           link.attr('href', '?q=node/' + d.feature_node_id);
           link.text('view feature: ' + d.feature_name);
           link.show();
+
+          link = $('#phylonode_gene_linkout');
+          //FIXME: hack depending on typical naming conventions. we can certainly do better
+          var gene = d.feature_name.replace(/^.....\./, "").replace(/\.\d+$/, "");
+          if (d.genus == 'Glycine' && d.species == 'max') {
+                  link.attr('href', 'http://www.soybase.org/sbt/search/search_results.php?category=FeatureName&search_term=' + gene);
+                  link.text('view at soybase: ' + gene);
+                  link.show();
+          }
+          else {
+                  link.hide();
+          }
         }
         else {
           // this shouldn't happen but ok
