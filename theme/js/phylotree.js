@@ -95,23 +95,43 @@
           link.text('view feature: ' + d.feature_name);
           link.show();
 
-          link = $('#phylonode_gene_linkout');
-          //FIXME: hack depending on typical naming conventions. we can certainly do better
-          var gene = d.feature_name.replace(/^.....\./, "").replace(/\.\d+$/, "");
-          if (d.genus == 'Glycine' && d.species == 'max') {
-                  link.attr('href', 'http://www.soybase.org/sbt/search/search_results.php?category=FeatureName&search_term=' + gene);
-                  link.text('view at soybase: ' + gene);
-                  link.show();
-          }
-          else {
-                  link.hide();
-          }
         }
         else {
           // this shouldn't happen but ok
           $('#phylonode_feature_link').hide();
         }
+	if (d.feature_name) {
+          var link = $('#phylonode_gene_linkout');
+          //FIXME: hack depending on typical naming conventions. we can certainly do better
+          var transcript = d.feature_name.replace(/^.....\./, "");
+          var gene = transcript.replace(/\.\d+$/, "");
+          if (d.genus == 'Glycine' && d.species == 'max') {
+                  link.attr('href', 'http://www.soybase.org/sbt/search/search_results.php?category=FeatureName&search_term=' + gene);
+                  link.text('view at SoyBase: ' + gene);
+                  link.show();
+          }
+          else if (d.genus == 'Arachis' && d.species == 'duranensis') {
+                  //link.attr('href', 'http://peanutbase.org/gb2/gbrowse/Aradu1.0/?q=' + gene);
+                  link.attr('href', 'http://peanutbase-stage.agron.iastate.edu/gb2/gbrowse/Aradu1.0/?q=' + gene);
+                  link.text('view at PeanutBase: ' + gene);
+                  link.show();
+          }
+          else if (d.genus == 'Arachis' && d.species == 'ipaensis') {
+                  //link.attr('href', 'http://peanutbase.org/gb2/gbrowse/Araip1.0/?q=' + gene);
+                  link.attr('href', 'http://peanutbase-stage.agron.iastate.edu/gb2/gbrowse/Araip1.0/?q=' + gene);
+                  link.text('view at PeanutBase: ' + gene);
+                  link.show();
+          }
+          else if (d.genus == 'Arabidopsis' && d.species == 'thaliana') {
+                  link.attr('href', ' http://www.araport.org/locus/' + gene);
+                  link.text('view at Arabidopsis Information Portal: ' + gene);
+                  link.show();
+          }
+          else {
+                  link.hide();
+          }
         
+        }
         if(d.organism_id) {
           var link = $('#phylonode_organism_link');
           link.attr('href', d.organism_node_id ?
