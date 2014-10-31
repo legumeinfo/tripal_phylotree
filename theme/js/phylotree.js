@@ -110,6 +110,16 @@
                   link.text('view at SoyBase: ' + gene);
                   link.show();
           }
+          else if (d.genus == 'Phaseolus' && d.species == 'vulgaris') {
+                  link.attr('href', 'http://phytozome.jgi.doe.gov/pz/portal.html#!gene?organism=Pvulgaris&searchText=locusName:' + gene);
+                  link.text('view at Phytozome: ' + gene);
+                  link.show();
+          }
+          else if (d.genus == 'Medicago' && d.species == 'truncatula') {
+                  link.attr('href', 'http://medicago.jcvi.org/medicago/jbrowse/?data=data%2Fjson%2Fmedicago&loc='+transcript+'&tracks=DNA%2Cgene_models&highlight=');
+                  link.text('view at JCVI: ' + transcript);
+                  link.show();
+          }
           else if (d.genus == 'Arachis' && d.species == 'duranensis') {
                   //link.attr('href', 'http://peanutbase.org/gb2/gbrowse/Aradu1.0/?q=' + gene);
                   link.attr('href', 'http://peanutbase-stage.agron.iastate.edu/gb2/gbrowse/Aradu1.0/?q=' + gene);
