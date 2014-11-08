@@ -58,8 +58,8 @@
         // interior node
         if(d.phylonode_id) {
           var link = $('#phylonode_context_link');
-	  //eventually, this link will be replaced with something internal to the site
-          link.attr('href', 'http://comparative-legumes.org/chado/context_viewer/' + d.phylonode_id);
+	  //eventually, this link will be replaced with something internal to the site; note that the trailing slash is somewhat important to avoid apparent hanging due to the way django handles url pattern matching
+          link.attr('href', 'http://comparative-legumes.org/chado/context_viewer/' + d.phylonode_id + '/');
           link.text('View Genomic Contexts for genes in this subtree');
           link.show();
         }
@@ -106,8 +106,8 @@
           var transcript = d.feature_name.replace(/^.....\./, "");
           var gene = transcript.replace(/\.\d+$/, "");
           if (d.genus == 'Glycine' && d.species == 'max') {
-                  //link.attr('href', 'http://www.soybase.org/sbt/search/search_results.php?category=FeatureName&search_term=' + gene);
-                  link.attr('href', 'http://www.soybase.org/gb2/gbrowse/gmax2.0/?q=' + gene + ';dbid=gene_models_wm82_a2_v1');
+                  link.attr('href', 'http://www.soybase.org/sbt/search/search_results.php?category=FeatureName&search_term=' + gene);
+                  //link.attr('href', 'http://www.soybase.org/gb2/gbrowse/gmax2.0/?q=' + gene + ';dbid=gene_models_wm82_a2_v1');
                   link.text('view at SoyBase: ' + gene);
                   link.show();
           }
