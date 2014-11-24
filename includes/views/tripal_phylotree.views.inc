@@ -124,6 +124,20 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
             'empty_column' => 0,
         ),
     );
+/* Footer: Global: Result summary */
+    $handler->display->display_options['footer']['result']['id'] = 'result';
+    $handler->display->display_options['footer']['result']['table'] = 'views';
+    $handler->display->display_options['footer']['result']['field'] = 'result';
+    $handler->display->display_options['footer']['result']['label'] = 'Result summary';
+    $handler->display->display_options['footer']['result']['content'] = 'Displaying @start - @end of @total records found.';
+/* No results behavior: Global: Text area */
+    $handler->display->display_options['empty']['area']['id'] = 'area';
+    $handler->display->display_options['empty']['area']['table'] = 'views';
+    $handler->display->display_options['empty']['area']['field'] = 'area';
+    $handler->display->display_options['empty']['area']['label'] = 'No records found';
+    $handler->display->display_options['empty']['area']['empty'] = TRUE;
+    $handler->display->display_options['empty']['area']['content'] = 'No records found. Please select your search options, then press "Apply".';
+    $handler->display->display_options['empty']['area']['format'] = '3';
 /* Field: phylotree_count: Family ID */
     $handler->display->display_options['fields']['phylotree_name']['id'] = 'phylotree_name';
     $handler->display->display_options['fields']['phylotree_name']['table'] = 'phylotree_count';
@@ -209,7 +223,6 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
-    $handler->display->display_options['filters']['total_count']['max_length'] = '40';
 /* Filter criterion: phylotree_count: Medtr count */
     $handler->display->display_options['filters']['medtr_count']['id'] = 'medtr_count';
     $handler->display->display_options['filters']['medtr_count']['table'] = 'phylotree_count';
@@ -226,7 +239,6 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
-    $handler->display->display_options['filters']['medtr_count']['max_length'] = '40';
 /* Filter criterion: phylotree_count: Glyma count */
     $handler->display->display_options['filters']['glyma_count']['id'] = 'glyma_count';
     $handler->display->display_options['filters']['glyma_count']['table'] = 'phylotree_count';
@@ -243,7 +255,6 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
-    $handler->display->display_options['filters']['glyma_count']['max_length'] = '40';
 /* Filter criterion: phylotree_count: Phavu count */
     $handler->display->display_options['filters']['phavu_count']['id'] = 'phavu_count';
     $handler->display->display_options['filters']['phavu_count']['table'] = 'phylotree_count';
@@ -260,7 +271,6 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
-    $handler->display->display_options['filters']['phavu_count']['max_length'] = '40';
 /* Filter criterion: phylotree_count: Aradu count */
     $handler->display->display_options['filters']['aradu_count']['id'] = 'aradu_count';
     $handler->display->display_options['filters']['aradu_count']['table'] = 'phylotree_count';
@@ -277,7 +287,6 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
-    $handler->display->display_options['filters']['aradu_count']['max_length'] = '40';
 /* Filter criterion: phylotree_count: Araip count */
     $handler->display->display_options['filters']['araip_count']['id'] = 'araip_count';
     $handler->display->display_options['filters']['araip_count']['table'] = 'phylotree_count';
@@ -294,7 +303,6 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
-    $handler->display->display_options['filters']['araip_count']['max_length'] = '40';
 
 /* Display: Page */
     $handler = $view->new_display('page', 'Page', 'page');
