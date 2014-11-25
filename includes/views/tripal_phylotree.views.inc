@@ -305,7 +305,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     );
 
 /* Display: Page */
-    $handler = $view->new_display('page', 'Page', 'page');
+    $handler = $view->new_display('page', 'Phylotree', 'page');
     $handler->display->display_options['path'] = 'search/phylotree';
 
     // End of exported code here 
