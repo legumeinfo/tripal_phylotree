@@ -98,6 +98,16 @@ function tripal_phylotree_menu() {
     'page arguments' => array(1),
     'access callback' => TRUE // allow all anonymous http clients
    );
+
+   $items['chado_gene_phylotree/%/text'] = array(
+    'page callback' => 'phylotree_by_genename_text',
+    // found this strategy described here: http://stackoverflow.com/questions/2285944/returning-untemplated-output-in-drupal-from-menu-callback-function
+    // not sure if it has advantages over the simpler approach described in the top answer, but seemed worth exploring
+    'delivery callback' => 'tripal_phylotree_text_deliver',
+    'page arguments' => array(1),
+    'access callback' => TRUE // allow all anonymous http clients
+   );
+  
   
    // create a route for viewing json of all phylonodes having this phylotree_id
    $items['chado_phylotree/%/json'] = array(
@@ -214,6 +224,11 @@ function tripal_phylotree_help ($path, $arg) {
   if ($path == 'admin/help#tripal_phylotree') {
     return theme('tripal_phylotree_help', array());
   }
+}
+
+function tripal_phylotree_text_deliver($page_callback_result) {
+	print $page_callback_result;
+	drupal_exit();
 }
 
 // hack to suppress the 'Submitted by...' info drupal adds to nodes
