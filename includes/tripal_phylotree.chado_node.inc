@@ -362,6 +362,33 @@ SQL;
 }
 
 /**
+ * phylotree_by_genename_text
+ *
+ * Lookup family by gene
+ *
+ * @param string $family_name
+ * @return string gene_name
+ * @ingroup tripal_phylotree
+ */
+function phylotree_by_genename_text($gene) {
+    
+    $sql = <<<SQL
+ SELECT fp.value 
+ FROM chado.featureprop fp, chado.feature g
+ WHERE g.uniquename = :gene
+ AND fp.feature_id=g.feature_id
+ AND fp.type_id=(select cvterm_id from chado.cvterm where name='gene family')
+SQL;
+
+    $args = array(':gene' => $gene);
+    $result = chado_query( $sql, $args );
+    $family = $result->fetchField();
+    //got this method for returning plain text from stackoverflow:
+
+    return $family;
+}
+
+/**
  * phylotree_json
  *  Get json representation of a phylotree id. See menu item for JSON service 
  *  endpoint.
