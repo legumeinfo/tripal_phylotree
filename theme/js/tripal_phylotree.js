@@ -2,7 +2,10 @@
 
 (function ($) {
   
-  var width = 550;
+  var phylogram_width = 350;
+  var dendrogram_width = 500;
+  var bubble_width = 500;
+  //var width = 250;
   var height = 0; // will be dynamically sized
   
   $(document).ready( function () {
@@ -180,23 +183,23 @@
     function displayData(treeData) {
       height = graphHeight(treeData);
       d3.phylogram.build('#phylogram', treeData, {
-        'width' : width,
-        'height' : height,
+        'width' : phylogram_width,
+        'height' : phylogram_width,
         'fill' : organismColor,
         'nodeMouseOver' : nodeMouseOver,
         'nodeMouseOut' : nodeMouseOut,
         'nodeMouseDown' : nodeMouseDown
       });
       d3.phylogram.buildRadial('#phylotree-radial-graph', treeData, {
-        'width' : width, // square graph 
+        'width' : dendrogram_width, // square graph 
         'fill' : organismColor,
         'nodeMouseOver' : nodeMouseOver,
         'nodeMouseOut' : nodeMouseOut,
         'nodeMouseDown' : nodeMouseDown
       });
       organismBubblePlot('#phylotree-organisms', treeData, {
-        'height' : width, // square graph
-        'width' : width, 
+        'height' : bubble_width, // square graph
+        'width' : bubble_width, 
         'fill' : organismColor,
         'nodeMouseOver' : nodeMouseOver,
         'nodeMouseOut' : nodeMouseOut,
