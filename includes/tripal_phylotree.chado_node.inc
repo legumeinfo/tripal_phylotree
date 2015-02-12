@@ -54,40 +54,51 @@ function tripal_phylotree_node_view($node, $view_mode, $langcode) {
   switch($view_mode) {
   case 'full':
     $node->content['tripal_phylotree_base'] = array(
-      '#markup' => theme('tripal_phylotree_base', array('node' => $node)),
+      '#theme' => 'tripal_phylotree_base',
+      '#node' => $node,
       '#tripal_toc_id'    => 'base',
-      '#tripal_toc_title' => 'Phylogram',
+      '#tripal_toc_title' => 'Overview',
       '#weight' => -100,
     );
-    $node->content['tripal_phylotree_radial'] = array(
-      '#markup' => theme('tripal_phylotree_radial', array('node' => $node)),
-      '#tripal_toc_id'    => 'phylotree_circ_dendrogram',
-      '#tripal_toc_title' => 'Circular Dendrogram',
-      '#weight' => -95,
-    );
-    $node->content['tripal_phylotree_organisms'] = array(
-      '#markup' => theme('tripal_phylotree_organisms', array('node' => $node)),
-      '#tripal_toc_id'    => 'phylotree_organisms',
-      '#tripal_toc_title' => 'Organisms',
+    $node->content['tripal_phylotree_phylogram'] = array(
+      '#theme' => 'tripal_phylotree_phylogram',
+      '#node' => $node,
+      '#tripal_toc_id'    => 'phylotree_phylogram',
+      '#tripal_toc_title' => 'Phylogram',
       '#weight' => -90,
     );
+    $node->content['tripal_phylotree_radial'] = array(
+      '#theme' => 'tripal_phylotree_radial',
+      '#node' => $node,
+      '#tripal_toc_id'    => 'phylotree_circ_dendrogram',
+      '#tripal_toc_title' => 'Circular Dendrogram',
+      '#weight' => -80,
+    ); 
+    $node->content['tripal_phylotree_organisms'] = array(
+      '#theme' => 'tripal_phylotree_organisms',
+      '#node' => $node,
+      '#tripal_toc_id'    => 'phylotree_organisms',
+      '#tripal_toc_title' => 'Organisms',
+      '#weight' => -70,
+    );
     $node->content['tripal_phylotree_references'] = array(
-      '#markup' => theme('tripal_phylotree_references', array('node' => $node)),
+      '#theme' => 'tripal_phylotree_references',
+      '#node' => $node,
       '#tripal_toc_id'    => 'phylotree_references',
       '#tripal_toc_title' => 'Cross References',
-      '#weight' => -80,
     );
      $node->content['tripal_phylotree_analysis'] = array(
-      '#markup' => theme('tripal_phylotree_analysis', array('node' => $node)),
+      '#theme' => 'tripal_phylotree_analysis',
+      '#node' => $node,
       '#tripal_toc_id'    => 'phylotree_analysis',
       '#tripal_toc_title' => 'Analysis',
-      '#weight' => -70,
-    ); 
+    );  
     break;
     
   case 'teaser':
     $node->content['tripal_phylotree_teaser'] = array(
-      '#markup' => theme('tripal_phylotree_teaser', array('node' => $node)),
+      '#theme' => 'tripal_phylotree_teaser',
+      '#node' => $node,
     );
     break;
     }
@@ -370,20 +381,24 @@ SQL;
  */
 function phylotree_json($phylotree_id) {
   
-  $sql = <<<SQL
-  SELECT n.phylonode_id, n.parent_phylonode_id, n.label AS name,
-  n.distance AS length, f.feature_id, f.name AS feature_name,
-  cvt.name AS cvterm_name,
-  o.organism_id, o.common_name, o.abbreviation, o.genus, o.species,
-  cf.nid AS feature_node_id, co.nid AS organism_node_id
-  FROM chado.phylonode n
-  LEFT OUTER JOIN chado.cvterm cvt ON n.type_id = cvt.cvterm_id
-  LEFT OUTER JOIN chado.feature f ON n.feature_id = f.feature_id
-  LEFT OUTER JOIN chado_feature cf ON cf.feature_id = f.feature_id
-  LEFT OUTER JOIN chado.organism o ON f.organism_id = o.organism_id
-  LEFT OUTER JOIN chado_organism co ON co.organism_id = o.organism_id
-  WHERE n.phylotree_id = :phylotree_id
-SQL;
+  // TODO: consider replacing this SQL with a chado_generate_var() call
+  // which would include all of the nids for both features and organisms.
+  $sql = "
+    SELECT 
+      n.phylonode_id, n.parent_phylonode_id, n.label AS name, n.distance AS length, 
+      f.feature_id, f.name AS feature_name,
+      cvt.name AS cvterm_name,
+      o.organism_id, o.common_name, o.abbreviation, o.genus, o.species,
+      cf.nid AS feature_node_id, 
+      co.nid AS organism_node_id
+    FROM {phylonode} n
+      LEFT OUTER JOIN {cvterm} cvt             ON n.type_id = cvt.cvterm_id
+      LEFT OUTER JOIN {feature} f              ON n.feature_id = f.feature_id
+      LEFT OUTER JOIN public.chado_feature cf  ON cf.feature_id = f.feature_id
+      LEFT OUTER JOIN {organism} o             ON f.organism_id = o.organism_id
+      LEFT OUTER JOIN public.chado_organism co ON co.organism_id = o.organism_id
+    WHERE n.phylotree_id = :phylotree_id
+  ";
 
   $args = array(':phylotree_id' => $phylotree_id);
   $result = chado_query( $sql, $args );
@@ -452,13 +467,16 @@ SQL;
  */
 function phylotree_feature_summary($phylotree_id) {
   
-  $sql = 'SELECT o.abbreviation, COUNT(o.organism_id) AS count '.
-    'FROM chado.phylonode n '.
-    'LEFT OUTER JOIN chado.feature f ON n.feature_id = f.feature_id '.
-    'LEFT OUTER JOIN chado.organism o ON f.organism_id = o.organism_id '.
-    'WHERE n.phylotree_id = :phylotree_id '.
-    'AND n.feature_id IS NOT NULL '.
-    'GROUP BY o.organism_id';
+  $sql = "
+    SELECT o.abbreviation, COUNT(o.organism_id) AS count 
+    FROM {phylonode} n 
+      LEFT OUTER JOIN {feature} f  ON n.feature_id = f.feature_id 
+      LEFT OUTER JOIN {organism} o ON f.organism_id = o.organism_id 
+    WHERE n.phylotree_id = :phylotree_id 
+      AND n.feature_id IS NOT NULL 
+    GROUP BY o.organism_id
+  ";
+
   $args = array(':phylotree_id' => $phylotree_id);
   $result = chado_query($sql, $args);
   $summary = array();

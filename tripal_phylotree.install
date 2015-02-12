@@ -5,6 +5,39 @@
  */
 
 /**
+ * Implements hook_install().
+ *
+ * @ingroup tripal_feature
+ */
+function tripal_phylotree_install() {
+  // create the module's data directory
+  tripal_create_files_dir('tripal_phylotree');
+
+  // add the vocabularies used by the feature module:
+  tripal_phylotree_add_cvterms();
+
+  // set the default vocabularies
+  tripal_set_default_cv('phylonode', 'type_id', 'tripal_phylogeny');
+  tripal_set_default_cv('phylotree', 'type_id', 'sequence');
+}
+
+/**
+ * Implements hook_disable().
+ *
+ * Disable default views when module is disabled
+ *
+ * @ingroup tripal_phylotree
+ */
+function tripal_phylotree_disable() {
+  // Disable all default views provided by this module
+  require_once("tripal_phylotree.views_default.inc");
+  $views = tripal_phylotree_views_default_views();
+  foreach (array_keys($views) as $view_name) {
+    tripal_disable_view($view_name,FALSE,array('suppress_error' => TRUE));
+  }
+}
+
+/**
  * Implementation of hook_requirements().
  *
  * @ingroup tripal_phylotree
@@ -60,4 +93,52 @@ function tripal_phylotree_schema() {
     'primary key' => array('nid'),
   );
   return $schema;
+}
+
+
+/**
+ * Adds controlled vocabulary terms needed by this module.
+ *
+ * @ingroup tripal_phylotree
+ */
+function tripal_phylotree_add_cvterms() {
+
+  tripal_insert_cv(
+    'tripal_phylogeny', 
+    'Terms used by the Tripal phylotree module for phylogenetic and taxonomic trees.'
+  );
+
+  // add the terms used to identify nodes in the tree
+  tripal_insert_cvterm(
+    array(
+      'name' => 'phylo_leaf',
+      'definition' => 'A leaf node in a phylogenetic tree.',
+      'cv_name' => 'tripal_phylogeny',
+      'is_relationship' => 0,
+      'db_name' => 'tripal'
+    ),
+    array('update_existing' => TRUE)
+  );
+  // add the terms used to identify nodes in the tree
+  tripal_insert_cvterm(
+    array(
+      'name' => 'phylo_root',
+      'definition' => 'The root node of a phylogenetic tree.',
+      'cv_name' => 'tripal_phylogeny',
+      'is_relationship' => 0,
+      'db_name' => 'tripal'
+    ),
+    array('update_existing' => TRUE)
+  );
+  // add the terms used to identify nodes in the tree
+  tripal_insert_cvterm(
+    array(
+      'name' => 'phylo_interior',
+      'definition' => 'An interior node in a phylogenetic tree.',
+      'cv_name' => 'tripal_phylogeny',
+      'is_relationship' => 0,
+      'db_name' => 'tripal'
+    ),
+    array('update_existing' => TRUE)
+  );
 }
