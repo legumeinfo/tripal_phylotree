@@ -141,4 +141,15 @@ function tripal_phylotree_add_cvterms() {
     ),
     array('update_existing' => TRUE)
   );
+  // add the terms used to identify nodes in the tree
+  tripal_insert_cvterm(
+    array(
+      'name' => 'taxonomy',
+      'definition' => 'A term used to indicate if a phylotree is a taxonomic tree',
+      'cv_name' => 'tripal_phylogeny',
+      'is_relationship' => 0,
+      'db_name' => 'tripal'
+    ),
+    array('update_existing' => TRUE)
+  );
 }

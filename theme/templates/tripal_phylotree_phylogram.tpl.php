@@ -6,7 +6,7 @@ $phylotree = $variables['node']->phylotree; ?>
   <img src="/<?php print drupal_get_path('module', 'tripal_phylotree') ?>/theme/images/ajax-loader.gif" class="phylogram-ajax-loader"/>
 </div> <?php
 
-if ($phylotree->type_id->name == 'polypeptide') { ?>
+if ($phylotree->type_id and $phylotree->type_id->name == 'polypeptide') { ?>
   <p>Phylogenies are essential to any analysis of evolutionary gene
     sequences collected across a group of organisms. A <b>phylogram</b>
     is a phylogenetic tree that has branch spans proportional to the

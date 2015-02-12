@@ -75,7 +75,11 @@ function tripal_phylotree_import_tree_file($file_name, $format, $options = array
     );
     $dbxref = chado_generate_var('dbxref', $values);
     if (!$dbxref) {
-      // ERROR
+      $db = chado_generate_var('db', array('name' => $db_name));
+      $dbxref = tripal_insert_dbxref(array(
+        'db_id' => $db->db_id,
+        'accession' => $accession,
+      ));
     }
   
     // Find the analysis that matches the given name
