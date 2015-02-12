@@ -1,10 +1,5 @@
 <?php 
-$phylotree = $variables['node']->phylotree; ?>
-
-<div id="phylogram">
-  <!-- d3js will add svg to this div, and remove the loader gif prefix with / for absolute url -->
-  <img src="/<?php print drupal_get_path('module', 'tripal_phylotree') ?>/theme/images/ajax-loader.gif" class="phylogram-ajax-loader"/>
-</div> <?php
+$phylotree = $variables['node']->phylotree; 
 
 if ($phylotree->type_id and $phylotree->type_id->name == 'polypeptide') { ?>
   <p>Phylogenies are essential to any analysis of evolutionary gene
@@ -13,6 +8,11 @@ if ($phylotree->type_id and $phylotree->type_id->name == 'polypeptide') { ?>
     amount of character change.
   </p> <?php
 }  ?>
+
+<div id="phylogram">
+  <!-- d3js will add svg to this div, and remove the loader gif prefix with / for absolute url -->
+  <img src="/<?php print drupal_get_path('module', 'tripal_phylotree') ?>/theme/images/ajax-loader.gif" class="phylogram-ajax-loader"/>
+</div> 
 
 <div id="phylonode_popup_dialog" style="display: none;">
   <!-- these links are for leaf nodes only -->
