@@ -54,6 +54,10 @@
       var dialog = $('#phylonode_popup_dialog');
       var title = (! d.children ) ? d.name : 'interior node ' + d.phylonode_id;
 
+      // remove previously generated external links for nodes with different phylonode_id:
+      $("div#linkout a[id!='^phylonode_linkout_"+d.phylonode_id+"']").remove();
+
+
       if(d.children) {
         // interior node
         if(d.phylonode_id) {
@@ -121,7 +125,6 @@
           //FIXME: hack depending on typical naming conventions. we can certainly do better
           var transcript = d.feature_name.replace(/^.....\./, "");
           var gene = transcript.replace(/\.\d+$/, "");
-
           // The ajax call should be at the end after generating #phylonode_feature_link, #phylonode_organism_link, etc.
           $.ajax({
             type: "GET",
@@ -130,18 +133,17 @@
 
               if (data.length > 0) {
                 $.each(data, function( index, value ) {
-                  var existinglink = $("a#phylonode_gene_linkout_"+index);
-                  alert(existinglink.length);
+                  var existinglink = $("a#phylonode_linkout_"+d.phylonode_id+"_"+index);
+                  
                   if (existinglink.length == 0) {
-                    var $link = $("<a id='#phylonode_gene_linkout_"+index+"' href='"+value.href+"' tabindex='-1'>"+value.text+"</a>");
-                    $("#linkout").append($link);
+                    var $link = $("<a id='phylonode_linkout_"+d.phylonode_id+"_"+index+"' href='"+value.href+"' tabindex='-1'>"+value.text+"</a>");
+                    $("div#linkout").append($link);
                   }
                 });
               }
             },
           });
 
-          console.log(d.genus+"/"+d.species+"/"+gene+"/"+transcript);
         } //linkout eof
 
 
