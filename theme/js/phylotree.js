@@ -56,7 +56,7 @@
 
       // remove previously generated external links for nodes with different phylonode_id:
       $("div#linkout a[id!='^phylonode_linkout_"+d.phylonode_id+"']").remove();
-
+      $("div#linkout br").remove();
 
       if(d.children) {
         // interior node
@@ -136,7 +136,7 @@
                   var existinglink = $("a#phylonode_linkout_"+d.phylonode_id+"_"+index);
                   
                   if (existinglink.length == 0) {
-                    var $link = $("<a id='phylonode_linkout_"+d.phylonode_id+"_"+index+"' href='"+value.href+"' tabindex='-1'>"+value.text+"</a>");
+                    var $link = $("<a id='phylonode_linkout_"+d.phylonode_id+"_"+index+"' href='"+value.href+"' tabindex='-1'>"+value.text+"</a></br>");
                     $("div#linkout").append($link);
                   }
                 });
