@@ -100,53 +100,8 @@
           // this shouldn't happen but ok
           $('#phylonode_feature_link').hide();
         }
-	if (d.feature_name) {
-          var link = $('#phylonode_gene_linkout');
-          //FIXME: hack depending on typical naming conventions. we can certainly do better
-          var transcript = d.feature_name.replace(/^.....\./, "");
-          var gene = transcript.replace(/\.\d+$/, "");
-          if (d.genus == 'Glycine' && d.species == 'max') {
-                  link.attr('href', 'http://www.soybase.org/sbt/search/search_results.php?category=FeatureName&search_term=' + gene);
-                  //link.attr('href', 'http://www.soybase.org/gb2/gbrowse/gmax2.0/?q=' + gene + ';dbid=gene_models_wm82_a2_v1');
-                  link.text('view at SoyBase: ' + gene);
-                  link.show();
-          }
-          else if (d.genus == 'Phaseolus' && d.species == 'vulgaris') {
-                  link.attr('href', 'http://phytozome.jgi.doe.gov/pz/portal.html#!gene?organism=Pvulgaris&searchText=locusName:' + gene);
-                  link.text('view at Phytozome: ' + gene);
-                  link.show();
-          }
-          else if (d.genus == 'Medicago' && d.species == 'truncatula') {
-                  link.attr('href', 'http://medicago.jcvi.org/medicago/jbrowse/?data=data%2Fjson%2Fmedicago&loc='+transcript+'&tracks=DNA%2Cgene_models&highlight=');
-                  link.text('view at JCVI: ' + transcript);
-                  link.show();
-          }
-          else if (d.genus == 'Arachis' && d.species == 'duranensis') {
-                  //link.attr('href', 'http://peanutbase.org/gb2/gbrowse/Aradu1.0/?q=' + gene);
-                  //link.attr('href', 'http://peanutbase-stage.agron.iastate.edu/gb2/gbrowse/Aradu1.0/?q=' + gene);
-                  link.attr('href', 'http://peanutbase.org/gb2/gbrowse/Aradu1.0/?q=' + gene + ';dbid=gene_models');
-                  //link.attr('href', 'http://peanutbase-stage.agron.iastate.edu/gb2/gbrowse/Aradu1.0/?q=' + gene + ';dbid=gene_models');
-                  link.text('view at PeanutBase: ' + gene);
-                  link.show();
-          }
-          else if (d.genus == 'Arachis' && d.species == 'ipaensis') {
-                  //link.attr('href', 'http://peanutbase.org/gb2/gbrowse/Araip1.0/?q=' + gene);
-                  //link.attr('href', 'http://peanutbase-stage.agron.iastate.edu/gb2/gbrowse/Araip1.0/?q=' + gene);
-                  link.attr('href', 'http://peanutbase.org/gb2/gbrowse/Araip1.0/?q=' + gene + ';dbid=gene_models');
-                  //link.attr('href', 'http://peanutbase-stage.agron.iastate.edu/gb2/gbrowse/Araip1.0/?q=' + gene + ';dbid=gene_models');
-                  link.text('view at PeanutBase: ' + gene);
-                  link.show();
-          }
-          else if (d.genus == 'Arabidopsis' && d.species == 'thaliana') {
-                  link.attr('href', ' http://www.araport.org/locus/' + gene);
-                  link.text('view at Arabidopsis Information Portal: ' + gene);
-                  link.show();
-          }
-          else {
-                  link.hide();
-          }
-        
-        }
+
+        // view organism bof
         if(d.organism_id) {
           var link = $('#phylonode_organism_link');
           link.attr('href', d.organism_node_id ?
@@ -157,7 +112,39 @@
         } else {
           // there should always be an organism id, but degrade gracefully
           $('#phylonode_organism_link').hide();
-        }
+        } // view organism eof
+
+
+        // Linkout bof:
+	if (d.feature_name) {
+
+          //FIXME: hack depending on typical naming conventions. we can certainly do better
+          var transcript = d.feature_name.replace(/^.....\./, "");
+          var gene = transcript.replace(/\.\d+$/, "");
+
+          // The ajax call should be at the end after generating #phylonode_feature_link, #phylonode_organism_link, etc.
+          $.ajax({
+            type: "GET",
+            url: window.location.origin+"/phylotree_links/"+d.genus+"/"+d.species+"/"+gene+"/"+transcript+"/json",
+            success:function(data) {
+
+              if (data.length > 0) {
+                $.each(data, function( index, value ) {
+                  var existinglink = $("a#phylonode_gene_linkout_"+index);
+                  alert(existinglink.length);
+                  if (existinglink.length == 0) {
+                    var $link = $("<a id='#phylonode_gene_linkout_"+index+"' href='"+value.href+"' tabindex='-1'>"+value.text+"</a>");
+                    $("#linkout").append($link);
+                  }
+                });
+              }
+            },
+          });
+
+          console.log(d.genus+"/"+d.species+"/"+gene+"/"+transcript);
+        } //linkout eof
+
+
       }
     
       dialog.dialog( {
