@@ -178,12 +178,22 @@ function chado_phylotree_form($node, &$form_state) {
   //$type_options = tripal_get_cvterm_default_select_options('phylotree', 'type_id', 'phylotree types');
   //$type_options[0] = 'Select a Type';
   $type_cv = tripal_get_default_cv('phylotree', 'type_id');
-  $cv_id = $type_cv->cv_id;
+  $so_cv  = tripal_get_cv(array('name' => 'sequence'));
+  $cv_id = $so_cv->cv_id;
+  
+  if (!$so_cv) {
+    drupal_set_message('The Sequence Ontolgoy does not appear to be imported.
+        Please import the Sequence Ontology before adding a tree.', 'error');
+  }
 
   $form['leaf_type'] = array(
-    '#title'       => t('Tree Leaf Type'),
+    '#title'       => t('Tree Type'),
     '#type'        => 'textfield',
-    '#description' => t("Choose the type of node that is used for the tree. The term must be a valid sequence ontology (SO) term, or the word 'taxonomy' if a taxonomic tree."),
+    '#description' => t("Choose the tree type. The type is  
+        a valid Sequence Ontology (SO) term. For example, trees derived 
+        from protein sequences should use the SO term 'polypeptide'. 
+        Alternatively, a phylotree can be used for representing a taxonomic 
+        tree. In this case, the word 'taxonomy' should be used."),
     '#required'    => FALSE,
     '#default_value' => $leaf_type,
     '#autocomplete_path' => "admin/tripal/chado/tripal_cv/cvterm/auto_name/$cv_id",
@@ -276,13 +286,15 @@ function chado_phylotree_validate($node, $form, &$form_state) {
 
     // make sure the phylotree type is a real sequence ontology term or the word
     // 'taxonomy'.
-    if ($node->leaf_type and $node->leaf_type != 'taxonomy') {
-      $type = tripal_get_cvterm(array(
-          'name' => $node->leaf_type,
-          'cv_id' => array('name' =>'sequence')
-      ));
-      if (!$type) {
-        form_set_error('leaf_type', t("The leaf type is not a valid name from the Sequence Ontology."));
+    if ($node->leaf_type) {
+      if ($node->leaf_type != 'taxonomy') {
+        $type = tripal_get_cvterm(array(
+            'name' => $node->leaf_type,
+            'cv_id' => array('name' =>'sequence')
+        ));
+        if (!$type) {
+          form_set_error('leaf_type', t("The leaf type is not a valid Sequence Ontology term."));
+        }
       }
     }
 
