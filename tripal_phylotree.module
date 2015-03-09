@@ -93,11 +93,20 @@ function tripal_phylotree_menu() {
     'weight' => 2
   );
   
-   $items['chado_phylotree/%'] = array(
+  // Enable admin view
+  $items['admin/tripal/chado/tripal_phylotree/views/phylotree/enable'] = array(
+    'title' => 'Enable Phylotree Administrative View',
+    'page callback' => 'tripal_enable_view',
+    'page arguments' => array('tripal_phylotree_admin_phylotree', 'admin/tripal/chado/tripal_phylotree'),
+    'access arguments' => array('administer tripal phylotree'),
+    'type' => MENU_CALLBACK,
+  );
+  
+  $items['chado_phylotree/%'] = array(
     'page callback' => 'phylotree_by_name',
     'page arguments' => array(1),
     'access callback' => TRUE // allow all anonymous http clients
-   );
+  );
   
    // create a route for viewing json of all phylonodes having this phylotree_id
    $items['chado_phylotree/%/json'] = array(
@@ -110,6 +119,22 @@ function tripal_phylotree_menu() {
 }
 
 /**
+ * Implements hook_search_biological_data_views().
+ *
+ * Adds the described views to the "Search Data" Page created by Tripal Views
+ */
+function tripal_phylotree_search_biological_data_views() {
+  return array(
+      'tripal_phylotree_user_phylotree' => array(
+          'machine_name' => 'tripal_phylotree_user_phylotree',
+          'human_name' => 'Phylogenetic Trees',
+          'description' => 'Gene trees, species trees, etc.',
+          'link' => 'chado/phylotree'
+      ),
+  );
+}
+
+/**
  * Implements hook_views_api().
  *
  * Essentially this hook tells drupal that there is views support for
@@ -119,29 +144,8 @@ function tripal_phylotree_menu() {
  * @ingroup tripal_phylotree
  */
 function tripal_phylotree_views_api() {
-    $path = drupal_get_path('module', 'tripal_phylotree');
-    return array(
-        'api' => 3.0,
-        'path' => $path . '/includes/views',
-        'template path' => $path .'/themes'
-    );
-}
-
-/**
- * Implements hook_search_biological_data_views().
- * Adds the described views to the "Search Data" Page created by Tripal Views
- *
- * @ingroup tripal_phylotree
- */
-
-function tripal_phylotree_search_biological_data_views() {
   return array(
-      'tripal_phylotree_user_phylotree' => array(
-          'machine_name' => 'tripal_phylotree_user_phylotree',
-          'human_name' => 'Phylotrees',
-          'description' => 'Gene trees, species trees, etc.',
-          'link' => 'chado/phylotree'
-    ),
+    'api' => 3.0,
   );
 }
 
@@ -168,6 +172,12 @@ function tripal_phylotree_theme($existing, $type, $theme, $path) {
     'tripal_phylotree_base' => array(
       'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_base',
+      'path' => "$path/theme/templates",
+    ),
+    // template for the phylogram
+    'tripal_phylotree_phylogram' => array(
+      'variables' => array('node' => NULL),
+      'template' => 'tripal_phylotree_phylogram',
       'path' => "$path/theme/templates",
     ),
     // partial for organisms block

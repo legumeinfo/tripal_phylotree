@@ -17,28 +17,20 @@ function tripal_phylotree_admin_phylotrees_listing() {
   $breadcrumb[] = l('Phylotrees', 'admin/tripal/extension/tripal_phylotree');
   drupal_set_breadcrumb($breadcrumb);
 
-  // EXPLANATION:  Typically for all Tripal modules the home administrative
-  // page for the module contains a search form to help the adminstrator
-  // locate records.  The following phylotree code adds a default View to
-  // the page
-  /*
   // Add the view
-  $view = views_embed_view('tripal_phylotree_admin_phylotrees','default');
+  $view = views_embed_view('tripal_phylotree_admin_phylotree','default');
   if (isset($view)) {
     $output .= $view;
   }
   else {
-    $output .= '<p>The Tripal Phylotree Module uses primarily views to provide an '
+    $output .= '<p>The Phylotree module uses primarily views to provide an '
       . 'administrative interface. Currently one or more views needed for this '
       . 'administrative interface are disabled. <strong>Click each of the following links to '
       . 'enable the pertinent views</strong>:</p>';
     $output .= '<ul>';
-      $output .= '<li>'.l('Phylotree Admin', 'admin/tripal/chado/tripal_phylotree/views/phylotrees/enable').'</li>';
+      $output .= '<li>'.l('Phylotree View', 'admin/tripal/chado/tripal_phylotree/views/phylotree/enable').'</li>';
     $output .= '</ul>';
   }
-  */
-  $output = 'TODO: typically a search view goes here. See Sync and Settings tabs above-right.';
-
   return $output;
 }
 
