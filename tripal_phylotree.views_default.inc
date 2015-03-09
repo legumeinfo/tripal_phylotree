@@ -259,6 +259,9 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['phylotree_name']['id'] = 'phylotree_name';
     $handler->display->display_options['fields']['phylotree_name']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['phylotree_name']['field'] = 'phylotree_name';
+    $handler->display->display_options['fields']['phylotree_name']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['phylotree_name']['alter']['path'] = 'node/[nid]';
+    $handler->display->display_options['fields']['phylotree_name']['alter']['absolute'] = TRUE;
     /* Field: phylotree_count: Description */
     $handler->display->display_options['fields']['phylotree_comment']['id'] = 'phylotree_comment';
     $handler->display->display_options['fields']['phylotree_comment']['table'] = 'phylotree_count';
