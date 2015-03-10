@@ -122,13 +122,15 @@ function chado_phylotree_form($node, &$form_state) {
   //    form elements and the form is being rebuilt
   //
   // set form field defaults
-  $phylotree    = null;
-  $phylotree_id = null;
-  $pname        = '';
-  $leaf_type    = '';
-  $analysis_id  = '';
+  $phylotree     = null;
+  $phylotree_id  = null;
+  $pname         = '';
+  $leaf_type     = '';
+  $analysis_id   = '';
   $dbxref        = '';
-  $comment      = '';
+  $comment       = '';
+  $tree_required = TRUE;
+  $tree_file     = '';
 
   // if we are editing an existing node then the phylotree is already part of the node
   if (property_exists($node, 'phylotree')) {
@@ -140,6 +142,19 @@ function chado_phylotree_form($node, &$form_state) {
     $comment        = $phylotree->comment;
     $analysis_id    = $phylotree->analysis_id->analysis_id;
     $dbxref         = $phylotree->dbxref_id->db_id->name . ":" . $phylotree->dbxref_id->accession;
+    $tree_required  = FALSE;
+
+    // TODO this should probably be converted to EntityFieldQuery call but
+    // no time to figure it out:
+    $sql = "
+      SELECT FM.fid, FM.filename 
+      FROM {file_managed} FM
+        INNER JOIN {file_usage} FU on FM.fid = FU.fid
+      WHERE FU.id = :nid and FU.module = 'tripal_phylotree'
+    ";
+    $file = db_query($sql, array(':nid' => $node->nid))->fetchObject();
+    $tree_file = $file->filename;
+    
 
     // keep track of the phylotree id
     $form['phylotree_id'] = array(
@@ -194,7 +209,7 @@ function chado_phylotree_form($node, &$form_state) {
         from protein sequences should use the SO term 'polypeptide'. 
         Alternatively, a phylotree can be used for representing a taxonomic 
         tree. In this case, the word 'taxonomy' should be used."),
-    '#required'    => FALSE,
+    '#required'    => TRUE,
     '#default_value' => $leaf_type,
     '#autocomplete_path' => "admin/tripal/chado/tripal_cv/cvterm/auto_name/$cv_id",
   );
@@ -222,7 +237,7 @@ function chado_phylotree_form($node, &$form_state) {
     '#description' => t("Enter a database cross-reference of the form 
         [DB name]:[accession]. The database name must already exist in the 
         database. If the accession does not exist it is automatically added."),
-    '#required'    => TRUE,
+    '#required'    => FALSE,
     '#default_value' => $dbxref,
   );
   
@@ -233,8 +248,66 @@ function chado_phylotree_form($node, &$form_state) {
     '#default_value' => $comment,
     '#description' => t('Enter a description for this tree.'),
   );
+  
+  $upload_location = tripal_get_files_stream('tripal_phylotree');
+  $form['tree_file'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Tree File Import'),
+    '#collapsible' => FALSE,
+  );
+  
+  $description = t('Please provide a file in the Newick format that contains 
+      the nodes of this tree.');
+  if ($tree_file) {
+    $form['tree_file']['curr_file'] = array(
+      '#type' => 'item',
+      '#title' => 'Current Tree File',
+      '#markup' => $tree_file,  
+    );
+    $description = t('Please provide a file in the Newick format that 
+        contains the nodes of this tree.  Please note that uploading a new 
+        file will overwrite the current tree.');
+  }  
+  $form['tree_file']['newick_tree'] = array(
+    '#type' => 'managed_file',
+    '#title' => t('New Tree File'),
+    '#description' => $description,
+    '#upload_location' => $upload_location,
+    '#upload_validators' => array(
+        // We don't want to require a specific file extension so leave the array empty.
+       'file_validate_extensions' => array(),
+        // The following is for checking the Newick file format.
+       'chado_phylotree_validate_newick_format' => array(),
+    ),
+    '#required' => $tree_required,
+  );
+  
+  $form['tree_file']['query_re'] = array(
+      '#title' => t('Query Name RE'),
+      '#type' => 'textfield',
+      '#description' => t('When importing the tree file, the importer
+          will attempt to associate the nodes with features that already
+          exist in the database. '),
+      '#default_value' => $query_re,
+  );
 
   return $form;
+}
+
+/**
+ * A validation function for checking the newick file format.
+ * 
+ * @param stdClass $file
+ *   A Drupal file object.
+ */
+function chado_phylotree_validate_newick_format(stdClass $file) {
+  // An array of strings where each string represents a unique error
+  // when examining the file.
+  $errors = array();
+
+  // TODO: check the newick file format for errors.
+  
+  return $errors;
 }
 
 /**
@@ -261,24 +334,28 @@ function chado_phylotree_validate($node, $form, &$form_state) {
   }
 
   // remove surrounding white-space on submitted values
-  $node->pname   = trim($node->pname);
-  $node->desc     = trim($node->desc);
+  $node->pname  = trim($node->pname);
+  $node->desc   = trim($node->desc);
+  $node->dbxref = trim($node->dbxref);
   
   // validate the dbxref for this tree
   $matches = array();
-  if (preg_match('/^(.*?):(.*)$/', $node->dbxref, $matches)) {
-    $db_name = $matches[1];
-    $accession = $matches[2];
-    $values = array(
-      'name' => $db_name
-    );
-    $dbxref = chado_generate_var('db', $values);
-    if (!$dbxref) {
-      form_set_error('dbxref', t("The database provided in the database cross reference does not exist. Please add the database."));
+  if ($node->dbxref) {
+    if(preg_match('/^(.*?):(.*)$/', $node->dbxref, $matches)) {
+ 
+      $db_name = $matches[1];
+      $accession = $matches[2];
+      $values = array(
+        'name' => $db_name
+      );
+      $dbxref = chado_generate_var('db', $values);
+      if (!$dbxref) {
+        form_set_error('dbxref', t("The database provided in the database cross reference does not exist. Please add the database."));
+      }
     }
-  }
-  else {
-    form_set_error('dbxref', t("The database cross reference is not in the correct format."));
+    else {
+      form_set_error('dbxref', t("The database cross reference is not in the correct format."));
+    }
   }
 
   // Validating for an update
@@ -314,8 +391,6 @@ function chado_phylotree_validate($node, $form, &$form_state) {
         form_set_error('pname', t("Phylotree update cannot proceed. The tree name '$node->pname' is in use by another tree. Please provide a unique name for this tree."));
       }
     }
-    
-    // TODO: validate the dbxref
   }
   // Validating for an insert
   else {
@@ -343,9 +418,57 @@ function chado_phylotree_validate($node, $form, &$form_state) {
     if ($result) {
       form_set_error('pname', t("Phylotree insert cannot proceed. The tree name '$node->pname' already exists for this tree. Please provide a unique name for this tree."));
     }
-    
-    // TODO: validate the dbxref
   }
+}
+/**
+ * Implements hook_node_submit()
+ * 
+ * @param unknown $node
+ * @param unknown $form
+ * @param unknown $form_state
+ */
+function tripal_phylotree_node_submit($node, $form, &$form_state) {
+  switch ($node->type) {
+    case 'chado_phylotree':
+
+      // If there is a newick file then handle it.
+      if ($form_state['values']['newick_tree']) {
+
+        // Make sure if we already have a file that we remove the old one.
+        $sql = "
+          SELECT FM.fid, FM.filename
+          FROM {file_managed} FM
+            INNER JOIN {file_usage} FU on FM.fid = FU.fid
+          WHERE FU.id = :nid and FU.module = 'tripal_phylotree'
+        ";
+        $result = db_query($sql, array(':nid' => $node->nid))->fetchObject();
+        if ($result) {
+          $file = file_load($result->fid);
+          file_delete($file, TRUE);
+        }
+
+        // Deal with the uploaded file by changing the status to permanent, save the
+        // file in it's proper location and associate the user.
+        $file = file_load($form_state['values']['newick_tree']);
+        $file->status = FILE_STATUS_PERMANENT;
+        file_save($file);
+        file_usage_add($file, 'tripal_phylotree', 'newick', $node->nid);
+        dpm($node);
+        dpm($form_state);
+
+        // Add a job to parse the new node tree.
+        $real_file_path = drupal_realpath($file->uri);
+        $options = array(
+          'leaf_type' => $node->leaf_type,
+          ''
+        );
+//         tripal_add_job("Import Newick file: " . $file->name, 'tripal_phylotree',
+//           'tripal_phylotree_import_tree_file', 
+//            array($real_file_path, 'newick', ));
+      }
+      break;
+  }
+;
 }
 /**
  * Implements hook_node_presave(). Acts on all node content types.
@@ -395,7 +518,7 @@ function tripal_phylotree_node_insert($node) {
       // Now use the API to set the path.
       chado_set_node_url($node);
 
-      // Now get the title
+      // Now get the title.
       $node->title = chado_get_node_title($node);
 
       break;
@@ -458,8 +581,9 @@ function chado_phylotree_chado_node_default_url_format() {
  * @ingroup tripal_phylotree
  */
 function chado_phylotree_insert($node) {
-  $node->pname   = trim($node->pname);
-  $node->desc    = trim($node->desc);
+  $node->pname  = trim($node->pname);
+  $node->desc   = trim($node->desc);
+  $node->dbxref = trim($node->dbxref);
   
   // get the leaf type id
   $type = NULL;
@@ -482,8 +606,13 @@ function chado_phylotree_insert($node) {
     $type = chado_select_record('cvterm', array('cvterm_id'), $values);
   }
   
-  // get the dbxref
-  // Add or find the dbxref for this tree
+  // A Dbxref is required by the phyltree module, but if the 
+  // tree was generated in-house and the site admin doens't want to
+  // assign a local dbxref then we will set it to the null db
+  // and the local:null dbxref.
+  if (!$node->dbxref) {
+    $node->dbxref = 'null:local:null';
+  }
   $matches = array();
   preg_match('/^(.*?):(.*)$/', $node->dbxref, $matches);
   $db_name = $matches[1];
@@ -554,9 +683,10 @@ function chado_phylotree_insert($node) {
  */
 function chado_phylotree_update($node) {
 
-  $node->pname   = trim($node->pname);
-  $node->desc = trim($node->desc);
-
+  $node->pname  = trim($node->pname);
+  $node->desc   = trim($node->desc);
+  $node->dbxref = trim($node->dbxref);
+  
   // get the leaf type id
   $type = NULL;
   if ($node->leaf_type == 'taxonomy') {
@@ -580,8 +710,13 @@ function chado_phylotree_update($node) {
     }
   }
   
-  // get the dbxref
-  // Add or find the dbxref for this tree
+  // A Dbxref is required by the phyltree module, but if the 
+  // tree was generated in-house and the site admin doens't want to
+  // assign a local dbxref then we will set it to the null db
+  // and the local:null dbxref.
+  if (!$node->dbxref) {
+    $node->dbxref = 'null:local:null';
+  }
   $matches = array();
   preg_match('/^(.*?):(.*)$/', $node->dbxref, $matches);
   $db_name = $matches[1];

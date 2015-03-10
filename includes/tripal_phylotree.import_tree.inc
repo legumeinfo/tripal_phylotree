@@ -6,7 +6,7 @@
  * @param $file_name
  *   The name of the file containing the phylogenetic tree to import.
  * @param $format
- *   The format of the file. Currently only the Newick file format is supported.
+ *   The format of the file. Currently only the 'newick' file format is supported.
  * @param $options
  *   A set of options for importing the file.  The options are required
  *     'name':       The name of the tree. This will be displayed to users.

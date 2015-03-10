@@ -2,7 +2,9 @@
 $phylotree = $variables['node']->phylotree;
 $dbxref = $phylotree->dbxref_id;
 
-if ($dbxref) { ?>
+// Make sure the dbxref isn't the null database. If not, then show this pane.
+if ($dbxref and $dbxref->db_id->name != 'null') { ?>
+
   <div class="tripal_phylotree-data-block-desc tripal-data-block-desc">This tree is also available in the following databases:</div><?php 
   
   // the $headers array is an array of fields to use as the colum headers.
