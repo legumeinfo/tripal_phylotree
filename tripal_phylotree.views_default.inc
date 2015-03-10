@@ -217,15 +217,15 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $view->name = 'tripal_phylotree_user_phylotree';
     $view->description = 'Allows users to search phylotree data';
     $view->tag = 'tripal search';
-    $view->base_table = 'phylotree_count';
-    $view->human_name = 'Phylogeny User Search';
+    $view->base_table = 'phylotree';
+    $view->human_name = 'Phylotree User Search';
     $view->core = 0;
     $view->api_version = '3.0';
     $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 
     /* Display: phylotrees_all */
     $handler = $view->new_display('default', 'phylotrees_all', 'default');
-    $handler->display->display_options['title'] = 'Phylogeny User Search';
+    $handler->display->display_options['title'] = 'Phylotree User Search';
     $handler->display->display_options['use_more_always'] = FALSE;
     $handler->display->display_options['access']['type'] = 'perm';
     $handler->display->display_options['access']['perm'] = 'access chado_phylotree content';
@@ -250,82 +250,71 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['header']['result']['id'] = 'result';
     $handler->display->display_options['header']['result']['table'] = 'views';
     $handler->display->display_options['header']['result']['field'] = 'result';
-    /* Footer: Global: Result summary */
-    $handler->display->display_options['footer']['result']['id'] = 'result';
-    $handler->display->display_options['footer']['result']['table'] = 'views';
-    $handler->display->display_options['footer']['result']['field'] = 'result';
-    $handler->display->display_options['footer']['result']['content'] = 'Displaying @start - @end of @total records found.';
-    /* Field: phylotree_count: Family ID */
-    $handler->display->display_options['fields']['phylotree_name']['id'] = 'phylotree_name';
-    $handler->display->display_options['fields']['phylotree_name']['table'] = 'phylotree_count';
-    $handler->display->display_options['fields']['phylotree_name']['field'] = 'phylotree_name';
-    $handler->display->display_options['fields']['phylotree_name']['alter']['make_link'] = TRUE;
-    $handler->display->display_options['fields']['phylotree_name']['alter']['path'] = 'node/[nid]';
-    $handler->display->display_options['fields']['phylotree_name']['alter']['absolute'] = TRUE;
-    /* Field: phylotree_count: Description */
-    $handler->display->display_options['fields']['phylotree_comment']['id'] = 'phylotree_comment';
-    $handler->display->display_options['fields']['phylotree_comment']['table'] = 'phylotree_count';
-    $handler->display->display_options['fields']['phylotree_comment']['field'] = 'phylotree_comment';
-    /* Field: phylotree_count: Total count */
-    $handler->display->display_options['fields']['total_count']['id'] = 'total_count';
-    $handler->display->display_options['fields']['total_count']['table'] = 'phylotree_count';
-    $handler->display->display_options['fields']['total_count']['field'] = 'total_count';
-    /* Filter criterion: phylotree_count: Family ID */
-    $handler->display->display_options['filters']['phylotree_name']['id'] = 'phylotree_name';
-    $handler->display->display_options['filters']['phylotree_name']['table'] = 'phylotree_count';
-    $handler->display->display_options['filters']['phylotree_name']['field'] = 'phylotree_name';
-    $handler->display->display_options['filters']['phylotree_name']['exposed'] = TRUE;
-    $handler->display->display_options['filters']['phylotree_name']['expose']['operator_id'] = 'phylotree_name_op';
-    $handler->display->display_options['filters']['phylotree_name']['expose']['label'] = 'Family ID';
-    $handler->display->display_options['filters']['phylotree_name']['expose']['use_operator'] = TRUE;
-    $handler->display->display_options['filters']['phylotree_name']['expose']['operator'] = 'phylotree_name_op';
-    $handler->display->display_options['filters']['phylotree_name']['expose']['identifier'] = 'phylotree_name';
-    $handler->display->display_options['filters']['phylotree_name']['expose']['remember_roles'] = array(
+    /* Field: Content: Nid */
+    $handler->display->display_options['fields']['nid']['id'] = 'nid';
+    $handler->display->display_options['fields']['nid']['table'] = 'node';
+    $handler->display->display_options['fields']['nid']['field'] = 'nid';
+    $handler->display->display_options['fields']['nid']['exclude'] = TRUE;
+    /* Field: Chado Phylotree: Phylotree Id */
+    $handler->display->display_options['fields']['phylotree_id']['id'] = 'phylotree_id';
+    $handler->display->display_options['fields']['phylotree_id']['table'] = 'phylotree';
+    $handler->display->display_options['fields']['phylotree_id']['field'] = 'phylotree_id';
+    $handler->display->display_options['fields']['phylotree_id']['exclude'] = TRUE;
+    /* Field: Chado Phylotree: Name */
+    $handler->display->display_options['fields']['name']['id'] = 'name';
+    $handler->display->display_options['fields']['name']['table'] = 'phylotree';
+    $handler->display->display_options['fields']['name']['field'] = 'name';
+    $handler->display->display_options['fields']['name']['label'] = 'Family ID';
+    $handler->display->display_options['fields']['name']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['name']['alter']['path'] = 'node/[nid]';
+    $handler->display->display_options['fields']['name']['alter']['absolute'] = TRUE;
+    /* Field: Chado Phylotree: Comment */
+    $handler->display->display_options['fields']['comment']['id'] = 'comment';
+    $handler->display->display_options['fields']['comment']['table'] = 'phylotree';
+    $handler->display->display_options['fields']['comment']['field'] = 'comment';
+    $handler->display->display_options['fields']['comment']['label'] = 'Description';
+    $handler->display->display_options['fields']['comment']['alter']['max_length'] = '240';
+    $handler->display->display_options['fields']['comment']['alter']['trim'] = TRUE;
+    /* Filter criterion: Chado Phylotree: Name */
+    $handler->display->display_options['filters']['name']['id'] = 'name';
+    $handler->display->display_options['filters']['name']['table'] = 'phylotree';
+    $handler->display->display_options['filters']['name']['field'] = 'name';
+    $handler->display->display_options['filters']['name']['group'] = 1;
+    $handler->display->display_options['filters']['name']['exposed'] = TRUE;
+    $handler->display->display_options['filters']['name']['expose']['operator_id'] = 'name_op';
+    $handler->display->display_options['filters']['name']['expose']['label'] = 'Family ID';
+    $handler->display->display_options['filters']['name']['expose']['use_operator'] = TRUE;
+    $handler->display->display_options['filters']['name']['expose']['operator'] = 'name_op';
+    $handler->display->display_options['filters']['name']['expose']['identifier'] = 'name';
+    $handler->display->display_options['filters']['name']['expose']['remember'] = TRUE;
+    $handler->display->display_options['filters']['name']['expose']['remember_roles'] = array(
         2 => '2',
-        1 => 0,
-        4 => 0,
+        1 => '1',
+        3 => '3',
     );
-    $handler->display->display_options['filters']['phylotree_name']['max_length'] = '40';
-    /* Filter criterion: phylotree_count: Description */
-    $handler->display->display_options['filters']['phylotree_comment']['id'] = 'phylotree_comment';
-    $handler->display->display_options['filters']['phylotree_comment']['table'] = 'phylotree_count';
-    $handler->display->display_options['filters']['phylotree_comment']['field'] = 'phylotree_comment';
-    $handler->display->display_options['filters']['phylotree_comment']['operator'] = 'allwords';
-    $handler->display->display_options['filters']['phylotree_comment']['exposed'] = TRUE;
-    $handler->display->display_options['filters']['phylotree_comment']['expose']['operator_id'] = 'phylotree_comment_op';
-    $handler->display->display_options['filters']['phylotree_comment']['expose']['label'] = 'Tree Description';
-    $handler->display->display_options['filters']['phylotree_comment']['expose']['use_operator'] = TRUE;
-    $handler->display->display_options['filters']['phylotree_comment']['expose']['operator'] = 'phylotree_comment_op';
-    $handler->display->display_options['filters']['phylotree_comment']['expose']['identifier'] = 'phylotree_comment';
-    $handler->display->display_options['filters']['phylotree_comment']['expose']['remember_roles'] = array(
+    $handler->display->display_options['filters']['name']['max_length'] = '15';
+    /* Filter criterion: Chado Phylotree: Comment */
+    $handler->display->display_options['filters']['comment']['id'] = 'comment';
+    $handler->display->display_options['filters']['comment']['table'] = 'phylotree';
+    $handler->display->display_options['filters']['comment']['field'] = 'comment';
+    $handler->display->display_options['filters']['comment']['operator'] = 'allwords';
+    $handler->display->display_options['filters']['comment']['group'] = 1;
+    $handler->display->display_options['filters']['comment']['exposed'] = TRUE;
+    $handler->display->display_options['filters']['comment']['expose']['operator_id'] = 'comment_op';
+    $handler->display->display_options['filters']['comment']['expose']['label'] = 'Tree Description';
+    $handler->display->display_options['filters']['comment']['expose']['use_operator'] = TRUE;
+    $handler->display->display_options['filters']['comment']['expose']['operator'] = 'comment_op';
+    $handler->display->display_options['filters']['comment']['expose']['identifier'] = 'comment';
+    $handler->display->display_options['filters']['comment']['expose']['remember'] = TRUE;
+    $handler->display->display_options['filters']['comment']['expose']['remember_roles'] = array(
         2 => '2',
-        1 => 0,
-        4 => 0,
-    );
-    $handler->display->display_options['filters']['phylotree_comment']['max_length'] = '40';
-    /* Filter criterion: phylotree_count: Total count */
-    $handler->display->display_options['filters']['total_count']['id'] = 'total_count';
-    $handler->display->display_options['filters']['total_count']['table'] = 'phylotree_count';
-    $handler->display->display_options['filters']['total_count']['field'] = 'total_count';
-    $handler->display->display_options['filters']['total_count']['exposed'] = TRUE;
-    $handler->display->display_options['filters']['total_count']['expose']['operator_id'] = 'total_count_op';
-    $handler->display->display_options['filters']['total_count']['expose']['label'] = 'Total count';
-    $handler->display->display_options['filters']['total_count']['expose']['use_operator'] = TRUE;
-    $handler->display->display_options['filters']['total_count']['expose']['operator'] = 'total_count_op';
-    $handler->display->display_options['filters']['total_count']['expose']['identifier'] = 'total_count';
-    $handler->display->display_options['filters']['total_count']['expose']['remember_roles'] = array(
-        2 => '2',
-        1 => 0,
-        4 => 0,
+        1 => '1',
+        3 => '3',
     );
 
-    /* Display: Phylogeny */
+    /* Display: Page */
     $handler = $view->new_display('page', 'Phylogeny', 'page');
     $handler->display->display_options['path'] = 'chado/phylotree';
-    $handler->display->display_options['menu']['type'] = 'normal';
-    $handler->display->display_options['menu']['title'] = 'Phylogeny';
-    $handler->display->display_options['menu']['description'] = 'Gene trees, species trees, etc.';
-    $handler->display->display_options['menu']['weight'] = '-10';
   
     return $view;
 }
