@@ -257,7 +257,7 @@ function tripal_phylotree_import_tree(&$tree, $phylotree, $options, $vocab, $par
       // type of tree. But we can't do that if we don't have a name.
       if (!empty($tree['name']) and $tree['name'] != '') {
         if ($options['taxonomy'] != TRUE) {
-          
+
           // This is a sequence-based tree. Try to match leaf nodes with features.
           // First, Get the Name and uniquename for the feature
           $matches = array();
