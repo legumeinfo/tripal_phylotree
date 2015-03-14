@@ -152,11 +152,19 @@ function chado_phylotree_form($node, &$form_state) {
       $dbxref = '';
     }
     
-    // Get the tree file name.
-    $file_id        = $phylotree->tripal_variables->phylotree_tree_file;
-    $file = file_load($file_id);
-    if ($file) {
-      $tree_file = $file->filename;
+    // Get the tree file name. If the file was added via the Drupal interface
+    // then a numeric file_id will be present in the phylotree_tree_file
+    // variable. If not then the tree was loaded on the command-line and
+    // the actual filename is in this variable.
+    $file_id = $phylotree->tripal_variables->phylotree_tree_file;
+    if (is_numeric($file_id)) {
+      $file = file_load($file_id);
+      if ($file) {
+        $tree_file = $file->filename;
+      }
+    }
+    else {
+      $tree_file = $file_id;
     }
     
     // The tree file is not a required input field when editing the node.
@@ -525,31 +533,6 @@ function chado_phylotree_insert($node) {
       tripal_add_node_variable($node->nid, 'phylotree_name_re', $node->name_re);
       tripal_add_node_variable($node->nid, 'phylotree_use_uniquename', $node->match);
       tripal_add_node_variable($node->nid, 'phylotree_tree_file', $node->tree_file);
-
-      // Load the file
-      $file = NULL;
-      $file = file_load($options['tree_file']);
-      $file->status = FILE_STATUS_PERMANENT;
-      $file = file_save($file);
-      file_usage_add($file, 'tripal_phylotree', $options['format'], $phylotree_id);
-
-      // Add a job to parse the new node tree.
-      $file = file_load($node->tree_file);
-      $real_file_path = drupal_realpath($file->uri);
-      $args = array(
-        $real_file_path,
-        'newick',
-         array(
-          'phylotree_id' => $phylotree_id,
-          'leaf_type' => $node->leaf_type,
-          'match' => $node->match ? 'uniquename' : 'name',
-          'name_re' => $node->name_re,
-         ),
-      );
-      if (tripal_add_job("Import Tree File: " . $file->filename, 'tripal_phylotree',
-          'tripal_phylotree_import_tree_file', $args, $user->uid)) {
-        drupal_set_message(t('The tree visualizations will appear once the tree is fully imported.'));
-      }
     }
     else {
       drupal_set_message(t('Unable to insert phylotree.'), 'error');
@@ -593,6 +576,7 @@ function chado_phylotree_update($node) {
 
   
   $options = array(
+    'phylotree_id' => $node->phylotree_id,
     'name'         => $node->tree_name,
     'description'  => $node->description,
     'analysis_id'  => $node->analysis_id,
@@ -607,53 +591,12 @@ function chado_phylotree_update($node) {
   $success = tripal_update_phylotree($phylotree_id, $options);
 
   if (!$success) {
-    drupal_set_message(t('Unable to update phylotree.'), 'warning');
-    drupal_set_message("Unable to update phylotree where values.", "error");
+    drupal_set_message("Unable to update phylotree.", "error");
     tripal_report_error('tripal_phylotree', TRIPAL_WARNING,
       'Update phylotree: Unable to update phylotree where values: %values',
       array('%values' => print_r($options, TRUE))
     );
-  }
-
-  if ($node->tree_file) {
-    // Make sure if we already have a file that we remove the old one.
-    $sql = "
-      SELECT FM.fid, FM.filename
-      FROM {file_managed} FM
-        INNER JOIN {file_usage} FU on FM.fid = FU.fid
-      WHERE FU.id = :nid and FU.module = 'tripal_phylotree'
-    ";
-    $result = db_query($sql, array(':nid' => $node->nid))->fetchObject();
-    if ($result) {
-      $file = file_load($result->fid);
-      file_delete($file, TRUE);
-    }
-
-    // Make the new file permanent and associate with this node.
-    $file = file_load($node->tree_file);
-    $file->status = FILE_STATUS_PERMANENT;
-    $file = file_save($file);
-    file_usage_add($file, 'tripal_phylotree', 'newick', $node->nid);
-    
-    // Remove any tree nodes
-    chado_delete_record('phylonode', array('phylotree_id' => $node->phylotree_id));
-    
-    // Add a job to parse the new node tree.
-    $real_file_path = drupal_realpath($file->uri);
-    $args = array(
-      $real_file_path,
-      'newick',
-       array(
-        'phylotree_id' => $phylotree_id,
-        'leaf_type' => $node->leaf_type,
-        'match' => $node->match ? 'uniquename' : 'name',
-        'name_re' => $node->name_re,
-       ),
-    );
-    if (tripal_add_job("Import Tree File: " . $file->filename, 'tripal_phylotree',
-        'tripal_phylotree_import_tree_file', $args, $user->uid)) {
-      drupal_set_message(t('The tree visualizations will appear once the tree is fully imported.'));
-    }
+    return;
   }
 
   // Remove any variables and then add back the variables from the form.

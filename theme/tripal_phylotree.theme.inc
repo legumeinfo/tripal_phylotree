@@ -38,6 +38,15 @@ function tripal_phylotree_preprocess_tripal_phylotree_radial(&$variables) {
   tripal_phylotree_set_tree_has_nodes($phylotree);
 }
 
+/**
+ * Implements hook_preprocess_hook();
+ *
+ * @param $variables
+ */
+function tripal_phylotree_preprocess_tripal_phylotree_organisms(&$variables) {
+  $phylotree = $variables['node']->phylotree;
+  tripal_phylotree_set_tree_has_nodes($phylotree);
+}
 
 /**
  * Helper function for the preprocess hooks that adds a 'has_nodes' to the phylotree object.

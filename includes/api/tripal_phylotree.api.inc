@@ -31,10 +31,6 @@ function tripal_validate_phylotree($val_type, &$options, &$errors) {
   
   // Set Defaults.
   if ($val_type == 'insert') {
-    // If no leaf type is provided then use the polypeptide term.
-    if (!array_key_exists('leaf_type', $options)) {
-      $options['leaf_type'] = 'polypeptide';
-    }
     // Match by feature name.
     if (!array_key_exists('match', $options)) {
       $options['match'] = 'name';
@@ -42,10 +38,6 @@ function tripal_validate_phylotree($val_type, &$options, &$errors) {
     // The regular expression is to match the entire node name.
     if (!array_key_exists('name_re', $options)) {
       $options['name_re'] = '^(.*)$';
-    }
-    // Don't sync by deafult.
-    if (!array_key_exists('sync', $options)) {
-      $options['sync'] = FALSE;
     }
     // A dbxref is not required by Tripal but is required by the database
     // field in the phylotree table.  Therefore, if the dbxref is not provided
@@ -74,25 +66,32 @@ function tripal_validate_phylotree($val_type, &$options, &$errors) {
       $errors['tree_file'] = t('Please provide either the full path to the tree_file or a Drupal managed file ID number.');
       return FALSE;
     }
-    if (!array_key_exists('format', $options)) {
+    if (!array_key_exists('format', $options) or !$options['format']) {
       $errors['format'] = t('Please provide an file format for the tree file.');
+      return FALSE;
+    }
+    // Make sure the file format is correct
+    if ($options['format'] != 'newick') {
+      $errors['format'] = t('The file format is not supported. Currently only the "newick" file format is supported.');
       return FALSE;
     }
   }
   else {
+    // Does the phylotree ID exist and is it valid
     if (!array_key_exists('phylotree_id', $options)) {
       $errors['phylotree_id'] = t('Please provide the ID for the tree.');
       return FALSE;
     }
+    $exists = chado_select_record('phylotree', array('phylotree_id'), 
+        array('phylotree_id' => $options['phylotree_id']), array('has_record' => 1));
+    if (!$exists) {
+      $errors['phylotree_id'] = t('The phylotree_id does not exist.');
+      return FALSE;
+    }
+
   }
-  
-  // Make sure the file format is correct
-  if (array_key_exists('format', $options) and $options['format'] != 'newick') {
-    $errors['format'] = t('The file format is not supported. Currently only the "newick" file format is supported.');
-    return FALSE;
-  }
-  
-  // Make sure the file exists
+
+  // Make sure the file exists if one is specified
   if (array_key_exists('tree_file', $options) and $options['tree_file']) {
     // If this is a numeric Drupal file then all is good, no need to check.
     if (!is_numeric($options['tree_file'])) {
@@ -100,6 +99,16 @@ function tripal_validate_phylotree($val_type, &$options, &$errors) {
         $errors['tree_file'] = t('The file provided does not exists.');
         return FALSE;
       }
+    }
+    // Make sure the file format is correct
+    if (!array_key_exists('format', $options) or $options['format'] != 'newick') {
+      $errors['format'] = t('Please provide a supported file format. Currently only the "newick" file format is supported.');
+      return FALSE;
+    }
+    
+    // If no leaf type is provided then use the polypeptide term.
+    if (!array_key_exists('leaf_type', $options) or !$options['leaf_type']) {
+      $options['leaf_type'] = 'polypeptide';
     }
   }
 
@@ -113,7 +122,7 @@ function tripal_validate_phylotree($val_type, &$options, &$errors) {
     }
     $options['analysis_id'] = $analysis[0]->analysis_id;
   }
-  else {
+  if (array_key_exists('analysis', $options) and $options['analysis']) {
     $analysis = chado_select_record('analysis', array('analysis_id'), array('name' => $options['analysis']));
     if (!$analysis) {
       $errors['analysis'] = t('The analysis ID provided does not exist.');
@@ -233,6 +242,9 @@ function tripal_validate_phylotree($val_type, &$options, &$errors) {
  *                   used.
  *     'match':      Set to 'uniquename' if the leaf nodes should be matched
  *                   with the feature uniquename. 
+ *     'load_now':   If set, the tree will be loaded immediately if a tree_file
+ *                   is provided. Otherwise, the tree will be loaded via
+ *                   a Tripal jobs call.
  *     
  * @return
  *   TRUE for success and FALSE for failure.
@@ -273,6 +285,48 @@ function tripal_insert_phylotree(&$options) {
   }
   $phylotree_id = $phylotree['phylotree_id'];
   $options['phylotree_id'] = $phylotree_id;
+  
+  // If the tree_file is numeric then it is a Drupal managed file and 
+  // we want to make the file permanent and associated with the tree.
+  if (is_numeric($options['tree_file'])) {
+    $file = NULL;
+    $file = file_load($options['tree_file']);
+    $file->status = FILE_STATUS_PERMANENT;
+    $file = file_save($file);
+    file_usage_add($file, 'tripal_phylotree', $options['format'], $phylotree_id);
+    $real_file_path = drupal_realpath($file->uri);
+  }
+  else {
+    $real_file_path = $options['tree_file'];
+  }
+
+  // If caller has requested to load the file now then do so, otherwise
+  // submit using a Tripal job. 
+  if (array_key_exists('load_now', $options) and $options['load_now']) {
+    $args = array(
+      'phylotree_id' => $phylotree_id,
+      'leaf_type' => $options['leaf_type'],
+      'match' => $options['match'] ? 'uniquename' : 'name',
+      'name_re' => $options['name_re'],
+    );
+    tripal_phylotree_import_tree_file($real_file_path, $options['format'], $args);
+  }
+  else {
+    $args = array(
+        $real_file_path,
+        'newick',
+        array(
+          'phylotree_id' => $phylotree_id,
+          'leaf_type' => $options['leaf_type'],
+          'match' => $options['match'] ? 'uniquename' : 'name',
+          'name_re' => $options['name_re'],
+        ),
+    );
+    if (tripal_add_job("Import Tree File: " . $file->filename, 'tripal_phylotree',
+        'tripal_phylotree_import_tree_file', $args, $user->uid)) {
+        drupal_set_message(t('The tree visualizations will appear once the tree is fully imported.'));
+    }
+  }
 
   return TRUE;
 }
@@ -286,6 +340,7 @@ function tripal_insert_phylotree(&$options) {
  * their approriate primary key values added to the options array. A Drupal
  * File object will be added to the options array for the tree file if one
  * is provided.
+ * 
  * 
  * @param $phylotree_id
  *   The ID of the phylotree to update.
@@ -316,13 +371,16 @@ function tripal_insert_phylotree(&$options) {
  *                   used.
  *     'match':      Set to 'uniquename' if the leaf nodes should be matched
  *                   with the feature uniquename. 
+ *     'load_now':   If set, the tree will be loaded immediately if a tree_file
+ *                   is provided. Otherwise, the tree will be loaded via
+ *                   a Tripal jobs call.
  */
 function tripal_update_phylotree($phylotree_id, &$options) {
   global $user;
 
   // Validate the incoming options.
   $errors = array();
-  $success = tripal_validate_phylotree('insert', $options, $errors);
+  $success = tripal_validate_phylotree('update', $options, $errors);
   if (!$success) {
     foreach ($errors as $field => $message) {
       tripal_report_error('tripal_phylotree', TRIPAL_ERROR, $message);
@@ -334,30 +392,92 @@ function tripal_update_phylotree($phylotree_id, &$options) {
   $match = array(
       'phylotree_id' => $phylotree_id,
   );
-  if (array_key_exists('name', $options)) {
+  if (array_key_exists('name', $options) and $options['name']) {
     $values['name'] = $options['name'];
   }
-  if (array_key_exists('analysis_id', $options)) {
+  if (array_key_exists('analysis_id', $options) and $options['analysis_id']) {
     $values['analysis_id'] = $options['analysis_id'];
   }
-  if (array_key_exists('dbxref_id', $options)) {
+  if (array_key_exists('dbxref_id', $options) and $options['dbxref_id']) {
     $values['dbxref_id'] = $options['dbxref_id'];
   }
-  if (array_key_exists('description', $options)) {
+  if (array_key_exists('description', $options) and $options['description']) {
     $values['comment'] = $options['description'];
   }
-  if (array_key_exists('type_id', $options)) {
+  if (array_key_exists('type_id', $options) and $options['type_id']) {
     $values['type_id'] = $options['type_id'];
   }
 
-  $options = array('return_record' => TRUE);
-  $phylotree = chado_update_record('phylotree', $match, $values, $options);
+  $phylotree = chado_update_record('phylotree', $match, $values, array('return_record' => TRUE));
   if (!$phylotree) {
     drupal_set_message(t('Unable to update phylotree.'), 'warning');
     tripal_report_error('tripal_phylotree', TRIPAL_WARNING,
         'Update phylotree: Unable to update phylotree where values: %values',
         array('%values' => print_r($values, TRUE))
     );
+  }
+  
+  // If we have a tree file, then import the tree
+  if (array_key_exists('tree_file', $options) and $options['tree_file']) {
+    
+    // Remove any existing nodes
+    chado_delete_record('phylonode', array('phylotree_id' => $options['phylotree_id']));
+  
+    // Make sure if we already have a file that we remove the old one.
+    $sql = "
+      SELECT FM.fid
+      FROM {file_managed} FM
+        INNER JOIN {file_usage} FU on FM.fid = FU.fid
+      WHERE FU.id = :id and FU.module = 'tripal_phylotree'
+    ";
+    $fid = db_query($sql, array(':id' => $options['phylotree_id']))->fetchField();
+    if ($fid) {
+      $file = file_load($fid);
+      file_delete($file, TRUE);
+    }
+  
+    // If the tree_file is numeric then it is a Drupal managed file and 
+    // we want to make the file permanent and associated with the tree.
+    if (is_numeric($options['tree_file'])) {
+      $file = file_load($options['tree_file']);
+      $file->status = FILE_STATUS_PERMANENT;
+      $file = file_save($file);
+      file_usage_add($file, 'tripal_phylotree', 'newick', $options['phylotree_id']);
+    
+      // Add a job to parse the new node tree.
+      $real_file_path = drupal_realpath($file->uri);
+    }
+    else {
+      $real_file_path = $options['tree_file'];
+    }
+    
+    // If caller has requested to load the file now then do so, otherwise
+    // submit using a Tripal job. 
+    if (array_key_exists('load_now', $options) and $options['load_now']) {
+      $args = array(
+        'phylotree_id' => $options['phylotree_id'],
+        'leaf_type' => $options['leaf_type'],
+        'match' => $options['match'] ? 'uniquename' : 'name',
+        'name_re' => $options['name_re'],
+      );
+      tripal_phylotree_import_tree_file($real_file_path, $options['format'], $args);
+    }
+    else {
+      $args = array(
+        $real_file_path,
+        'newick',
+        array(
+          'phylotree_id' => $options['phylotree_id'],
+          'leaf_type' => $options['leaf_type'],
+          'match' => $options['match'] ? 'uniquename' : 'name',
+          'name_re' => $options['name_re'],
+        ),
+      );
+      if (tripal_add_job("Import Tree File: " . $file->filename, 'tripal_phylotree',
+          'tripal_phylotree_import_tree_file', $args, $user->uid)) {
+        drupal_set_message(t('The tree visualizations will appear once the tree is fully imported.'));
+      }
+    }
   }
   
   return TRUE;

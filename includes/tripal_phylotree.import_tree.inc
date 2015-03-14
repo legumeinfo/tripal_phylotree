@@ -30,7 +30,7 @@
  */
 function tripal_phylotree_import_tree_file($file_name, $format, $options = array(), $job_id = NULL) {
 
-  // Set some option details.
+    // Set some option details.
   if (!array_key_exists('leaf_type', $options)) {
     $options['leaf_type'] = 'polypeptide';
   }
@@ -47,21 +47,19 @@ function tripal_phylotree_import_tree_file($file_name, $format, $options = array
   if (!array_key_exists('phylotree_id', $options)) {
     if (!array_key_exists('name', $options)) {
        tripal_report_error('tripal_phylotree', TRIPAL_ERROR,
-         'Please provide the phylotree_id for the tree.');
+         'The phylotree_id is required for importing the tree.');
        return FALSE;
     }
   }
   
   // get the phylotree record.
-  $values = array(
-      'phylotree_id' => $options['phylotree_id']
-  );
+  $values = array('phylotree_id' => $options['phylotree_id']);
   $phylotree = chado_generate_var('phylotree', $values);
   
   if (!$phylotree) {
     tripal_report_error('tripal_phylotree', TRIPAL_ERROR,
         'Could not find the phylotree using the ID provided: %phylotree_id.',
-        array('%phylotree_id', $options['phylotree_id']));
+        array('%phylotree_id' => $options['phylotree_id']));
     return FALSE;
   }
   
@@ -126,7 +124,7 @@ function tripal_phylotree_import_tree_file($file_name, $format, $options = array
     $transaction->rollback();
     print "FAILED: Rolling back database changes...\n";
   }
-  print "\nDone.\n";
+  print "\nDone Importing Tree.\n";
 }
 
 /**
@@ -161,7 +159,7 @@ function tripal_phylotree_assign_tree_indices(&$tree, &$index = 1) {
  * @param $options
  */
 function tripal_phylotree_import_tree(&$tree, $phylotree, $options, $vocab, $parent = NULL) {
-  if (array_key_exists('name', $tree)) {
+  if (is_array($tree) and array_key_exists('name', $tree)) {
     $values = array(
       'phylotree_id' => $phylotree->phylotree_id,
       'left_idx'  => $tree['left_index'],
@@ -241,7 +239,7 @@ function tripal_phylotree_import_tree(&$tree, $phylotree, $options, $vocab, $par
     $phylonode = chado_insert_record('phylonode', $values);
     $tree['phylonode_id'] = $phylonode['phylonode_id'];
   }
-  if (array_key_exists('branch_set', $tree)) {
+  if (is_array($tree) and array_key_exists('branch_set', $tree)) {
     foreach ($tree['branch_set'] as $key => $node) {
       tripal_phylotree_import_tree($tree['branch_set'][$key], $phylotree, $options, $vocab, $tree);
     }
