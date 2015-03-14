@@ -1,0 +1,387 @@
+<?php
+
+/**
+ * Validates an $options array for insert or update of a phylotree record.
+ * 
+ * If validation passes then any values that needed validation lookups 
+ * (such as the dbxref, analysis, leaf_type, etc) will have their approriate 
+ * primary_keys added to the $options array, and missing default values
+ * will also be added.
+ * 
+ * @param $val_type
+ *   The type of validation. Can be either 'insert' or 'update'.
+ * @param $options 
+ *   An array of key/value pairs containing any of the valid keys for
+ *   either the tripal_insert_phylotree() or tripal_update_phylotree() 
+ *   functions.
+ * @param $errors
+ *   An empty array where validation error messages will be set.
+ * @return
+ *   If validation failes then FALSE is returned.  Any options that do not pass 
+ *   validation checks will be added in the $errors array with the key being 
+ *   the option and the value being the error message.  If validation
+ *   is successful then TRUE is returned.
+ *    
+ */
+function tripal_validate_phylotree($val_type, &$options, &$errors) {
+
+  if ($val_type != 'insert' and $val_type != 'update') {
+    tripal_report_error('tripal_phylotree', TRIPAL_ERROR, "The $val_type argument must be either 'update or 'insert'.");
+  }
+  
+  // Set Defaults.
+  if ($val_type == 'insert') {
+    // If no leaf type is provided then use the polypeptide term.
+    if (!array_key_exists('leaf_type', $options)) {
+      $options['leaf_type'] = 'polypeptide';
+    }
+    // Match by feature name.
+    if (!array_key_exists('match', $options)) {
+      $options['match'] = 'name';
+    }
+    // The regular expression is to match the entire node name.
+    if (!array_key_exists('name_re', $options)) {
+      $options['name_re'] = '^(.*)$';
+    }
+    // Don't sync by deafult.
+    if (!array_key_exists('sync', $options)) {
+      $options['sync'] = FALSE;
+    }
+    // A dbxref is not required by Tripal but is required by the database
+    // field in the phylotree table.  Therefore, if the dbxref is not provided
+    // we can set this to be the null database and null dbxref which
+    // is represented as 'null:local:null'
+    if (!array_key_exists('dbxref', $options)) {
+      $options['dbxref'] = "null:local:null";
+    }
+  }
+
+  // Make sure required values are set.
+  if ($val_type == 'insert') {
+    if (!array_key_exists('name', $options)) {
+      $errors['name'] = t('Please provide the name of the tree.');
+      return FALSE;
+    }
+    if (!array_key_exists('description', $options)) {
+      $errors['description'] = t('Please provide a description for this tree.');
+      return FALSE;
+    }
+    if (!array_key_exists('analysis', $options) and !array_key_exists('analysis_id', $options)) {
+      $errors['analysis'] = t('Please provide an analysis or analysis_id for this tree.');
+      return FALSE;
+    }
+    if (!array_key_exists('tree_file', $options)) {
+      $errors['tree_file'] = t('Please provide either the full path to the tree_file or a Drupal managed file ID number.');
+      return FALSE;
+    }
+    if (!array_key_exists('format', $options)) {
+      $errors['format'] = t('Please provide an file format for the tree file.');
+      return FALSE;
+    }
+  }
+  else {
+    if (!array_key_exists('phylotree_id', $options)) {
+      $errors['phylotree_id'] = t('Please provide the ID for the tree.');
+      return FALSE;
+    }
+  }
+  
+  // Make sure the file format is correct
+  if (array_key_exists('format', $options) and $options['format'] != 'newick') {
+    $errors['format'] = t('The file format is not supported. Currently only the "newick" file format is supported.');
+    return FALSE;
+  }
+  
+  // Make sure the file exists
+  if (array_key_exists('tree_file', $options) and $options['tree_file']) {
+    // If this is a numeric Drupal file then all is good, no need to check.
+    if (!is_numeric($options['tree_file'])) {
+      if (!file_exists($options['tree_file'])) {
+        $errors['tree_file'] = t('The file provided does not exists.');
+        return FALSE;
+      }
+    }
+  }
+
+  // Make sure the analysis exists.
+  $analysis = NULL;
+  if (array_key_exists('analysis_id', $options) and $options['analysis_id']) {
+    $analysis = chado_select_record('analysis', array('analysis_id'), array('analysis_id' => $options['analysis_id']));
+    if (!$analysis) {
+      $errors['analysis_id'] = t('The analysis name provided does not exist.');
+      return FALSE;
+    }
+    $options['analysis_id'] = $analysis[0]->analysis_id;
+  }
+  else {
+    $analysis = chado_select_record('analysis', array('analysis_id'), array('name' => $options['analysis']));
+    if (!$analysis) {
+      $errors['analysis'] = t('The analysis ID provided does not exist.');
+      return FALSE;
+    }
+    $options['analysis_id'] = $analysis[0]->analysis_id;
+  }
+
+  // Make sure the leaf type exists.
+  $type = NULL;
+  if (array_key_exists('leaf_type', $options) and $options['leaf_type']) {
+    if ($options['leaf_type'] == 'taxonomy') {
+      $values = array(
+        'cv_id' => array(
+           'name' => 'tripal_phylogeny'
+        ),
+        'name' => 'taxonomy'
+      );
+      $type = chado_select_record('cvterm', array('cvterm_id'), $values);
+    }
+    else {
+      $values = array(
+        'cv_id' => array(
+           'name' => 'sequence'
+        ),
+        'name' => $options['leaf_type']
+      );
+      $type = chado_select_record('cvterm', array('cvterm_id'), $values);
+      if (!$type) {
+        $errors['leaf_type'] = t('The leaf_type provided is not a valid Sequence Ontology term: %term.');
+        return FALSE;
+      }
+    }
+    $options['type_id'] = $type[0]->cvterm_id;
+  }
+
+  // A Dbxref is required by the phylotree module, but if the
+  // tree was generated in-house and the site admin doens't want to
+  // assign a local dbxref then we will set it to the null db
+  // and the local:null dbxref.
+  if (array_key_exists('dbxref', $options)) {
+    if (!$options['dbxref']) {
+        $options['dbxref'] = 'null:local:null';
+    }
+    $matches = array();
+    preg_match('/^(.*?):(.*)$/', $options['dbxref'], $matches);
+    $db_name = $matches[1];
+    $accession = $matches[2];
+    $values = array(
+      'accession' => $accession,
+      'db_id' => array(
+        'name' => $db_name
+      ),
+    );
+    $dbxref = chado_generate_var('dbxref', $values);
+    if (!$dbxref) {
+      $errors['dbxref'] = t('The dbxref provided does not exist in the database: %dbxref.', array('%dbxref' => $dbxref));
+      return FALSE;
+    }
+    $options['dbxref_id'] = $dbxref->dbxref_id;
+  }
+  
+  // Make sure the tree name is unique
+  if (array_key_exists('name', $options) and $options['name']) {
+    $sql = "
+      SELECT *
+      FROM {phylotree} P
+      WHERE
+        P.name = :name
+    ";
+    $args = array(':name' => $options['name']);
+    if ($val_type == 'update') {
+      $sql .= " AND NOT P.phylotree_id = :phylotree_id";
+      $args[':phylotree_id'] = $options['phylotree_id'];
+    }
+    $result = chado_query($sql, $args)->fetchObject();
+    if ($result) {
+      $errors['name'] = t("The tree name is in use by another tree. Please provide a different unique name for this tree.");
+    }
+  }
+
+  return TRUE;
+}
+/**
+ * Inserts a phylotree record into Chado.
+ * 
+ * This function validates the options passed prior to insertion of the record,
+ * and if validation passes then any values in the options array that needed 
+ * validation lookups (such as the dbxref, analysis, leaf_type, etc) will have 
+ * their approriate primary key values added to the options array. 
+ * 
+ * @param $options
+ *  An array of key value pairs with the following keys required:
+ *     'name':       The name of the tree. This will be displayed to users.
+ *     'description: A description about the tree
+ *     'anlaysis_id: The ID of the analysis to which this phylotree should be 
+ *                   associated.
+ *     'analysis':   If the analysis_id key is not used then the analysis name
+ *                   may be provided to identify the analysis to which the tree
+ *                   should be associated.
+ *     'leaf_type':  A sequence ontology term or the word 'organism'. If the
+ *                   type is 'organism' then this tree represents a 
+ *                   taxonomic tree.  The default, if not specified, is the
+ *                   term 'polypeptide'.
+ *     'tree_file':  The path of the file containing the phylogenetic tree to 
+ *                   import or a Drupal managed_file numeric ID. 
+ *     'format':     The file format. Currently only 'newick is supported'
+ *  Optional keys:
+ *     'dbxref':     A database cross-reference of the form DB:ACCESSION. 
+ *                   Where DB is the database name, which is already present 
+ *                   in Chado, and ACCESSION is the unique identifier for 
+ *                   this tree in the remote database.
+ *     'name_re':    If the leaf type is NOT 'taxonomy', then the value of
+ *                   this field can be a regular expression to pull out
+ *                   the name of the feature from the node label in the 
+ *                   intput tree. If no value is provided the entire label is 
+ *                   used.
+ *     'match':      Set to 'uniquename' if the leaf nodes should be matched
+ *                   with the feature uniquename. 
+ *     
+ * @return
+ *   TRUE for success and FALSE for failure.
+ */
+function tripal_insert_phylotree(&$options) {
+  global $user;
+  
+  $options['name_re'] = trim($options['name_re']);
+  $options['leaf_type'] = trim($options['leaf_type']);
+  $options['name'] = trim($options['name']);
+  $options['format'] = trim($options['format']);
+  $options['tree_file'] = trim($options['tree_file']);
+
+  // Validate the incoming options.
+  $errors = array();
+  $success = tripal_validate_phylotree('insert', $options, $errors);
+  if (!$success) {
+    foreach ($errors as $field => $message) {
+      tripal_report_error('tripal_phylotree', TRIPAL_ERROR, $message);
+    }
+    return FALSE;
+  }
+
+  // If we're here then all is good, so add the phylotree record.
+  $values = array(
+    'analysis_id' => $options['analysis_id'],
+    'name' => $options['name'],
+    'dbxref_id' => $options['dbxref_id'],
+    'comment' => $options['description'],
+    'type_id' => $options['type_id'],
+  );
+  $phylotree = chado_insert_record('phylotree', $values);
+  if (!$phylotree) {
+    drupal_set_message(t('Unable to add phylotree.'), 'warning');
+    tripal_report_error('tripal_phylotree', TRIPAL_WARNING, 'Insert phylotree: Unable to create phylotree where values: %values',
+        array('%values' => print_r($values, TRUE)));
+    return FALSE;
+  }
+  $phylotree_id = $phylotree['phylotree_id'];
+  $options['phylotree_id'] = $phylotree_id;
+
+  return TRUE;
+}
+
+/**
+ * Updates a phylotree record into Chado.
+ * 
+ * This function validates the options passed prior to update of the record
+ * and if validation passes then any values in the options array that needed 
+ * validation lookups (such as the dbxref, analysis, leaf_type, etc) will have 
+ * their approriate primary key values added to the options array. A Drupal
+ * File object will be added to the options array for the tree file if one
+ * is provided.
+ * 
+ * @param $phylotree_id
+ *   The ID of the phylotree to update.
+ * @param $options
+ *  An array of key value pairs with the following optional keys:
+ *     'name':       The name of the tree. This will be displayed to users.
+ *     'description: A description about the tree
+ *     'anlaysis_id: The ID of the analysis to which this phylotree should be 
+ *                   associated.
+ *     'analysis':   If the analysis_id key is not used then the analysis name
+ *                   may be provided to identify the analysis to which the tree
+ *                   should be associated.
+ *     'leaf_type':  A sequence ontology term or the word 'organism'. If the
+ *                   type is 'organism' then this tree represents a 
+ *                   taxonomic tree.  The default, if not specified, is the
+ *                   term 'polypeptide'.
+ *     'tree_file':  The path of the file containing the phylogenetic tree to 
+ *                   import or a Drupal managed_file numeric ID. 
+ *     'format':     The file format. Currently only 'newick is supported'
+ *     'dbxref':     A database cross-reference of the form DB:ACCESSION. 
+ *                   Where DB is the database name, which is already present 
+ *                   in Chado, and ACCESSION is the unique identifier for 
+ *                   this tree in the remote database.
+ *     'name_re':    If the leaf type is NOT 'taxonomy', then the value of
+ *                   this field can be a regular expression to pull out
+ *                   the name of the feature from the node label in the 
+ *                   intput tree. If no value is provided the entire label is 
+ *                   used.
+ *     'match':      Set to 'uniquename' if the leaf nodes should be matched
+ *                   with the feature uniquename. 
+ */
+function tripal_update_phylotree($phylotree_id, &$options) {
+  global $user;
+
+  // Validate the incoming options.
+  $errors = array();
+  $success = tripal_validate_phylotree('insert', $options, $errors);
+  if (!$success) {
+    foreach ($errors as $field => $message) {
+      tripal_report_error('tripal_phylotree', TRIPAL_ERROR, $message);
+    }
+    return FALSE;
+  }
+
+  // If we're here then all is good, so update the phylotree record.
+  $match = array(
+      'phylotree_id' => $phylotree_id,
+  );
+  if (array_key_exists('name', $options)) {
+    $values['name'] = $options['name'];
+  }
+  if (array_key_exists('analysis_id', $options)) {
+    $values['analysis_id'] = $options['analysis_id'];
+  }
+  if (array_key_exists('dbxref_id', $options)) {
+    $values['dbxref_id'] = $options['dbxref_id'];
+  }
+  if (array_key_exists('description', $options)) {
+    $values['comment'] = $options['description'];
+  }
+  if (array_key_exists('type_id', $options)) {
+    $values['type_id'] = $options['type_id'];
+  }
+
+  $options = array('return_record' => TRUE);
+  $phylotree = chado_update_record('phylotree', $match, $values, $options);
+  if (!$phylotree) {
+    drupal_set_message(t('Unable to update phylotree.'), 'warning');
+    tripal_report_error('tripal_phylotree', TRIPAL_WARNING,
+        'Update phylotree: Unable to update phylotree where values: %values',
+        array('%values' => print_r($values, TRUE))
+    );
+  }
+  
+  return TRUE;
+}
+
+/**
+ * Deletes a phylotree record from Chado.
+ * 
+ * @param $phylotree_id
+ * 
+ * @return 
+ *   TRUE on success, FALSE on failure.
+ */
+function tripal_delete_phylotree($phylotree_id) {
+  
+  // if we don't have a phylotree id for this node then this isn't a node of
+  // type chado_phylotree or the entry in the chado_phylotree table was lost.
+  if (!$phylotree_id) {
+    tripal_report_error('tripal_phylotree', TRIPAL_ERROR,
+        'Please provide a phylotree_id to delete a tree.');
+    return FALSE;
+  }
+
+  // Remove the tree
+  $values = array('phylotree_id' => $phylotree_id);
+  return chado_delete_record('phylotree', $values);
+}
