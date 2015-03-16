@@ -21,3 +21,5 @@ if ($phylotree->has_nodes) {
     <div><a id="phylonode_feature_link" href="" tabindex="-1"></a></div>
     <div><a id="phylonode_organism_link" href="" tabindex="-1"></a></div>
   </div>
+ <?php
+} ?>
