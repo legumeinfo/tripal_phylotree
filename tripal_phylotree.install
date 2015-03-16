@@ -7,29 +7,47 @@
 /**
  * Implements hook_install().
  *
- * @ingroup tripal_feature
+ * @ingroup tripal_phylotree
  */
 function tripal_phylotree_install() {
-  // create the module's data directory
+
+  // Create the module's data directory.
   tripal_create_files_dir('tripal_phylotree');
 
-  // add the vocabularies used by the feature module:
+  // Add the vocabularies used by the feature module.
   tripal_phylotree_add_cvterms();
 
-  // set the default vocabularies
+  // Set the default vocabularies.
   tripal_set_default_cv('phylonode', 'type_id', 'tripal_phylogeny');
   tripal_set_default_cv('phylotree', 'type_id', 'sequence');
 
-  // add the materializedviews
+  // Add the materializedviews.
   tripal_phylotree_add_mview();
 
-  // we want to integrate the materialized views so that they
-  // are available for Drupal Views, upon which our search forms are built
+  // We want to integrate the materialized views so that they
+  // are available for Drupal Views, upon which our search forms are built.
   tripal_phylotree_integrate_view();
-
   $mview_id =  tripal_get_mview_id('phylotree_count');
-
-  tripal_populate_mview($mview_id);
+  
+  // SPF: commented out automatic populate of MView.  If the query fails
+  // for some reason the install will not properly complete.
+  // tripal_populate_mview($mview_id);
+  
+  // Add the custom tables.
+  tripal_phylotree_add_custom_tables();
+  
+  // Add an index on the phylonode table.  We have chado hardcoded here
+  // because there is no correspnding Tripal API call to add a custom index to
+  // a table.  Perhaps there should be one...
+  if (!db_index_exists('chado.phylonode', 'phylonode_idx1')) {
+    db_add_index('chado.phylonode', 'phylonode_idx1', array('parent_phylonode_id'));
+  }
+  
+  // Add in the variables that this module will use to store properties for
+  // loading of the tree files.
+  tripal_insert_variable('phylotree_name_re', 'The regular expression for matching a name in a string.');
+  tripal_insert_variable('phylotree_use_uniquename', 'Set to 1 if features should be matched using the unqiuename rather than the name.');
+  tripal_insert_variable('phylotree_tree_file', 'Holds the Drupal file ID for the uploaded tree file.');
 }
 
 /**
@@ -56,7 +74,7 @@ function tripal_phylotree_disable() {
 function tripal_phylotree_requirements($phase) {
   $requirements = array();
   if ($phase == 'install') {
-    // make sure chado is installed
+    // Make sure chado is installed.
     if (!$GLOBALS["chado_is_installed"]) {
       $requirements ['tripal_phylotree'] = array(
         'title' => "tripal_phylotree",
@@ -103,6 +121,7 @@ function tripal_phylotree_schema() {
     ),
     'primary key' => array('nid'),
   );
+  
   return $schema;
 }
 
@@ -119,7 +138,7 @@ function tripal_phylotree_add_cvterms() {
     'Terms used by the Tripal phylotree module for phylogenetic and taxonomic trees.'
   );
 
-  // add the terms used to identify nodes in the tree
+  // Add the terms used to identify nodes in the tree.
   tripal_insert_cvterm(
     array(
       'name' => 'phylo_leaf',
@@ -130,7 +149,7 @@ function tripal_phylotree_add_cvterms() {
     ),
     array('update_existing' => TRUE)
   );
-  // add the terms used to identify nodes in the tree
+  // Add the terms used to identify nodes in the tree.
   tripal_insert_cvterm(
     array(
       'name' => 'phylo_root',
@@ -141,7 +160,7 @@ function tripal_phylotree_add_cvterms() {
     ),
     array('update_existing' => TRUE)
   );
-  // add the terms used to identify nodes in the tree
+  // Add the terms used to identify nodes in the tree.
   tripal_insert_cvterm(
     array(
       'name' => 'phylo_interior',
@@ -152,7 +171,7 @@ function tripal_phylotree_add_cvterms() {
     ),
     array('update_existing' => TRUE)
   );
-  // add the terms used to identify nodes in the tree
+  // Add the terms used to identify nodes in the tree.
   tripal_insert_cvterm(
     array(
       'name' => 'taxonomy',
@@ -176,9 +195,8 @@ function tripal_phylotree_uninstall() {
     if ($mview_id) {
         tripal_delete_mview($mview_id);
     }
-    //Remove views integration
+    // Remove views integration.
     // Note: tripal_remove_views_intergration accepts table_name and priority in a key value form.
-
     $delete_view=array(
         'table_name' => 'phylotree_count',
         'priority' => '-1',
@@ -188,50 +206,50 @@ function tripal_phylotree_uninstall() {
 }
 
 function tripal_phylotree_add_mview(){
-    //Materialized view addition
+  // Materialized view addition.
+  $sql_query="
+    WITH count_genes as 
+      (SELECT count(*) count, t.phylotree_id 
+       FROM phylotree t, phylonode n 
+       WHERE n.phylotree_id = t.phylotree_id AND n.label is NOT NULL
+       GROUP BY t.phylotree_id) 
+    SELECT
+      phylotree.phylotree_id AS phylotree_phylotree_id,
+      phylotree.name         AS phylotree_name,
+      phylotree.comment      AS phylotree_comment,
+      count_genes.count      AS total_count
+    FROM chado.phylotree phylotree
+      LEFT JOIN chado_phylotree chado_phylotree ON phylotree.phylotree_id = chado_phylotree.phylotree_id
+      LEFT JOIN count_genes count_genes         ON phylotree.phylotree_id = count_genes.phylotree_id
+  ";
 
-        $sql_query="WITH count_genes as (select count(*) count, t.phylotree_id from phylotree t, phylonode n where n.phylotree_id=t.phylotree_id and n.label is not null group by t.phylotree_id) SELECT
-phylotree.phylotree_id AS phylotree_phylotree_id,
-phylotree.name AS phylotree_name,
-phylotree.comment AS phylotree_comment,
-count_genes.count as total_count
-FROM chado.phylotree phylotree
-LEFT JOIN chado_phylotree chado_phylotree ON phylotree.phylotree_id = chado_phylotree.phylotree_id
-LEFT JOIN count_genes count_genes ON phylotree.phylotree_id = count_genes.phylotree_id";
+  // Table Phylotree User Search description.
+  $schema = array (
+    'table' => 'phylotree_count',
+    'fields' => array(
+      'phylotree_phylotree_id' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+      'phylotree_name' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+      ),
+      'phylotree_comment' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+      ),
+      'total_count' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('phylotree_phylotree_id'),
+  );
 
-        //Table Phylotree User Search  description
-
-        $schema = array (
-            'table' => 'phylotree_count',
-            'fields' => array(
-                'phylotree_phylotree_id' => array(
-                    'type' => 'int',
-                    'not null' => FALSE,
-                ),
-                'phylotree_name' => array(
-                    'type' => 'text',
-                    'not null' => FALSE,
-                ),
-                'phylotree_comment' => array(
-                    'type' => 'text',
-                    'not null' => FALSE,
-                ),
-                'total_count' => array(
-                    'type' => 'int',
-                    'not null' => TRUE,
-                ),
-            ),
-            'primary key' => array('phylotree_phylotree_id'),
-        );
-
-            // add a comment to make sure this view makes sense to the site administator
-            $comment = t('This view is used to provide a table for Phylotree User Search with total count.');
-            tripal_add_mview(
-                'phylotree_count', // name of materialized view
-                'tripal_phylotree', // name of module submitting view
-                $schema,      // schema api array representation
-                $sql_query,         // sql query that loads the mview
-                $comment );
+  // Add a comment to make sure this view makes sense to the site administator.
+  $comment = t('This view is used to provide a table for Phylotree User Search with total count.');
+  tripal_add_mview('phylotree_count', 'tripal_phylotree',  $schema, $sql_query, $comment);
 }
 
 
@@ -241,121 +259,182 @@ LEFT JOIN count_genes count_genes ON phylotree.phylotree_id = count_genes.phylot
  */
 
 function tripal_phylotree_integrate_view(){
-    $integration = array (
-        'table' => 'phylotree_count',
-        'name' => 'phylotree_count',
-        'type' => 'chado',
-        'description' => '',
-        'priority' => '-1',
-        'base_table' => '1',
-        'fields' => array (
-            'phylotree_phylotree_id' => array (
-                'name' => 'phylotree_phylotree_id',
-                'title' => 'Phylotree ID',
-                'description' => 'Phylotree ID',
-                'type' => 'int',
-                'handlers' => array (
-                    'filter' => array (
-                        'name' => 'views_handler_filter_numeric',
-                    ),
-                    'field' => array (
-                        'name' => 'views_handler_field_numeric',
-                    ),
-                    'sort' => array (
-                        'name' => 'views_handler_sort',
-                    ),
-                    'argument' => array (
-                        'name' => 'views_handler_argument_numeric',
-                    ),
-                    'relationship' => array (
-                        'name' => 'views_handler_relationship',
-                    ),
-                ),
-                'joins' => array (
-                ),
-            ),
-
-            'phylotree_name' => array (
-                'name' => 'phylotree_name',
-                'title' => 'Family ID',
-                'description' => 'Family ID',
-                'type' => 'text',
-                'handlers' => array (
-                    'filter' => array (
-                        'name' => 'tripal_views_handler_filter_select_string',
-                    ),
-                    'field' => array (
-                        'name' => 'views_handler_field',
-                    ),
-                    'sort' => array (
-                        'name' => 'views_handler_sort',
-                    ),
-                    'argument' => array (
-                        'name' => 'views_handler_argument_string',
-                    ),
-                    'relationship' => array (
-                        'name' => 'views_handler_relationship',
-                    ),
-                ),
-                'joins' => array (
-                ),
-            ),
-
-            'phylotree_comment' => array (
-                'name' => 'phylotree_comment',
-                'title' => 'Description',
-                'description' => 'Description',
-                'type' => 'text',
-                'handlers' => array (
-                    'filter' => array (
-                        'name' => 'tripal_views_handler_filter_select_string',
-                    ),
-                    'field' => array (
-                        'name' => 'views_handler_field',
-                    ),
-                    'sort' => array (
-                        'name' => 'views_handler_sort',
-                    ),
-                    'argument' => array (
-                        'name' => 'views_handler_argument_string',
-                    ),
-                    'relationship' => array (
-                        'name' => 'views_handler_relationship',
-                    ),
-                ),
-                'joins' => array (
-                ),
-            ),
-
-            'total_count' => array (
-                'name' => 'total_count',
-                'title' => 'Total count',
-                'description' => 'Total count',
-                'type' => 'int',
-                'handlers' => array (
-                    'filter' => array (
-                        'name' => 'views_handler_filter_numeric',
-                    ),
-                    'field' => array (
-                        'name' => 'views_handler_field',
-                    ),
-                    'sort' => array (
-                        'name' => 'views_handler_sort',
-                    ),
-                    'argument' => array (
-                        'name' => 'views_handler_argument_numeric',
-                    ),
-                    'relationship' => array (
-                        'name' => 'views_handler_relationship',
-                    ),
-                ),
-                'joins' => array (
-                ),
-            ),
-
+  $integration = array (
+    'table' => 'phylotree_count',
+    'name' => 'phylotree_count',
+    'type' => 'chado',
+    'description' => '',
+    'priority' => '-1',
+    'base_table' => '1',
+    'fields' => array (
+      'phylotree_phylotree_id' => array (
+        'name' => 'phylotree_phylotree_id',
+        'title' => 'Phylotree ID',
+        'description' => 'Phylotree ID',
+        'type' => 'int',
+        'handlers' => array (
+          'filter' => array (
+            'name' => 'views_handler_filter_numeric' 
+          ),
+          'field' => array (
+            'name' => 'views_handler_field_numeric' 
+          ),
+          'sort' => array (
+            'name' => 'views_handler_sort' 
+          ),
+          'argument' => array (
+            'name' => 'views_handler_argument_numeric' 
+          ),
+          'relationship' => array (
+            'name' => 'views_handler_relationship' 
+          ) 
         ),
-    );
-    // add the array above that will integrate our qtl_search materialized view
-    // for use with Drupal Views
-    tripal_add_views_integration($integration);
+        'joins' => array () 
+      ),
+      'phylotree_name' => array (
+        'name' => 'phylotree_name',
+        'title' => 'Family ID',
+        'description' => 'Family ID',
+        'type' => 'text',
+        'handlers' => array (
+          'filter' => array (
+            'name' => 'tripal_views_handler_filter_select_string' 
+          ),
+          'field' => array (
+            'name' => 'views_handler_field' 
+          ),
+          'sort' => array (
+            'name' => 'views_handler_sort' 
+          ),
+          'argument' => array (
+            'name' => 'views_handler_argument_string' 
+          ),
+          'relationship' => array (
+            'name' => 'views_handler_relationship' 
+          ) 
+        ),
+        'joins' => array ()
+      ),
+      'phylotree_comment' => array (
+        'name' => 'phylotree_comment',
+        'title' => 'Description',
+        'description' => 'Description',
+        'type' => 'text',
+        'handlers' => array (
+          'filter' => array (
+            'name' => 'tripal_views_handler_filter_select_string' 
+          ),
+          'field' => array (
+            'name' => 'views_handler_field' 
+          ),
+          'sort' => array (
+            'name' => 'views_handler_sort' 
+          ),
+          'argument' => array (
+            'name' => 'views_handler_argument_string' 
+          ),
+          'relationship' => array (
+            'name' => 'views_handler_relationship' 
+          ) 
+        ),
+        'joins' => array () 
+      ),
+      'total_count' => array (
+        'name' => 'total_count',
+        'title' => 'Total count',
+        'description' => 'Total count',
+        'type' => 'int',
+        'handlers' => array (
+          'filter' => array (
+            'name' => 'views_handler_filter_numeric' 
+          ),
+          'field' => array (
+            'name' => 'views_handler_field' 
+          ),
+          'sort' => array (
+            'name' => 'views_handler_sort' 
+          ),
+          'argument' => array (
+            'name' => 'views_handler_argument_numeric' 
+          ),
+          'relationship' => array (
+            'name' => 'views_handler_relationship' 
+          ) 
+        ),
+        'joins' => array () 
+      ) 
+    ) 
+  );
+  
+  // Add the array above that will integrate our qtl_search materialized view
+  // for use with Drupal Views.
+  tripal_add_views_integration($integration);
+}
+
+/**
+ * Add any custom tables needed by this module.
+ * - phylotreeprop: keep track of properties of phylotree
+ *
+ * @ingroup tripal_phylotree
+ */
+function tripal_phylotree_add_custom_tables() {
+  $schema = array (
+    'table' => 'phylotreeprop',
+    'fields' => array (
+      'phylotreeprop_id' => array (
+        'type' => 'serial',
+        'not null' => true,
+      ),
+      'phylotree_id' => array (
+        'type' => 'int',
+        'not null' => true,
+      ),
+      'type_id' => array (
+        'type' => 'int',
+        'not null' => true,
+      ),
+      'value' => array (
+        'type' => 'text',
+        'not null' => false,
+      ),
+      'rank' => array (
+        'type' => 'int',
+        'not null' => true,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array (
+      0 => 'phylotreeprop_id',
+    ),
+    'unique keys' => array (
+      'phylotreeprop_c1' => array (
+        0 => 'phylotree_id',
+        1 => 'type_id',
+        2 => 'rank',
+      ),
+    ),
+    'indexes' => array (
+      'phylotreeprop_idx1' => array (
+        0 => 'phylotree_id',
+      ),
+      'phylotreeprop_idx2' => array (
+        0 => 'type_id',
+      ),
+    ),
+    'foreign keys' => array (
+      'cvterm' => array (
+        'table' => 'cvterm',
+        'columns' => array (
+          'type_id' => 'cvterm_id',
+        ),
+      ),
+      'phylotree' => array (
+        'table' => 'phylotree',
+        'columns' => array (
+          'phylotree_id' => 'phylotree_id',
+        ),
+      ),
+    ),
+  );
+  chado_create_custom_table('phylotreeprop', $schema, TRUE);
 }

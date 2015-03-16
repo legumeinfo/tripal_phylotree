@@ -2,7 +2,7 @@
 /**
  * Implements hook_preprocess_hook()
  * 
- * @param unknown $variables
+ * @param $variables
  */
 function tripal_phylotree_preprocess_tripal_phylotree_phylogram(&$variables) {
   $phylotree = $variables['node']->phylotree;
@@ -25,5 +25,37 @@ function tripal_phylotree_preprocess_tripal_phylotree_phylogram(&$variables) {
     ",
     'inline'
   );
+  tripal_phylotree_set_tree_has_nodes($phylotree);
 }
 
+/**
+ * Implements hook_preprocess_hook();
+ * 
+ * @param $variables
+ */
+function tripal_phylotree_preprocess_tripal_phylotree_radial(&$variables) {
+  $phylotree = $variables['node']->phylotree;
+  tripal_phylotree_set_tree_has_nodes($phylotree);
+}
+
+/**
+ * Implements hook_preprocess_hook();
+ *
+ * @param $variables
+ */
+function tripal_phylotree_preprocess_tripal_phylotree_organisms(&$variables) {
+  $phylotree = $variables['node']->phylotree;
+  tripal_phylotree_set_tree_has_nodes($phylotree);
+}
+
+/**
+ * Helper function for the preprocess hooks that adds a 'has_nodes' to the phylotree object.
+ */
+function tripal_phylotree_set_tree_has_nodes(&$phylotree) {
+  if (!property_exists($phylotree, 'has_nodes')) {
+    // If the nodes haven't loaded then don't show the phylogram.
+    $values  = array('phylotree_id' => $phylotree->phylotree_id);
+    $options = array('limit' => 1, 'offset' => 0, 'has_record' => 1);
+    $phylotree->has_nodes = chado_select_record('phylonode', array('phylonode_id'), $values, $options);
+  }
+}
