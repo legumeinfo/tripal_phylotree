@@ -28,21 +28,20 @@ function tripal_phylotree_install() {
   // are available for Drupal Views, upon which our search forms are built.
   tripal_phylotree_integrate_view();
   $mview_id =  tripal_get_mview_id('phylotree_count');
-  
+
   // SPF: commented out automatic populate of MView.  If the query fails
   // for some reason the install will not properly complete.
   // tripal_populate_mview($mview_id);
-  
+
   // Add the custom tables.
   tripal_phylotree_add_custom_tables();
-  
-  // Add an index on the phylonode table.  We have chado hardcoded here
-  // because there is no correspnding Tripal API call to add a custom index to
-  // a table.  Perhaps there should be one...
-  if (!db_index_exists('chado.phylonode', 'phylonode_idx1')) {
-    db_add_index('chado.phylonode', 'phylonode_idx1', array('parent_phylonode_id'));
+
+  // Add an index on the phylonode table.
+  $exists = chado_index_exists('phylonode', 'parent_phylonode_id');
+  if (!$exists) {
+    chado_add_index('phylonode', 'parent_phylonode_id', array('parent_phylonode_id'));
   }
-  
+
   // Add in the variables that this module will use to store properties for
   // loading of the tree files.
   tripal_insert_variable('phylotree_name_re', 'The regular expression for matching a name in a string.');
@@ -121,7 +120,7 @@ function tripal_phylotree_schema() {
     ),
     'primary key' => array('nid'),
   );
-  
+
   return $schema;
 }
 
@@ -134,7 +133,7 @@ function tripal_phylotree_schema() {
 function tripal_phylotree_add_cvterms() {
 
   tripal_insert_cv(
-    'tripal_phylogeny', 
+    'tripal_phylogeny',
     'Terms used by the Tripal phylotree module for phylogenetic and taxonomic trees.'
   );
 
@@ -208,11 +207,11 @@ function tripal_phylotree_uninstall() {
 function tripal_phylotree_add_mview(){
   // Materialized view addition.
   $sql_query="
-    WITH count_genes as 
-      (SELECT count(*) count, t.phylotree_id 
-       FROM phylotree t, phylonode n 
+    WITH count_genes as
+      (SELECT count(*) count, t.phylotree_id
+       FROM phylotree t, phylonode n
        WHERE n.phylotree_id = t.phylotree_id AND n.label is NOT NULL
-       GROUP BY t.phylotree_id) 
+       GROUP BY t.phylotree_id)
     SELECT
       phylotree.phylotree_id AS phylotree_phylotree_id,
       phylotree.name         AS phylotree_name,
@@ -274,22 +273,22 @@ function tripal_phylotree_integrate_view(){
         'type' => 'int',
         'handlers' => array (
           'filter' => array (
-            'name' => 'views_handler_filter_numeric' 
+            'name' => 'views_handler_filter_numeric'
           ),
           'field' => array (
-            'name' => 'views_handler_field_numeric' 
+            'name' => 'views_handler_field_numeric'
           ),
           'sort' => array (
-            'name' => 'views_handler_sort' 
+            'name' => 'views_handler_sort'
           ),
           'argument' => array (
-            'name' => 'views_handler_argument_numeric' 
+            'name' => 'views_handler_argument_numeric'
           ),
           'relationship' => array (
-            'name' => 'views_handler_relationship' 
-          ) 
+            'name' => 'views_handler_relationship'
+          )
         ),
-        'joins' => array () 
+        'joins' => array ()
       ),
       'phylotree_name' => array (
         'name' => 'phylotree_name',
@@ -298,20 +297,20 @@ function tripal_phylotree_integrate_view(){
         'type' => 'text',
         'handlers' => array (
           'filter' => array (
-            'name' => 'tripal_views_handler_filter_select_string' 
+            'name' => 'tripal_views_handler_filter_select_string'
           ),
           'field' => array (
-            'name' => 'views_handler_field' 
+            'name' => 'views_handler_field'
           ),
           'sort' => array (
-            'name' => 'views_handler_sort' 
+            'name' => 'views_handler_sort'
           ),
           'argument' => array (
-            'name' => 'views_handler_argument_string' 
+            'name' => 'views_handler_argument_string'
           ),
           'relationship' => array (
-            'name' => 'views_handler_relationship' 
-          ) 
+            'name' => 'views_handler_relationship'
+          )
         ),
         'joins' => array ()
       ),
@@ -322,22 +321,22 @@ function tripal_phylotree_integrate_view(){
         'type' => 'text',
         'handlers' => array (
           'filter' => array (
-            'name' => 'tripal_views_handler_filter_select_string' 
+            'name' => 'tripal_views_handler_filter_select_string'
           ),
           'field' => array (
-            'name' => 'views_handler_field' 
+            'name' => 'views_handler_field'
           ),
           'sort' => array (
-            'name' => 'views_handler_sort' 
+            'name' => 'views_handler_sort'
           ),
           'argument' => array (
-            'name' => 'views_handler_argument_string' 
+            'name' => 'views_handler_argument_string'
           ),
           'relationship' => array (
-            'name' => 'views_handler_relationship' 
-          ) 
+            'name' => 'views_handler_relationship'
+          )
         ),
-        'joins' => array () 
+        'joins' => array ()
       ),
       'total_count' => array (
         'name' => 'total_count',
@@ -346,26 +345,26 @@ function tripal_phylotree_integrate_view(){
         'type' => 'int',
         'handlers' => array (
           'filter' => array (
-            'name' => 'views_handler_filter_numeric' 
+            'name' => 'views_handler_filter_numeric'
           ),
           'field' => array (
-            'name' => 'views_handler_field' 
+            'name' => 'views_handler_field'
           ),
           'sort' => array (
-            'name' => 'views_handler_sort' 
+            'name' => 'views_handler_sort'
           ),
           'argument' => array (
-            'name' => 'views_handler_argument_numeric' 
+            'name' => 'views_handler_argument_numeric'
           ),
           'relationship' => array (
-            'name' => 'views_handler_relationship' 
-          ) 
+            'name' => 'views_handler_relationship'
+          )
         ),
-        'joins' => array () 
-      ) 
-    ) 
+        'joins' => array ()
+      )
+    )
   );
-  
+
   // Add the array above that will integrate our qtl_search materialized view
   // for use with Drupal Views.
   tripal_add_views_integration($integration);
