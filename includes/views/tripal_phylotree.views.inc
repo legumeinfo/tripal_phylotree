@@ -44,7 +44,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $view->api_version = '3.0';
     $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 
-/* Display: Master */
+    /* Display: Master */
     $handler = $view->new_display('default', 'Master', 'default');
     $handler->display->display_options['title'] = 'Phylotree';
     $handler->display->display_options['use_more_always'] = FALSE;
@@ -124,13 +124,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
             'empty_column' => 0,
         ),
     );
-/* Footer: Global: Result summary */
+    /* Footer: Global: Result summary */
     $handler->display->display_options['footer']['result']['id'] = 'result';
     $handler->display->display_options['footer']['result']['table'] = 'views';
     $handler->display->display_options['footer']['result']['field'] = 'result';
     $handler->display->display_options['footer']['result']['label'] = 'Result summary';
     $handler->display->display_options['footer']['result']['content'] = 'Displaying @start - @end of @total records found.';
-/* No results behavior: Global: Text area */
+    /* No results behavior: Global: Text area */
     $handler->display->display_options['empty']['area']['id'] = 'area';
     $handler->display->display_options['empty']['area']['table'] = 'views';
     $handler->display->display_options['empty']['area']['field'] = 'area';
@@ -138,49 +138,70 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['empty']['area']['empty'] = TRUE;
     $handler->display->display_options['empty']['area']['content'] = 'No records found. Please select your search options, then press "Apply".';
     $handler->display->display_options['empty']['area']['format'] = '3';
-/* Field: phylotree_count: Family ID */
+    /* Field: phylotree_count: Family ID */
     $handler->display->display_options['fields']['phylotree_name']['id'] = 'phylotree_name';
     $handler->display->display_options['fields']['phylotree_name']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['phylotree_name']['field'] = 'phylotree_name';
     $handler->display->display_options['fields']['phylotree_name']['alter']['make_link'] = TRUE;
     $handler->display->display_options['fields']['phylotree_name']['alter']['path'] = 'chado_phylotree/[phylotree_name]';
-/* Field: phylotree_count: Description */
+    /* Field: phylotree_count: Description */
     $handler->display->display_options['fields']['phylotree_comment']['id'] = 'phylotree_comment';
     $handler->display->display_options['fields']['phylotree_comment']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['phylotree_comment']['field'] = 'phylotree_comment';
-/* Field: phylotree_count: Total count */
+    /* Field: phylotree_count: Total count */
     $handler->display->display_options['fields']['total_count']['id'] = 'total_count';
     $handler->display->display_options['fields']['total_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['total_count']['field'] = 'total_count';
-/* Field: phylotree_count: Medtr count */
+    $handler->display->display_options['fields']['total_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['total_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]';
+    /* Field: phylotree_count: Medtr count */
     $handler->display->display_options['fields']['medtr_count']['id'] = 'medtr_count';
     $handler->display->display_options['fields']['medtr_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['medtr_count']['field'] = 'medtr_count';
-/* Field: phylotree_count: Cicar count */
+    $handler->display->display_options['fields']['medtr_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['medtr_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Med. truncatula';
+    $handler->display->display_options['fields']['medtr_count']['alter']['absolute'] = TRUE;
+    /* Field: phylotree_count: Cicar count */
     $handler->display->display_options['fields']['cicar_count']['id'] = 'cicar_count';
     $handler->display->display_options['fields']['cicar_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['cicar_count']['field'] = 'cicar_count';
-/* Field: phylotree_count: Glyma count */
+    $handler->display->display_options['fields']['cicar_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['cicar_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Cic. arietinum';
+    $handler->display->display_options['fields']['cicar_count']['alter']['absolute'] = TRUE;
+    /* Field: phylotree_count: Glyma count */
     $handler->display->display_options['fields']['glyma_count']['id'] = 'glyma_count';
     $handler->display->display_options['fields']['glyma_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['glyma_count']['field'] = 'glyma_count';
-/* Field: phylotree_count: Phavu count */
+    $handler->display->display_options['fields']['glyma_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['glyma_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Gly. max';
+    $handler->display->display_options['fields']['glyma_count']['alter']['absolute'] = TRUE;
+    /* Field: phylotree_count: Phavu count */
     $handler->display->display_options['fields']['phavu_count']['id'] = 'phavu_count';
     $handler->display->display_options['fields']['phavu_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['phavu_count']['field'] = 'phavu_count';
-/* Field: phylotree_count: Cajca count */
+    $handler->display->display_options['fields']['phavu_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['phavu_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Pha. vulgaris';
+    /* Field: phylotree_count: Cajca count */
     $handler->display->display_options['fields']['cajca_count']['id'] = 'cajca_count';
     $handler->display->display_options['fields']['cajca_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['cajca_count']['field'] = 'cajca_count';
-/* Field: phylotree_count: Aradu count */
+    $handler->display->display_options['fields']['cajca_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['cajca_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Caj. cajan';
+    /* Field: phylotree_count: Aradu count */
     $handler->display->display_options['fields']['aradu_count']['id'] = 'aradu_count';
     $handler->display->display_options['fields']['aradu_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['aradu_count']['field'] = 'aradu_count';
-/* Field: phylotree_count: Araip count */
+    $handler->display->display_options['fields']['aradu_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['aradu_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Ara. duranensis';
+    $handler->display->display_options['fields']['aradu_count']['alter']['absolute'] = TRUE;
+    /* Field: phylotree_count: Araip count */
     $handler->display->display_options['fields']['araip_count']['id'] = 'araip_count';
     $handler->display->display_options['fields']['araip_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['araip_count']['field'] = 'araip_count';
-/* Filter criterion: phylotree_count: Family ID */
+    $handler->display->display_options['fields']['araip_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['araip_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Ara. ipaensis';
+    $handler->display->display_options['fields']['araip_count']['alter']['absolute'] = TRUE;
+    /* Filter criterion: phylotree_count: Family ID */
     $handler->display->display_options['filters']['phylotree_name']['id'] = 'phylotree_name';
     $handler->display->display_options['filters']['phylotree_name']['table'] = 'phylotree_count';
     $handler->display->display_options['filters']['phylotree_name']['field'] = 'phylotree_name';
@@ -188,6 +209,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['filters']['phylotree_name']['exposed'] = TRUE;
     $handler->display->display_options['filters']['phylotree_name']['expose']['operator_id'] = 'phylotree_name_op';
     $handler->display->display_options['filters']['phylotree_name']['expose']['label'] = 'Family ID';
+    $handler->display->display_options['filters']['phylotree_name']['expose']['description'] = '(e.is equal to: phytozome_10.)';
     $handler->display->display_options['filters']['phylotree_name']['expose']['use_operator'] = TRUE;
     $handler->display->display_options['filters']['phylotree_name']['expose']['operator'] = 'phylotree_name_op';
     $handler->display->display_options['filters']['phylotree_name']['expose']['identifier'] = 'phylotree_name';
@@ -197,7 +219,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         4 => 0,
     );
     $handler->display->display_options['filters']['phylotree_name']['max_length'] = '40';
-/* Filter criterion: phylotree_count: Description */
+    /* Filter criterion: phylotree_count: Description */
     $handler->display->display_options['filters']['phylotree_comment']['id'] = 'phylotree_comment';
     $handler->display->display_options['filters']['phylotree_comment']['table'] = 'phylotree_count';
     $handler->display->display_options['filters']['phylotree_comment']['field'] = 'phylotree_comment';
@@ -206,6 +228,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['filters']['phylotree_comment']['exposed'] = TRUE;
     $handler->display->display_options['filters']['phylotree_comment']['expose']['operator_id'] = 'phylotree_comment_op';
     $handler->display->display_options['filters']['phylotree_comment']['expose']['label'] = 'Description';
+    $handler->display->display_options['filters']['phylotree_comment']['expose']['description'] = '(e.Contains all words: iron )';
     $handler->display->display_options['filters']['phylotree_comment']['expose']['use_operator'] = TRUE;
     $handler->display->display_options['filters']['phylotree_comment']['expose']['operator'] = 'phylotree_comment_op';
     $handler->display->display_options['filters']['phylotree_comment']['expose']['identifier'] = 'phylotree_comment';
@@ -215,7 +238,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         4 => 0,
     );
     $handler->display->display_options['filters']['phylotree_comment']['max_length'] = '40';
-/* Filter criterion: phylotree_count: Total count */
+    /* Filter criterion: phylotree_count: Total count */
     $handler->display->display_options['filters']['total_count']['id'] = 'total_count';
     $handler->display->display_options['filters']['total_count']['table'] = 'phylotree_count';
     $handler->display->display_options['filters']['total_count']['field'] = 'total_count';
@@ -231,7 +254,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
-/* Filter criterion: phylotree_count: Medtr count */
+    /* Filter criterion: phylotree_count: Medtr count */
     $handler->display->display_options['filters']['medtr_count']['id'] = 'medtr_count';
     $handler->display->display_options['filters']['medtr_count']['table'] = 'phylotree_count';
     $handler->display->display_options['filters']['medtr_count']['field'] = 'medtr_count';
@@ -247,7 +270,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
-/* Filter criterion: phylotree_count: Cicar count */
+    /* Filter criterion: phylotree_count: Cicar count */
     $handler->display->display_options['filters']['cicar_count']['id'] = 'cicar_count';
     $handler->display->display_options['filters']['cicar_count']['table'] = 'phylotree_count';
     $handler->display->display_options['filters']['cicar_count']['field'] = 'cicar_count';
@@ -263,7 +286,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
-/* Filter criterion: phylotree_count: Glyma count */
+    /* Filter criterion: phylotree_count: Glyma count */
     $handler->display->display_options['filters']['glyma_count']['id'] = 'glyma_count';
     $handler->display->display_options['filters']['glyma_count']['table'] = 'phylotree_count';
     $handler->display->display_options['filters']['glyma_count']['field'] = 'glyma_count';
@@ -279,7 +302,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
-/* Filter criterion: phylotree_count: Phavu count */
+    /* Filter criterion: phylotree_count: Phavu count */
     $handler->display->display_options['filters']['phavu_count']['id'] = 'phavu_count';
     $handler->display->display_options['filters']['phavu_count']['table'] = 'phylotree_count';
     $handler->display->display_options['filters']['phavu_count']['field'] = 'phavu_count';
@@ -295,7 +318,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
-/* Filter criterion: phylotree_count: Cajca count */
+    /* Filter criterion: phylotree_count: Cajca count */
     $handler->display->display_options['filters']['cajca_count']['id'] = 'cajca_count';
     $handler->display->display_options['filters']['cajca_count']['table'] = 'phylotree_count';
     $handler->display->display_options['filters']['cajca_count']['field'] = 'cajca_count';
@@ -311,7 +334,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
-/* Filter criterion: phylotree_count: Aradu count */
+    /* Filter criterion: phylotree_count: Aradu count */
     $handler->display->display_options['filters']['aradu_count']['id'] = 'aradu_count';
     $handler->display->display_options['filters']['aradu_count']['table'] = 'phylotree_count';
     $handler->display->display_options['filters']['aradu_count']['field'] = 'aradu_count';
@@ -327,7 +350,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
-/* Filter criterion: phylotree_count: Araip count */
+    /* Filter criterion: phylotree_count: Araip count */
     $handler->display->display_options['filters']['araip_count']['id'] = 'araip_count';
     $handler->display->display_options['filters']['araip_count']['table'] = 'phylotree_count';
     $handler->display->display_options['filters']['araip_count']['field'] = 'araip_count';
@@ -344,10 +367,10 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         4 => 0,
     );
 
-/* Display: Page */
+    /* Display: Phylotree */
     $handler = $view->new_display('page', 'Phylotree', 'page');
     $handler->display->display_options['path'] = 'search/phylotree';
-
+    
     // End of exported code here 
 
     return $view;
