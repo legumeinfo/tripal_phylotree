@@ -109,6 +109,8 @@ function tripal_phylotree_add_mview(){
   
     $sql_query="WITH count_genes as (select count(*) count, t.phylotree_id from phylotree t, phylonode n where n.phylotree_id=t.phylotree_id and n.label is not null group by t.phylotree_id),
 count_medtr_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'medtr.%' group by t.phylotree_id),
+count_cicar_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'cicar.%' group by t.phylotree_id),
+count_cajca_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'cajca.%' group by t.phylotree_id),
 count_phavu_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'phavu.%' group by t.phylotree_id),
 count_aradu_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'aradu.%' group by t.phylotree_id),
 count_araip_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'araip.%' group by t.phylotree_id),
@@ -119,16 +121,20 @@ phylotree.name AS phylotree_name,
 phylotree.comment AS phylotree_comment, 
 count_genes.count as total_count, 
 count_medtr_genes.count as medtr_count, 
+count_cicar_genes.count as cicar_count, 
 count_glyma_genes.count as glyma_count, 
 count_phavu_genes.count as phavu_count, 
+count_cajca_genes.count as cajca_count, 
 count_aradu_genes.count as aradu_count, 
 count_araip_genes.count as araip_count
 FROM chado.phylotree phylotree
 LEFT JOIN chado_phylotree chado_phylotree ON phylotree.phylotree_id = chado_phylotree.phylotree_id
 LEFT JOIN count_genes count_genes ON phylotree.phylotree_id = count_genes.phylotree_id
 LEFT JOIN count_medtr_genes ON phylotree.phylotree_id = count_medtr_genes.phylotree_id
+LEFT JOIN count_cicar_genes ON phylotree.phylotree_id = count_cicar_genes.phylotree_id
 LEFT JOIN count_glyma_genes ON phylotree.phylotree_id = count_glyma_genes.phylotree_id
 LEFT JOIN count_phavu_genes ON phylotree.phylotree_id = count_phavu_genes.phylotree_id
+LEFT JOIN count_cajca_genes ON phylotree.phylotree_id = count_cajca_genes.phylotree_id
 LEFT JOIN count_aradu_genes ON phylotree.phylotree_id = count_aradu_genes.phylotree_id
 LEFT JOIN count_araip_genes ON phylotree.phylotree_id = count_araip_genes.phylotree_id";
 
@@ -157,11 +163,19 @@ LEFT JOIN count_araip_genes ON phylotree.phylotree_id = count_araip_genes.phylot
         'type' => 'int',
         'not null' => TRUE,
       ),
+      'cicar_count' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
       'glyma_count' => array(
         'type' => 'int',
         'not null' => TRUE,
       ),
       'phavu_count' => array(
+          'type' => 'int',
+          'not null' => TRUE,
+      ),
+      'cajca_count' => array(
           'type' => 'int',
           'not null' => TRUE,
       ),
@@ -332,6 +346,32 @@ function tripal_phylotree_integrate_view(){
           ),
       ),
 
+      'cicar_count' => array (
+          'name' => 'cicar_count',
+          'title' => 'Cicar count',
+          'description' => 'Cicar count',
+          'type' => 'int',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'views_handler_filter_numeric',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_numeric',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+
       'glyma_count' => array (
           'name' => 'glyma_count',
           'title' => 'Glyma count',
@@ -362,6 +402,32 @@ function tripal_phylotree_integrate_view(){
           'name' => 'phavu_count',
           'title' => 'Phavu count',
           'description' => 'Phavu count',
+          'type' => 'int',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'views_handler_filter_numeric',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_numeric',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+
+      'cajca_count' => array (
+          'name' => 'cajca_count',
+          'title' => 'Cajca count',
+          'description' => 'Cajca count',
           'type' => 'int',
           'handlers' => array (
               'filter' => array (
