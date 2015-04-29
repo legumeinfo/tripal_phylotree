@@ -156,6 +156,10 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['medtr_count']['id'] = 'medtr_count';
     $handler->display->display_options['fields']['medtr_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['medtr_count']['field'] = 'medtr_count';
+/* Field: phylotree_count: Cicar count */
+    $handler->display->display_options['fields']['cicar_count']['id'] = 'cicar_count';
+    $handler->display->display_options['fields']['cicar_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['fields']['cicar_count']['field'] = 'cicar_count';
 /* Field: phylotree_count: Glyma count */
     $handler->display->display_options['fields']['glyma_count']['id'] = 'glyma_count';
     $handler->display->display_options['fields']['glyma_count']['table'] = 'phylotree_count';
@@ -164,6 +168,10 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['phavu_count']['id'] = 'phavu_count';
     $handler->display->display_options['fields']['phavu_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['phavu_count']['field'] = 'phavu_count';
+/* Field: phylotree_count: Cajca count */
+    $handler->display->display_options['fields']['cajca_count']['id'] = 'cajca_count';
+    $handler->display->display_options['fields']['cajca_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['fields']['cajca_count']['field'] = 'cajca_count';
 /* Field: phylotree_count: Aradu count */
     $handler->display->display_options['fields']['aradu_count']['id'] = 'aradu_count';
     $handler->display->display_options['fields']['aradu_count']['table'] = 'phylotree_count';
@@ -239,6 +247,22 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
+/* Filter criterion: phylotree_count: Cicar count */
+    $handler->display->display_options['filters']['cicar_count']['id'] = 'cicar_count';
+    $handler->display->display_options['filters']['cicar_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['filters']['cicar_count']['field'] = 'cicar_count';
+    $handler->display->display_options['filters']['cicar_count']['group'] = 1;
+    $handler->display->display_options['filters']['cicar_count']['exposed'] = TRUE;
+    $handler->display->display_options['filters']['cicar_count']['expose']['operator_id'] = 'cicar_count_op';
+    $handler->display->display_options['filters']['cicar_count']['expose']['label'] = 'Cicar count';
+    $handler->display->display_options['filters']['cicar_count']['expose']['use_operator'] = TRUE;
+    $handler->display->display_options['filters']['cicar_count']['expose']['operator'] = 'cicar_count_op';
+    $handler->display->display_options['filters']['cicar_count']['expose']['identifier'] = 'cicar_count';
+    $handler->display->display_options['filters']['cicar_count']['expose']['remember_roles'] = array(
+        2 => '2',
+        1 => 0,
+        4 => 0,
+    );
 /* Filter criterion: phylotree_count: Glyma count */
     $handler->display->display_options['filters']['glyma_count']['id'] = 'glyma_count';
     $handler->display->display_options['filters']['glyma_count']['table'] = 'phylotree_count';
@@ -267,6 +291,22 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['filters']['phavu_count']['expose']['operator'] = 'phavu_count_op';
     $handler->display->display_options['filters']['phavu_count']['expose']['identifier'] = 'phavu_count';
     $handler->display->display_options['filters']['phavu_count']['expose']['remember_roles'] = array(
+        2 => '2',
+        1 => 0,
+        4 => 0,
+    );
+/* Filter criterion: phylotree_count: Cajca count */
+    $handler->display->display_options['filters']['cajca_count']['id'] = 'cajca_count';
+    $handler->display->display_options['filters']['cajca_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['filters']['cajca_count']['field'] = 'cajca_count';
+    $handler->display->display_options['filters']['cajca_count']['group'] = 1;
+    $handler->display->display_options['filters']['cajca_count']['exposed'] = TRUE;
+    $handler->display->display_options['filters']['cajca_count']['expose']['operator_id'] = 'cajca_count_op';
+    $handler->display->display_options['filters']['cajca_count']['expose']['label'] = 'Cajca count';
+    $handler->display->display_options['filters']['cajca_count']['expose']['use_operator'] = TRUE;
+    $handler->display->display_options['filters']['cajca_count']['expose']['operator'] = 'cajca_count_op';
+    $handler->display->display_options['filters']['cajca_count']['expose']['identifier'] = 'cajca_count';
+    $handler->display->display_options['filters']['cajca_count']['expose']['remember_roles'] = array(
         2 => '2',
         1 => 0,
         4 => 0,
