@@ -123,6 +123,20 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
             'separator' => '',
             'empty_column' => 0,
         ),
+        'cajca_count' => array(
+            'sortable' => 1,
+            'default_sort_order' => 'asc',
+            'align' => '',
+            'separator' => '',
+            'empty_column' => 0,
+        ),
+        'cicar_count' => array(
+            'sortable' => 1,
+            'default_sort_order' => 'asc',
+            'align' => '',
+            'separator' => '',
+            'empty_column' => 0,
+        ),
     );
     /* Footer: Global: Result summary */
     $handler->display->display_options['footer']['result']['id'] = 'result';
