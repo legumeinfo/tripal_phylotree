@@ -37,10 +37,13 @@ if( ! empty($phylotree->comment) ) {
        class="phylogram-ajax-loader"/>
 </div>
 
-<p>Phylogenies are essential to any analysis of evolutionary gene
-  sequences collected across a group of organisms. A <b>phylogram</b>
-  is a phylogenetic tree that has branch spans proportional to the
-  amount of character change.
+<p>
+Click on colored terminal nodes to get more information about legume
+genes. Click on internal (white) nodes to view the "genomic context" for
+the genes included in the subtree for that node. The genomic context
+viewer shows flanking genes and allows exploration of syntenic regions
+from all included legume genomes. You can access the Phytozome family
+through the "Cross Reference" tab.
 </p>
 
 <div id="phylonode_popup_dialog" style="display: none;">
