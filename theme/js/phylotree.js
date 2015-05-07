@@ -103,7 +103,6 @@
           link.attr('href', '?q=node/' + d.feature_node_id);
           link.text('view feature: ' + d.feature_name);
           link.show();
-
         }
         else {
           // this shouldn't happen but ok
@@ -111,7 +110,7 @@
         }
 
         // view organism bof
-        if(d.organism_id) {
+        if(d.organism_node_id) {
           var link = $('#phylonode_organism_link');
           link.attr('href', d.organism_node_id ?
                     '?q=node/' + d.organism_node_id : '#');
@@ -119,7 +118,6 @@
                     d.species + ( d.common_name ? ' (' + d.common_name + ')' : '' ) );
           link.show();
         } else {
-          // there should always be an organism id, but degrade gracefully
           $('#phylonode_organism_link').hide();
         } // view organism eof
 
