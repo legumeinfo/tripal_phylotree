@@ -3,29 +3,29 @@
 
 /**
  * Imports a tree file.
- * 
+ *
  * This function is used as a wrapper for loading a phylogenetic tree using
- * any number of file loaders.  
- * 
+ * any number of file loaders.
+ *
  * @param $file_name
  *   The name of the file containing the phylogenetic tree to import.
  * @param $format
- *   The format of the file. Currently only the 'newick' file format is 
+ *   The format of the file. Currently only the 'newick' file format is
  *   supported.
  * @param $options
- *   Options if the phylotree record already exists:  
+ *   Options if the phylotree record already exists:
  *     'phylotree_id': The imported nodes will be associated with this tree.
  *     'leaf_type':  A sequence ontology term or the word 'organism'. If the
- *                   type is 'organism' then this tree represents a 
+ *                   type is 'organism' then this tree represents a
  *                   taxonomic tree.  The default, if not specified, is the
- *                   term 'polypeptide'. 
+ *                   term 'polypeptide'.
  *     'name_re':    If the leaf type is NOT 'taxonomy', then the value of
  *                   this field can be a regular expression to pull out
- *                   the name of the feature from the node label in the 
- *                   intput tree. If no value is provided the entire label is 
+ *                   the name of the feature from the node label in the
+ *                   intput tree. If no value is provided the entire label is
  *                   used.
  *     'match':      Set to 'uniquename' if the leaf nodes should be matched
- *                   with the feature uniquename.                  
+ *                   with the feature uniquename.
  *
  */
 function tripal_phylotree_import_tree_file($file_name, $format, $options = array(), $job_id = NULL) {
@@ -41,7 +41,7 @@ function tripal_phylotree_import_tree_file($file_name, $format, $options = array
     $options['name_re'] = '^(.*)$';
   }
   $options['name_re'] = trim($options['name_re']);
-  
+
   // If a phylotree ID is not passed in then make sure we have the other
   // required fields for creating a tree.
   if (!array_key_exists('phylotree_id', $options)) {
@@ -51,18 +51,18 @@ function tripal_phylotree_import_tree_file($file_name, $format, $options = array
        return FALSE;
     }
   }
-  
+
   // get the phylotree record.
   $values = array('phylotree_id' => $options['phylotree_id']);
   $phylotree = chado_generate_var('phylotree', $values);
-  
+
   if (!$phylotree) {
     tripal_report_error('tripal_phylotree', TRIPAL_ERROR,
         'Could not find the phylotree using the ID provided: %phylotree_id.',
         array('%phylotree_id' => $options['phylotree_id']));
     return FALSE;
   }
-  
+
   // Get the vocabulary terms used to describe nodes in the tree
   $values = array(
       'name' => 'phylo_leaf',
@@ -110,7 +110,7 @@ function tripal_phylotree_import_tree_file($file_name, $format, $options = array
       // Parse the tree into the expected nested node format.
       module_load_include('inc', 'tripal_phylotree', 'includes/parsers/tripal_phylotree.newick_parser');
       $tree = tripal_phylotree_parse_newick_file($file_name);
-      
+
       // Assign the right and left indecies to the tree ndoes
       tripal_phylotree_assign_tree_indices($tree);
     }
@@ -119,20 +119,19 @@ function tripal_phylotree_import_tree_file($file_name, $format, $options = array
     tripal_phylotree_import_tree($tree, $phylotree, $options, $vocab);
   }
   catch (Exception $e) {
-    print "\n"; // make sure we start errors on new line
-    watchdog_exception('T_blastXML_load', $e);
     $transaction->rollback();
-    print "FAILED: Rolling back database changes...\n";
+    watchdog_exception('tripal_phylotree', $e);
+    print "\nFAILED: Rolling back database changes...\n";
   }
   print "\nDone Importing Tree.\n";
 }
 
 /**
- * 
+ *
  * @param unknown $tree
  */
 function tripal_phylotree_assign_tree_indices(&$tree, &$index = 1) {
-  // Assign a left and right index to each node.  The child node must 
+  // Assign a left and right index to each node.  The child node must
   // have a right and left index less than that of it's parents.  We
   // increment the index by 100 to give space for new nodes that might
   // be added later.
@@ -151,10 +150,10 @@ function tripal_phylotree_assign_tree_indices(&$tree, &$index = 1) {
 }
 /**
  * Iterates through the tree array and creates phylonodes in Chado.
- * 
+ *
  * The fucntion iterates through the tree in a top-down approach adding
  * parent internal nodes prior to leaf nodes.
- * 
+ *
  * @param $tree
  * @param $options
  */
@@ -186,7 +185,7 @@ function tripal_phylotree_import_tree(&$tree, $phylotree, $options, $vocab, $par
     else if ($tree['is_leaf']) {
       $values['type_id'] = $vocab['leaf']->cvterm_id;
       $values['parent_phylonode_id'] = $parent['phylonode_id'];
-      
+
       // Match this leaf node with an organism or feature depending on the
       // type of tree. But we can't do that if we don't have a name.
       if (!empty($tree['name']) and $tree['name'] != '') {
@@ -220,7 +219,7 @@ function tripal_phylotree_import_tree(&$tree, $phylotree, $options, $vocab, $par
           $feature = chado_select_record('feature', $sel_columns, $sel_values);
           if (count($feature) > 1) {
             // Found multiple features, cannot make an association.
-          } 
+          }
           else if (count($feature) == 1) {
             $values['feature_id'] = $feature[0]->feature_id;
           }

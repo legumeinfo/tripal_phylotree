@@ -103,7 +103,7 @@
           // this shouldn't happen but ok
           $('#phylonode_feature_link').hide();
         }
-	if (d.feature_name) {
+        if (d.feature_name) {
           var link = $('#phylonode_gene_linkout');
           //FIXME: hack depending on typical naming conventions. we can certainly do better
           var transcript = d.feature_name.replace(/^.....\./, "");
@@ -157,7 +157,8 @@
           link.text('view organism: ' + d.genus + ' '+
                     d.species + ( d.common_name ? ' (' + d.common_name + ')' : '' ) );
           link.show();
-        } else {
+        } 
+        else {
           // there should always be an organism id, but degrade gracefully
           $('#phylonode_organism_link').hide();
         }
@@ -172,7 +173,7 @@
       });
     };
 
-    $.getJSON(pathToTheme +'/js/legume-colors.json', function(colorData) {
+    $.getJSON(pathToTheme + '/js/legume-colors.json', function(colorData) {
       legumeColors = colorData;
       $.getJSON(phylotreeDataURL, function(treeData) {
         displayData(treeData);
@@ -184,7 +185,7 @@
       height = graphHeight(treeData);
       d3.phylogram.build('#phylogram', treeData, {
         'width' : phylogram_width,
-        'height' : phylogram_width,
+        'height' : height,
         'fill' : organismColor,
         'nodeMouseOver' : nodeMouseOver,
         'nodeMouseOut' : nodeMouseOut,

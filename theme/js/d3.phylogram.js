@@ -259,10 +259,12 @@ if (!d3) { throw "d3 wasn't included!"};
           if (n.children) {
             if (n.depth == 0) {
               return "root node"
-            } else {
+            } 
+            else {
               return "inner node"
             }
-          } else {
+          } 
+          else {
             return "leaf node"
           }
         })
