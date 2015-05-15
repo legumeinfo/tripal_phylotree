@@ -62,13 +62,8 @@
         // interior node
         if(d.phylonode_id) {
           var link = $('#phylonode_context_link');
-          //eventually, this link will be replaced with something internal to the site; note that the trailing slash is somewhat important to avoid apparent hanging due to the way django handles url pattern matching
-          if (window.location.href.indexOf("legumeinfo") > -1) {
-              link.attr('href', 'http://comparative-legumes.org/chado/context_viewer/' + d.phylonode_id + '/');
-          }
-          else {
-              link.attr('href', 'http://test.comparative-legumes.org/chado/context_viewer/' + d.phylonode_id + '/');
-          }
+          //note that the trailing slash is somewhat important to avoid apparent hanging due to the way django handles url pattern matching
+          link.attr('href', '/lis_gene_families/chado/context_viewer/' + d.phylonode_id + '/');
           link.text('View Genomic Contexts for genes in this subtree');
           link.show();
         }
