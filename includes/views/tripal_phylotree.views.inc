@@ -223,7 +223,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['filters']['phylotree_name']['exposed'] = TRUE;
     $handler->display->display_options['filters']['phylotree_name']['expose']['operator_id'] = 'phylotree_name_op';
     $handler->display->display_options['filters']['phylotree_name']['expose']['label'] = 'Family ID';
-    $handler->display->display_options['filters']['phylotree_name']['expose']['description'] = '(e.g. is equal to: phytozome_10_2.59192412)';
+    $handler->display->display_options['filters']['phylotree_name']['expose']['description'] = '(e.g. [is equal to]: phytozome_10_2.59192412)';
     $handler->display->display_options['filters']['phylotree_name']['expose']['use_operator'] = TRUE;
     $handler->display->display_options['filters']['phylotree_name']['expose']['operator'] = 'phylotree_name_op';
     $handler->display->display_options['filters']['phylotree_name']['expose']['identifier'] = 'phylotree_name';
@@ -242,7 +242,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['filters']['phylotree_comment']['exposed'] = TRUE;
     $handler->display->display_options['filters']['phylotree_comment']['expose']['operator_id'] = 'phylotree_comment_op';
     $handler->display->display_options['filters']['phylotree_comment']['expose']['label'] = 'Description';
-    $handler->display->display_options['filters']['phylotree_comment']['expose']['description'] = '(e.g. Contains all words: iron homeostasis) ';
+    $handler->display->display_options['filters']['phylotree_comment']['expose']['description'] = '(e.g. [Contains all words]: iron homeostasis) ';
     $handler->display->display_options['filters']['phylotree_comment']['expose']['use_operator'] = TRUE;
     $handler->display->display_options['filters']['phylotree_comment']['expose']['operator'] = 'phylotree_comment_op';
     $handler->display->display_options['filters']['phylotree_comment']['expose']['identifier'] = 'phylotree_comment';
