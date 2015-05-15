@@ -152,7 +152,10 @@ function tripal_phylotree_assign_tree_indices(&$tree, &$index = 1) {
  * Iterates through the tree array and creates phylonodes in Chado.
  *
  * The fucntion iterates through the tree in a top-down approach adding
- * parent internal nodes prior to leaf nodes.
+ * parent internal nodes prior to leaf nodes.  The tree should be in the
+ * following format:
+ *
+ *
  *
  * @param $tree
  * @param $options

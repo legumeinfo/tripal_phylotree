@@ -17,6 +17,7 @@ require_once 'theme/tripal_phylotree.theme.inc';
 require_once 'includes/tripal_phylotree.admin.inc';
 require_once 'includes/tripal_phylotree.chado_node.inc';
 require_once 'includes/tripal_phylotree.import_tree.inc';
+require_once 'includes/tripal_phylotree.taxonomy_import.inc';
 
 /**
  * Implements hook_permission().
@@ -115,6 +116,25 @@ function tripal_phylotree_menu() {
     'page callback' => 'phylotree_json',
     'page arguments' => array(1),
     'access callback' => TRUE // allow all anonymous http clients
+   );
+
+   // Data Loaders
+   $items['admin/tripal/loaders/newic_tree_loader'] = array(
+     'title' => 'Phylogenetic Trees',
+     'description' => 'Loads phylogenetic trees. (Redirects to create a phylogenetic tree content type)',
+     'page callback' => 'drupal_goto',
+     'page arguments' => array('node/add/chado-phylotree'),
+     'access arguments' => array('administer tripal phylotree'),
+     'type' => MENU_NORMAL_ITEM,
+   );
+   $items['admin/tripal/loaders/taxonomy_loader'] = array(
+     'title' => 'NCBI Taxonomy Loader',
+     'description' => 'Loads taxonomic details about installed organisms.',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('tripal_phylotree_taxonomy_load_form'),
+     'access arguments' => array('administer tripal phylotree'),
+     'file' => '/includes/tripal_phylotree.taxonomy_import.inc',
+     'type' => MENU_NORMAL_ITEM,
    );
 
   return $items;
