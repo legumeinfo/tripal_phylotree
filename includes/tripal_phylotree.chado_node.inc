@@ -340,8 +340,7 @@ function chado_phylotree_node_access($node, $op, $account) {
  * also be done for example by URL aliases, for example using pathauto
  * module.
  *
- * @param int $phylotree_id
- * @return string json
+ * @param int $name
  * @ingroup tripal_phylotree
  */
 function phylotree_by_name($name) {
@@ -366,8 +365,8 @@ SQL;
  *
  * Lookup family by gene
  *
- * @param string $family_name
- * @return string gene_name
+ * @param string $gene_name
+ * @return string $family_name
  * @ingroup tripal_phylotree
  */
 function phylotree_by_genename_text($gene) {
@@ -399,6 +398,19 @@ SQL;
  */
 function phylotree_json($phylotree_id) {
   
+  //getting the name of the tree will allow construction of links to MSAs
+  //TODO: might be better to have this function accept the name as its param
+  $sql = <<<SQL
+  SELECT name from chado.phylotree where phylotree_id = :phylotree_id
+SQL;
+
+  $args = array(':phylotree_id' => $phylotree_id);
+  $result = chado_query( $sql, $args );
+  $phylotree_name = '';
+  foreach ($result as $r) {
+    $phylotree_name = $r->name;
+  }
+
   $sql = <<<SQL
   SELECT n.phylonode_id, n.parent_phylonode_id, n.label AS name,
   n.distance AS length, f.feature_id, f.name AS feature_name,
@@ -463,6 +475,7 @@ SQL;
     }
     else {
       $root_phylonode_ref = &$node;
+      $root_phylonode_ref['phylotree_name'] = $phylotree_name;
     }
   }
   // dump datastructure as json to browser. drupal sets the mime-type correctly.

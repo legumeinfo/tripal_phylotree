@@ -51,6 +51,7 @@ through the "Cross Reference" tab.
   <div><a id="phylonode_feature_link" href="" tabindex="-1"></a></div>
   <div id="linkout"></div>
   <div><a id="phylonode_context_search_link" href="" tabindex="-1"></a></div>
+  <div><a id="msa_link" href="" tabindex="-1"></a></div>
   <div><a id="phylonode_organism_link" href="" tabindex="-1"></a></div>
   
   <!-- these links are for interior nodes only -->
