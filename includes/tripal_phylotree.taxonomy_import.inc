@@ -16,9 +16,15 @@ function tripal_phylotree_taxonomy_load_form($form, &$form_state) {
       that are not mapped to the NCBI taxonomic database will appears
       below.'),
   );
-  $form['sync_ncbi'] = array(
+  $form['do_sync'] = array(
+    '#type' => 'checkbox',
+    '#value' => 'sync',
+    '#title' => 'Create Taxonomy Page',
+    '#description' => 'Checking this box will cause a page to be created for the taxonomy (this is the equivalent of syncing the tree).'
+  );
+  $form['import_ncbi'] = array(
     '#type' => 'submit',
-    '#name' => 'ncbi_sync',
+    '#name' => 'import_sync',
     '#value' => 'Import NCBI taxonomic data'
   );
   return $form;
@@ -31,15 +37,17 @@ function tripal_phylotree_taxonomy_load_form($form, &$form_state) {
  */
 function tripal_phylotree_taxonomy_load_form_submit($form, &$form_state) {
   global $user;
-  $args = array();
-  tripal_add_job("Import NCBI Taxonomy", 'tripal_phylotree', 'tripal_phylotree_ncbi_taxonomy_import', $args, $user->uid);
+  $sync = $form_state['values']['do_sync'];
+  $args = array($sync);
+  tripal_add_job("Import NCBI Taxonomy", 'tripal_phylotree',
+    'tripal_phylotree_ncbi_taxonomy_import', $args, $user->uid);
 }
 
 /**
  *
  * @param unknown $job_id
  */
-function tripal_phylotree_ncbi_taxonomy_import($job_id) {
+function tripal_phylotree_ncbi_taxonomy_import($sync, $job_id) {
 
   print "\nNOTE: Importing of NCBI taxonomy data is performed using a database transaction. \n" .
     "If the load fails or is terminated prematurely then the entire set of \n" .
@@ -74,7 +82,7 @@ function tripal_phylotree_ncbi_taxonomy_import($job_id) {
       $analysis = $analysis[0];
     }
 
-    // If the tree already exists then don't insert it again
+    // If the tree already exists then don't insert it again.
     $tree_name = 'NCBI Taxonomy Tree';
     $phylotree = chado_select_record('phylotree', array('*'), array('name' => $tree_name));
     if (count($phylotree) == 0) {
@@ -97,13 +105,23 @@ function tripal_phylotree_ncbi_taxonomy_import($job_id) {
       $phylotree = $phylotree[0];
     }
 
-    // Get the list of orgnaisms that haven't yet been imported.
-    $sql = "
-      SELECT O.*
-      FROM {organism} O
-        LEFT JOIN {organism_dbxref} ODBX on O.organism_id = ODBX.organism_id
-      WHERE ODBX.dbxref_id IS NULL
-    ";
+    // Clean out the phylotree in the event this is a reload
+    chado_delete_record('phylonode', array('phylotree_id' => $phylotree->phylotree_id));
+
+    // The taxonomic tree must have a root, so create that first.
+    $tree = array(
+      'name' => 'root',
+      'depth' => 0,
+      'is_root' => 1,
+      'is_leaf' => 0,
+      'is_internal' => 0,
+      'left_index' => 0,
+      'right_index' => 0,
+      'branch_set' => array(),
+    );
+
+    // Get the list of orgnaisms
+    $sql = "SELECT O.* FROM {organism} O";
     $organisms = chado_query($sql);
     while ($organism = $organisms->fetchObject()) {
       // Build the query string to get the information about this species.
@@ -122,7 +140,6 @@ function tripal_phylotree_ncbi_taxonomy_import($job_id) {
       fclose($rfh);
 
       // Parse the XML to get the taxonomy ID
-      $tree = array();
       $xml = new SimpleXMLElement($xml_text);
       if ($xml) {
         $taxid = (string) $xml->IdList->Id;
@@ -197,54 +214,57 @@ function tripal_phylotree_ncbi_taxonomy_import($job_id) {
             $parent = (string) $taxon->ParentTaxId;
             $rank = (string) $taxon->Rank;
             $sci_name = (string) $taxon->ScientificName;
-            $i = 0;
-            $parent = NULL;
+            $lineage_depth = preg_split('/;\s*/', $lineage);
+            $parent = $tree;
+            $i = 1;
             foreach ($taxon->LineageEx->children() as $child) {
               $tid = (string) $child->TaxID;
               $name = (string) $child->ScientificName;
-              $cvterm = tripal_get_cvterm(array(
-                'name' => (string) $child->Rank,
-                'cv_id' => array(
-                  'name' => 'taxonomy',
-                ),
-              ));
               $node = array(
                 'name' => $name,
                 'depth' => $i,
-                'is_root' => $i == 0 ? TRUE : FALSE,
-                'is_leaf' => FALSE,
-                'is_internal' => $i > 0 ? TRUE : FALSE,
-                'descendents' => 0,
+                'is_root' => 0,
+                'is_leaf' => 0,
+                'is_internal' => 1,
                 'left_index' => 0,
                 'right_index' => 0,
-                'type' => $cvterm->cvterm_id,
-                'xref' => "taxonomy:$tid",
+                'parent' => $parent,
+                'branch_set' => array(),
+                'parent' => $parent['name'],
               );
+              $parent = $node;
+              tripal_phylotree_taxonomy_import_add_node($tree, $node, $lineage_depth);
               $i++;
             }
-
             // Now add in the leaf node
-            $cvterm = tripal_get_cvterm(array(
-              'name' => $rank,
-              'cv_id' => array(
-                'name' => 'taxonomy',
-              ),
-            ));
             $node = array(
               'name' => $sci_name,
               'depth' => $i,
-              'is_root' => FALSE,
-              'is_leaf' => TRUE,
-              'is_internal' => FALSE,
-              'descendents' => 0,
+              'is_root' => 0,
+              'is_leaf' => 1,
+              'is_internal' => 0,
               'left_index' => 0,
               'right_index' => 0,
-              'type' => $cvterm->cvterm_id,
-              'xref' => "taxonomy:$tid",
+              'parent' => $parent['name'],
             );
-          }
-        }
-      }
+            tripal_phylotree_taxonomy_import_add_node($tree, $node, $lineage_depth);
+
+            // Set the indecies for the tree.
+            tripal_phylotree_assign_tree_indices($tree);
+          } // end: if ($xml) { ...
+        } // end: if ($taxid) { ...
+      } // end: if ($xml) { ...
+    } // end: while ($organism = $organisms->fetchObject()) { ...
+    // print json_encode(($tree));
+
+    // Now add the tree
+    $options = array('taxonomy' => 1);
+    tripal_phylotree_import_tree($tree, $phylotree, $options);
+
+    // If ther user requested to sync the tree then do it.
+    if ($sync) {
+      chado_node_sync_records('phylotree', FALSE, FALSE,
+        array(), $ids = array($phylotree->phylotree_id));
     }
   }
   catch (Exception $e) {
@@ -253,6 +273,40 @@ function tripal_phylotree_ncbi_taxonomy_import($job_id) {
     watchdog_exception('tripal_phylogeny', $e);
     print "FAILED: Rolling back database changes...\n";
   }
+}
+
+/**
+ *
+ * @param unknown $node
+ */
+function tripal_phylotree_taxonomy_import_add_node(&$tree, $node, $lineage_depth) {
+
+   // Get the branch set for the tree root.
+   $branch_set = &$tree['branch_set'];
+
+   // Iterate through the tree up until the depth where this node will
+   // be placed.
+   $node_depth = $node['depth'];
+   for ($i = 1; $i <= $node_depth; $i++) {
+     // Iterate through any existing nodes in the branch set to see if
+     // the node name matches the correct name for the lineage at this
+     // depth. If it matches then it is inside of this branch set that
+     // we will place the node.
+     for ($j = 0; $j < count($branch_set); $j++) {
+       // If this node already exists in the tree then return.
+       if ($branch_set[$j]['name'] == $node['name'] and
+           $branch_set[$j]['depth'] = $node['depth']) {
+         return;
+       }
+       // Otherwise, set the branch to be the current branch and continue.
+       if ($branch_set[$j]['name'] == $lineage_depth[$i-1]) {
+         $branch_set = &$branch_set[$j]['branch_set'];
+         break;
+       }
+     }
+   }
+   // Add the node to the last branch set.  This should be where this node goes.
+   $branch_set[] = $node;
 }
 
 /**

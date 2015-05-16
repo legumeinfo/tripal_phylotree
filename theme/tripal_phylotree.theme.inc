@@ -17,11 +17,22 @@ function tripal_phylotree_preprocess_tripal_phylotree_phylogram(&$variables) {
 
   drupal_add_library('system', 'ui.dialog');
 
+  $options = json_encode(array(
+    'phylogram_width' => variable_get('tripal_phylotree_default_phylogram_width', 350),
+    'dendrogram_width' => variable_get('tripal_phylotree_default_dendrogram_width', 500),
+    'bubble_width' => variable_get('tripal_phylotree_default_bubble_width', 500),
+    'root_node_size' => variable_get('tripal_phylotree_default_root_node_size', 6),
+    'interior_node_size' => variable_get('tripal_phylotree_default_interior_node_size', 6),
+    'leaf_node_size' => variable_get('tripal_phylotree_default_leaf_node_size', 6),
+  ));
+  // Add javascript data needed for this tree.
   drupal_add_js("
       // var having URL of json data source for charting
       var phylotreeDataURL = \"/chado_phylotree/$phylotree->phylotree_id/json\";
       // var with path to our theme, for use by javascript functions.
       var pathToTheme = \"/$module_path/theme\";
+      // var with custom options
+      var treeOptions = $options;
     ",
     'inline'
   );

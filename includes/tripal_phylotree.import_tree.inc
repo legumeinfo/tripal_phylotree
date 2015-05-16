@@ -63,42 +63,6 @@ function tripal_phylotree_import_tree_file($file_name, $format, $options = array
     return FALSE;
   }
 
-  // Get the vocabulary terms used to describe nodes in the tree
-  $values = array(
-      'name' => 'phylo_leaf',
-      'cv_id' => array(
-          'name' => 'tripal_phylogeny',
-      ),
-  );
-  $leaf = chado_generate_var('cvterm', $values);
-  if (!$leaf) {
-    tripal_report_error('tripal_phylotree', TRIPAL_ERROR,
-        "Could not find the leaf vocabulary term: 'phylo_leaf'. It should " .
-        "already be present as part of the tripal_phylogeny vocabulary.");
-    return FALSE;
-  }
-  $values['name'] = 'phylo_interior';
-  $internal = chado_generate_var('cvterm', $values);
-  if (!$internal) {
-    tripal_report_error('tripal_phylotree', TRIPAL_ERROR,
-        "Could not find the leaf vocabulary term: 'phylo_interior'. It should " .
-        "already be present as part of the tripal_phylogeny vocabulary.");
-    return FALSE;
-  }
-  $values['name'] = 'phylo_root';
-  $root = chado_generate_var('cvterm', $values);
-  if (!$root) {
-    tripal_report_error('tripal_phylotree', TRIPAL_ERROR,
-        "Could not find the leaf vocabulary term: 'phylo_root'. It should " .
-        "already be present as part of the tripal_phylogeny vocabulary.");
-    return FALSE;
-  }
-  $vocab = array(
-      'leaf' => $leaf,
-      'internal' => $internal,
-      'root' => $root,
-  );
-
   $transaction = db_transaction();
   print "\nNOTE: Loading of this tree file is performed using a database transaction. \n" .
       "If the load fails or is terminated prematurely then the entire set of \n" .
@@ -116,7 +80,7 @@ function tripal_phylotree_import_tree_file($file_name, $format, $options = array
     }
     // Iterate through the tree nodes and add them to Chado in accordance
     // with the details in the $options array.
-    tripal_phylotree_import_tree($tree, $phylotree, $options, $vocab);
+    tripal_phylotree_import_tree($tree, $phylotree, $options);
   }
   catch (Exception $e) {
     $transaction->rollback();
@@ -128,7 +92,55 @@ function tripal_phylotree_import_tree_file($file_name, $format, $options = array
 
 /**
  *
- * @param unknown $tree
+ * @return boolean|multitype:Either
+ */
+function tripal_phylotree_get_node_types_vocab() {
+  // Get the vocabulary terms used to describe nodes in the tree
+  $values = array(
+    'name' => 'phylo_leaf',
+    'cv_id' => array(
+      'name' => 'tripal_phylogeny',
+    ),
+  );
+  $leaf = chado_generate_var('cvterm', $values);
+  if (!$leaf) {
+    tripal_report_error('tripal_phylotree', TRIPAL_ERROR,
+      "Could not find the leaf vocabulary term: 'phylo_leaf'. It should " .
+      "already be present as part of the tripal_phylogeny vocabulary.");
+    return FALSE;
+  }
+  $values['name'] = 'phylo_interior';
+  $internal = chado_generate_var('cvterm', $values);
+  if (!$internal) {
+    tripal_report_error('tripal_phylotree', TRIPAL_ERROR,
+      "Could not find the leaf vocabulary term: 'phylo_interior'. It should " .
+      "already be present as part of the tripal_phylogeny vocabulary.");
+    return FALSE;
+  }
+  $values['name'] = 'phylo_root';
+  $root = chado_generate_var('cvterm', $values);
+  if (!$root) {
+    tripal_report_error('tripal_phylotree', TRIPAL_ERROR,
+      "Could not find the leaf vocabulary term: 'phylo_root'. It should " .
+      "already be present as part of the tripal_phylogeny vocabulary.");
+    return FALSE;
+  }
+  $vocab = array(
+    'leaf' => $leaf,
+    'internal' => $internal,
+    'root' => $root,
+  );
+  return $vocab;
+}
+
+/**
+ * Iterates through the tree and sets the left and right indicies .
+ *
+ * @param $tree
+ *   The tree array.
+ * @param $index
+ *   This parameters is not used when the function is first called. It
+ *   is used for recursive calls.
  */
 function tripal_phylotree_assign_tree_indices(&$tree, &$index = 1) {
   // Assign a left and right index to each node.  The child node must
@@ -148,19 +160,61 @@ function tripal_phylotree_assign_tree_indices(&$tree, &$index = 1) {
     }
   }
 }
+
 /**
  * Iterates through the tree array and creates phylonodes in Chado.
  *
  * The fucntion iterates through the tree in a top-down approach adding
- * parent internal nodes prior to leaf nodes.  The tree should be in the
- * following format:
+ * parent internal nodes prior to leaf nodes.  Each node of the tree should have
+ * the following fields:
  *
+ *   -name:         The name (or label) for this node.
+ *   -depth:        The depth of the node in the tree.
+ *   -is_root:      Set to 1 if this node is a root node.
+ *   -is_leaf:      Set to 1 if this node is a leaf node.
+ *   -is_internal:  Set to 1 if this node is an internal node.
+ *   -left_index:   The index of the node to the left in the tree.
+ *   -right_index:  The index of the node to the right in the tree.
+ *   -branch_set:   An array containing a list of nodes of that are children
+ *                  of the node.
  *
+ * Prior to importing the tree the indicies can be set by using the
+ * tripal_phylotree_assign_tree_indices() function.
  *
  * @param $tree
+ *   The tree array.
  * @param $options
+ *   The options provide some direction for how the tree is imported.  The
+ *   following keys can be used:
+ *   -taxonomy:  Set to 1 if this tree is a taxonomic tree. Set to 0
+ *               otherwise.
+ *   -leaf_type: Set to the leaf type name. If this is a non-taxonomic tree
+ *               that is associated with features, then this should be the
+ *               Sequence Ontology term for the feature (e.g. polypeptide).
+ *               If this is a taxonomic tree then this option is not needed.
+ *   -match:     Set to either 'name' or 'uniquename'.  This is used for
+ *               matching the feature name or uniquename with the node name.
+ *               This is not needed for taxonomic trees.
+ *   -match_re:  Set to a regular that can be used for matching the node
+ *               name with the feature name if the node name is not
+ *               identical to the feature name.
+ * @param $vocab
+ *   Optional. An array containing a set of key/value pairs that maps node
+ *   types to CV terms.  The keys must be 'root', 'internal' or 'leaf'.  If
+ *   no vocab is provded then the terms provided by the tripal_phylogeny
+ *   CV will be used.
+ * @param $parent
+ *   This argument is not needed when the funtion is first called. This
+ *   function is recursive and this argument is used on recursive calls.
  */
-function tripal_phylotree_import_tree(&$tree, $phylotree, $options, $vocab, $parent = NULL) {
+function tripal_phylotree_import_tree(&$tree, $phylotree, $options, $vocab = array(), $parent = NULL) {
+
+  // Get the vocabulary terms used to describe nodes in the tree if one
+  // wasn't provided.
+  if (count($vocab) == 0) {
+    $vocab = tripal_phylotree_get_node_types_vocab();
+  }
+
   if (is_array($tree) and array_key_exists('name', $tree)) {
     $values = array(
       'phylotree_id' => $phylotree->phylotree_id,

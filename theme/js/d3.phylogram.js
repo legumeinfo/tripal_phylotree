@@ -194,8 +194,11 @@ if (!d3) { throw "d3 wasn't included!"};
     var fill = options.fill || function(d) {
       return 'cyan';
     };
+    var size = options.size || function(d) {
+      return 6;
+    }
     var nodeMouseOver = options.nodeMouseOver || function(d) {};
-    var nodeMouseOut = options.nodeMouseOut || function(d) {};
+    var nodeMouseOut  = options.nodeMouseOut  || function(d) {};
     var nodeMouseDown = options.nodeMouseDown || function(d) {};
     
     var tree = options.tree || d3.layout.cluster()
@@ -208,7 +211,7 @@ if (!d3) { throw "d3 wasn't included!"};
     var vis = options.vis || d3.select(selector).append("svg:svg")
         .attr("width", w + 300)
         .attr("height", h + 30)
-      .append("svg:g")
+        .append("svg:g")
         .attr("transform", "translate(20, 20)");
     var nodes = tree(nodes);
     
@@ -216,14 +219,15 @@ if (!d3) { throw "d3 wasn't included!"};
       var yscale = d3.scale.linear()
         .domain([0, w])
         .range([0, w]);
-    } else {
+    } 
+    else {
       var yscale = scaleBranchLengths(nodes, w)
     }
     
     if (!options.skipTicks) {
       vis.selectAll('line')
           .data(yscale.ticks(10))
-        .enter().append('svg:line')
+          .enter().append('svg:line')
           .attr('y1', 0)
           .attr('y2', h)
           .attr('x1', yscale)
@@ -232,7 +236,7 @@ if (!d3) { throw "d3 wasn't included!"};
 
       vis.selectAll("text.rule")
           .data(yscale.ticks(10))
-        .enter().append("svg:text")
+          .enter().append("svg:text")
           .attr("class", "rule")
           .attr("x", yscale)
           .attr("y", 0)
@@ -245,7 +249,7 @@ if (!d3) { throw "d3 wasn't included!"};
         
     var link = vis.selectAll("path.link")
         .data(tree.links(nodes))
-      .enter().append("svg:path")
+        .enter().append("svg:path")
         .attr("class", "link")
         .attr("d", diagonal)
         .attr("fill", "none")
@@ -254,7 +258,7 @@ if (!d3) { throw "d3 wasn't included!"};
         
     var node = vis.selectAll("g.node")
         .data(nodes)
-      .enter().append("svg:g")
+        .enter().append("svg:g")
         .attr("class", function(n) {
           if (n.children) {
             if (n.depth == 0) {
@@ -270,13 +274,13 @@ if (!d3) { throw "d3 wasn't included!"};
         })
         .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
 
-    // style the root node
+     // style the root node
      vis.selectAll('g.root.node')
       .append('svg:circle')
       .on('click', nodeMouseDown)
       .on('mouseover', nodeMouseOver)
       .on('mouseout', nodeMouseOut)
-      .attr("r", 6)
+      .attr("r", size)
       .attr('fill', 'dimgrey')
       .attr('stroke', 'black')
       .attr('stroke-width', '2px');
@@ -287,7 +291,7 @@ if (!d3) { throw "d3 wasn't included!"};
       .on('mouseover', nodeMouseOver)
       .on('mouseout', nodeMouseOut)
       .append("svg:circle")
-      .attr("r", 6)
+      .attr("r", size)
       .attr('stroke', 'dimgrey')
       .attr('fill', fill)
       .attr('stroke-width', '2px');
@@ -297,7 +301,7 @@ if (!d3) { throw "d3 wasn't included!"};
       .on('mouseover', nodeMouseOver)
       .on('mouseout', nodeMouseOut)
       .append("svg:circle")
-      .attr("r", 5)
+      .attr("r", size)
       .attr('stroke', 'dimgrey')
       .attr('stroke-width', '2px')
       .attr('fill', 'white');
@@ -330,10 +334,12 @@ if (!d3) { throw "d3 wasn't included!"};
   d3.phylogram.buildRadial = function(selector, nodes, options) {
     options = options || {};
     
-    var fill = options.fill || function(node) {
+    var fill = options.fill || function(d) {
       return 'cyan';
     };
-
+    var size = options.size || function(d) {
+      return 6;
+    }
     var nodeMouseOver = options.nodeMouseOver || function(d) {};
     var nodeMouseOut = options.nodeMouseOut || function(d) {};
     var nodeMouseDown = options.nodeMouseDown || function(d) {};
@@ -345,7 +351,7 @@ if (!d3) { throw "d3 wasn't included!"};
     var vis = d3.select(selector).append("svg:svg")
         .attr("width", r * 2)
         .attr("height", r * 2)
-      .append("svg:g")
+        .append("svg:g")
         .attr("transform", "translate(" + r + "," + r + ")");
         
     var tree = d3.layout.tree()
@@ -360,6 +366,7 @@ if (!d3) { throw "d3 wasn't included!"};
       vis: vis,
       tree: tree,
       fill : fill,
+      size: size,
       nodeMouseOver : nodeMouseOver,
       nodeMouseOut : nodeMouseOut,
       nodeMouseDown : nodeMouseDown,

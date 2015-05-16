@@ -193,7 +193,7 @@ function tripal_phylotree_add_cvterms() {
   tripal_insert_db($values);
   tripal_insert_cv('taxonomy', 'A taxonomy for NCBI taxonomy ranks');
 
-  $terms = array('class', 'cohort', 'family', 'forma', 'genus', 'infraclass',
+  $terms = array('rank', 'taxid', 'class', 'cohort', 'family', 'forma', 'genus', 'infraclass',
     'infraorder', 'kingdom', 'no rank', 'order', 'parvorder', 'phylum',
     'species', 'species group', 'species subgroup', 'subclass', 'subcohort',
     'subfamily', 'subgenus', 'subkingdom', 'suborder', 'subphylum',

@@ -824,6 +824,12 @@ function phylotree_json($phylotree_id) {
   $phylonodes = array();
   $root_phylonode_ref = null;
 
+  // Get the tree properties
+  $root_size = variable_get('tripal_phylotree_default_root_node_size', 5);
+  $internal_size = variable_get('tripal_phylotree_default_internal_node_size', 5);
+  $leaf_size = variable_get('tripal_phylotree_default_leaf_node_size', 5);
+
+
   foreach ($result as $r) {
     $phylonode_id = (int) $r->phylonode_id;
 
