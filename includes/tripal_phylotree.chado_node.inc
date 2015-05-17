@@ -800,7 +800,7 @@ function phylotree_json($phylotree_id) {
       cvt.name AS cvterm_name,
       o.organism_id, o.common_name, o.abbreviation, o.genus, o.species,
       fo.organism_id AS fo_organism_id, fo.common_name AS fo_common_name,
-      fo.abbreviation AS fo_abbreviation, fo.genus as fo_genus, o.species AS fo_species,
+      fo.abbreviation AS fo_abbreviation, fo.genus as fo_genus, fo.species AS fo_species,
       cf.nid AS feature_node_id,
       fco.nid AS fo_organism_node_id,
       co.nid AS organism_node_id

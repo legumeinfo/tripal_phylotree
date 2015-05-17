@@ -177,6 +177,11 @@ function tripal_phylotree_assign_tree_indices(&$tree, &$index = 1) {
  *   -right_index:  The index of the node to the right in the tree.
  *   -branch_set:   An array containing a list of nodes of that are children
  *                  of the node.
+ *   -parent:       The name of the parent node.
+ *   -organism_id:  The organism_id for associtating the node with an organism.
+ *   -properties:   An array of key/value pairs where the key is the cvterm_id
+ *                  and the value is the property value.  These properties
+ *                  will be assocaited with the phylonode.
  *
  * Prior to importing the tree the indicies can be set by using the
  * tripal_phylotree_assign_tree_indices() function.
@@ -246,7 +251,7 @@ function tripal_phylotree_import_tree(&$tree, $phylotree, $options, $vocab = arr
       // Match this leaf node with an organism or feature depending on the
       // type of tree. But we can't do that if we don't have a name.
       if (!empty($tree['name']) and $tree['name'] != '') {
-        if ($options['taxonomy'] != TRUE) {
+        if (!$options['taxonomy']) {
 
           // This is a sequence-based tree. Try to match leaf nodes with features.
           // First, Get the Name and uniquename for the feature
@@ -284,16 +289,34 @@ function tripal_phylotree_import_tree(&$tree, $phylotree, $options, $vocab = arr
             // Could not find a feature that matches the name or uniquename
           }
         }
-        else {
-          // This is a taxonomic tree. Try to match leaf nodes with organisms.
-          // TODO: support linking of leaf nodes to recrods in the organims table.
-        }
       }
     }
 
     // Insert the new node and then add it's assigned phylonode_id to the node
     $phylonode = chado_insert_record('phylonode', $values);
     $tree['phylonode_id'] = $phylonode['phylonode_id'];
+
+    // This is a taxonomic tree, so assocaite this node with an
+    // organism if one is provided.
+    if (array_key_exists('organism_id', $tree)) {
+      $values = array(
+        'phylonode_id' => $tree['phylonode_id'],
+        'organism_id' => $tree['organism_id']
+      );
+      $pylonode_organism = chado_insert_record('phylonode_organism', $values);
+    }
+
+    // Associate any properties
+    if (array_key_exists('properties', $tree)) {
+      foreach ($tree['properties'] as $type_id => $value) {
+        $values = array(
+          'phylonode_id' => $tree['phylonode_id'],
+          'type_id' => $type_id,
+          'value' => $value,
+        );
+        $pylonode_organism = chado_insert_record('phylonodeprop', $values);
+      }
+    }
   }
   if (is_array($tree) and array_key_exists('branch_set', $tree)) {
     foreach ($tree['branch_set'] as $key => $node) {

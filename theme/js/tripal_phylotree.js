@@ -5,9 +5,7 @@
   var height = 0; // will be dynamically sized
   
   $(document).ready( function () {
-    
-    var legumeColors = null;
-    
+        
     var nodeSize = function(d) {
       var size;
       if (d.cvterm_name == "phylo_root") {
@@ -25,8 +23,11 @@
     // function to generate color based on the organism genus and species
     // on graph node d
     var organismColor = function(d) {
-      var color = legumeColors[d.fo_genus + ' ' + d.fo_species];
-      if(color) { return color; }
+      var color = null;
+      if (d.fo_genus) {
+        color = organismColors[d.fo_genus + ' ' + d.fo_species];
+      }
+      if (color) { return color; }
       else { return 'grey'; }
     };
 
@@ -183,12 +184,9 @@
       });
     };
 
-    $.getJSON(pathToTheme + '/js/legume-colors.json', function(colorData) {
-      legumeColors = colorData;
-      $.getJSON(phylotreeDataURL, function(treeData) {
-        displayData(treeData);
-        $('.phylogram-ajax-loader').remove();
-      });
+    $.getJSON(phylotreeDataURL, function(treeData) {
+      displayData(treeData);
+      $('.phylogram-ajax-loader').remove();
     });
 
     function displayData(treeData) {

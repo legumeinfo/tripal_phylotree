@@ -221,7 +221,8 @@ function tripal_phylotree_add_cvterms() {
     'genbank_common_name',
     'synonym',
     'other_name',
-    'equivalent_name'
+    'equivalent_name',
+    'anamorph'
   );
   $options = array('update_existing' => TRUE);
   foreach ($terms as $term) {

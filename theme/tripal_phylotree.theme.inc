@@ -17,6 +17,7 @@ function tripal_phylotree_preprocess_tripal_phylotree_phylogram(&$variables) {
 
   drupal_add_library('system', 'ui.dialog');
 
+  // Get the tree options as set by the administrator.
   $options = json_encode(array(
     'phylogram_width' => variable_get('tripal_phylotree_default_phylogram_width', 350),
     'dendrogram_width' => variable_get('tripal_phylotree_default_dendrogram_width', 500),
@@ -25,6 +26,17 @@ function tripal_phylotree_preprocess_tripal_phylotree_phylogram(&$variables) {
     'interior_node_size' => variable_get('tripal_phylotree_default_interior_node_size', 6),
     'leaf_node_size' => variable_get('tripal_phylotree_default_leaf_node_size', 6),
   ));
+
+  // Get the node colors as set by the administrator.
+  $colors = array();
+  $color_defaults = variable_get("tripal_phylotree_org_colors", array('1' => array('organism' => '', 'color' => '')));
+  foreach ($color_defaults as $i => $details) {
+    if ($details['organism']) {
+      $colors[$details['organism']] =  $details['color'];
+    }
+  }
+  $colors = json_encode($colors);
+
   // Add javascript data needed for this tree.
   drupal_add_js("
       // var having URL of json data source for charting
@@ -33,6 +45,8 @@ function tripal_phylotree_preprocess_tripal_phylotree_phylogram(&$variables) {
       var pathToTheme = \"/$module_path/theme\";
       // var with custom options
       var treeOptions = $options;
+      // var with the organism colors
+      var organismColors = $colors;
     ",
     'inline'
   );

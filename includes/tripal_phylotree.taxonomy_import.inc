@@ -120,6 +120,12 @@ function tripal_phylotree_ncbi_taxonomy_import($sync, $job_id) {
       'branch_set' => array(),
     );
 
+    // Get the "Rank" cvterm
+    $rank_cvterm = tripal_get_cvterm(array(
+      'name' => 'rank',
+      'cv_id' => array('name' => 'taxonomy')
+    ));
+
     // Get the list of orgnaisms
     $sql = "SELECT O.* FROM {organism} O";
     $organisms = chado_query($sql);
@@ -200,6 +206,10 @@ function tripal_phylotree_ncbi_taxonomy_import($sync, $job_id) {
                   break;
                 case 'EquivalentName':
                   tripal_phylotree_taxonomy_add_organism_property($organism->organism_id, 'equivalent_name', $name, $name_ranks[$type]);
+                  break;
+                case 'Anamorph':
+                  tripal_phylotree_taxonomy_add_organism_property($organism->organism_id, 'anamorph', $name, $name_ranks[$type]);
+                  break;
                 case 'Name':
                   // skip the Name stanza
                   break;
@@ -220,6 +230,7 @@ function tripal_phylotree_ncbi_taxonomy_import($sync, $job_id) {
             foreach ($taxon->LineageEx->children() as $child) {
               $tid = (string) $child->TaxID;
               $name = (string) $child->ScientificName;
+              $node_rank = (string) $child->Rank;
               $node = array(
                 'name' => $name,
                 'depth' => $i,
@@ -231,6 +242,9 @@ function tripal_phylotree_ncbi_taxonomy_import($sync, $job_id) {
                 'parent' => $parent,
                 'branch_set' => array(),
                 'parent' => $parent['name'],
+                'properties' => array(
+                  $rank_cvterm->cvterm_id => $node_rank,
+                ),
               );
               $parent = $node;
               tripal_phylotree_taxonomy_import_add_node($tree, $node, $lineage_depth);
@@ -246,6 +260,10 @@ function tripal_phylotree_ncbi_taxonomy_import($sync, $job_id) {
               'left_index' => 0,
               'right_index' => 0,
               'parent' => $parent['name'],
+              'organism_id' => $organism->organism_id,
+              'properties' => array(
+                $rank_cvterm->cvterm_id => $rank,
+              ),
             );
             tripal_phylotree_taxonomy_import_add_node($tree, $node, $lineage_depth);
 

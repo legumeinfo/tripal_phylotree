@@ -82,7 +82,17 @@ function tripal_phylotree_menu() {
     'page arguments' => array('tripal_phylotree_admin'),
     'access arguments' => array('administer tripal phylotree'),
     'type' => MENU_LOCAL_TASK,
-    'weight' => 5
+    'weight' => 1
+  );
+
+  $items['admin/tripal/extension/tripal_phylotree/plots'] = array(
+    'title' => 'Plot Defaults',
+    'description' => 'Set defaults for the trees, dendrograms and bubble plot',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tripal_phylotree_default_plots_form'),
+    'access arguments' => array('administer tripal phylotree'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2
   );
 
   // sync menu item (will be rendered as a tab by tripal)
@@ -93,11 +103,11 @@ function tripal_phylotree_menu() {
     'page arguments' => array('chado_node_sync_form', 'tripal_phylotree', 'chado_phylotree'),
     'access arguments' => array('administer tripal phylotree'),
     'type' => MENU_LOCAL_TASK,
-    'weight' => 2
+    'weight' => 3
   );
 
   // Enable admin view
-  $items['admin/tripal/chado/tripal_phylotree/views/phylotree/enable'] = array(
+  $items['admin/tripal/extension/tripal_phylotree/views/phylotree/enable'] = array(
     'title' => 'Enable Phylotree Administrative View',
     'page callback' => 'tripal_enable_view',
     'page arguments' => array('tripal_phylotree_admin_phylotree', 'admin/tripal/chado/tripal_phylotree'),
@@ -238,6 +248,12 @@ function tripal_phylotree_theme($existing, $type, $theme, $path) {
       'template' => 'tripal_phylotree_teaser',
       'path' => "$path/theme/templates",
     ),
+
+    // FORM THEMES
+    // Theme function for the project table in admin projects form
+    'tripal_phylotree_admin_org_color_tables' => array(
+      'render element' => 'element',
+    )
   );
   return $items;
 }
@@ -256,3 +272,5 @@ function tripal_phylotree_help ($path, $arg) {
 
 // hack to suppress the 'Submitted by...' info drupal adds to nodes
 $variables['display_submitted'] = FALSE;
+
+
