@@ -295,7 +295,6 @@ function tripal_phylotree_block_view($delta='') {
   * the userinfo block content 
   * return string
   */
-//function theblock_contents() {
 function tripal_phylotree_userinfo_block_contents() {
   return '<span style="font-family:times">Search for gene families starting from a Phytozome family ID (phytozome_10_2.59192412) or a word from the gene description/name/function, e.g., iron homeostasis or chlorophyll binding protein.  </span>(<a href="/search/phylotree/userinfo" arget="_blank">More help</a>)';
 }
