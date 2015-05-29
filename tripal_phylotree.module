@@ -15,6 +15,8 @@
 require_once 'theme/tripal_phylotree.theme.inc';
 require_once 'includes/tripal_phylotree.admin.inc';
 require_once 'includes/tripal_phylotree.chado_node.inc';
+require_once 'includes/tripal_phylotree_userinfo_block.inc';
+
 
 /**
  * Implements hook_permission().
@@ -108,29 +110,15 @@ function tripal_phylotree_menu() {
     'access callback' => TRUE // allow all anonymous http clients
    );
   
-  
    // create a route for viewing json of all phylonodes having this phylotree_id
    $items['chado_phylotree/%/json'] = array(
     'page callback' => 'phylotree_json',
     'page arguments' => array(1),
     'access callback' => TRUE // allow all anonymous http clients
    );
-
-   //Userinfo details will be available at this path via hook_menu 
-     $items['search/phylotree/userinfo'] = array(
-       'title' => 'Userinfo',
-       'page callback' => 'userinfo_content',
-       'access callback' => TRUE, //visible to anonymous users
-     );
    
   return $items;
 }
-
-//Userinfo hook_menu callback to hook_theme
-function userinfo_content() {
-  return theme('tripal_phylotree_userinfo');
-}
-
 
 /**
  * Implements hook_views_api().
@@ -223,16 +211,10 @@ function tripal_phylotree_theme($existing, $type, $theme, $path) {
       'template' => 'tripal_phylotree_teaser',
       'path' => "$path/theme/templates",
     ),
-    //Userinfo template 
-    'tripal_phylotree_userinfo' => array(
-      'variables' => array('node' => NULL),
-      'template' => 'tripal_phylotree_userinfo',
-      'path' => "$path/theme/templates",
-    ),
-
   );
   return $items;
 }
+
 
 /**
  * Implements hook_help().
@@ -250,56 +232,6 @@ function tripal_phylotree_text_deliver($page_callback_result) {
 	print $page_callback_result;
 	drupal_exit();
 }
-
-  
-/**
- *@ Userinfo block: A block at the top with userinfo/Help
- */
-
-/**
- * Implement hook_block_info().
- * Define a block to appear at the top of the module(tripal_phyloptree) view/page.
- */
-function tripal_phylotree_block_info() {
-  $blocks['tripal_phylotree_userinfo_block'] = array(  //the block-id (prefix with module name to avoid namespace conflict)
-    'info' => t('User info block at top of tripal_phylotree view.'),
-    'status' => TRUE,
-    'region' => 'highlighted', 
-    'weight' => 0,
-    'visibility' => BLOCK_VISIBILITY_LISTED, // appears only in listed paths
-    'pages' => "search/phylotree", // block appears only in this path
-  );
-  return $blocks;
-}    //end: _block_info
-
-
-/**
- * Implements hook_block_view().
- *   The block content 
- */
-function tripal_phylotree_block_view($delta='') {
-  $block = array();
-  switch ($delta) { 
-    case 'tripal_phylotree_userinfo_block':  //if this is the block-ID
-      //a heading
-      $block['subject'] = t('<span align="center" style="font-size:100%">Phylotree: Gene Family Search</span>');
-      // block text from f()
-      $block['content'] = theblock_contents();
-      break;
-  }
-  return $block;
-}    //end: _block_view
-
-
-/**
-  * the userinfo block content 
-  * return string
-  */
-function theblock_contents() {
-  return '<span style="font-family:times">Search for gene families starting from a Phytozome family ID (phytozome_10_2.59192412) or a word from the gene description/name/function, e.g., iron homeostasis or chlorophyll binding protein.  </span>(<a href="/search/phylotree/userinfo" arget="_blank">More help</a>)';
-}
-
-/* End: block at the top with user help info*/
 
 
 // hack to suppress the 'Submitted by...' info drupal adds to nodes

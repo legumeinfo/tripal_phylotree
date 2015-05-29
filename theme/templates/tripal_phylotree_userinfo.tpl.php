@@ -1,5 +1,4 @@
 <!-- This is a test page under development -->
-<!-- Current URL alias in lis-dev: /tutorial/helpfiles/geneFamilySearchHelp-->
 
 <h1>HOW TO: Gene Family Search</h1>
 <div style="font-family:times">
@@ -12,6 +11,7 @@
 <p>This tools can help you lead to very related genes, based on sequence similarity for further exploration, in legumes and other plant species.</p>
 
 </div>
+
 
 <!--SCRATCH PAD-->
 <!--
