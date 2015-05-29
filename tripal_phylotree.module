@@ -17,7 +17,6 @@ require_once 'includes/tripal_phylotree.admin.inc';
 require_once 'includes/tripal_phylotree.chado_node.inc';
 require_once 'includes/tripal_phylotree_userinfo_block.inc';
 
-
 /**
  * Implements hook_permission().
  *

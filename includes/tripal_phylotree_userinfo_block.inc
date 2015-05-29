@@ -1,7 +1,8 @@
 <?php
 
 /**
- *@ Userinfo block and content: A block (with guide text) at the top of module view with an optional link to detailed help in another drupal path.
+ *@ Userinfo block and content: 
+ *  A block (with guide text) at the top of module view with an optional link to detailed help in another drupal path.
  *  The detailed help drupal path is defined here via altering hook_menu and contents populated by a template by altering hook_theme.
  *  These routines avoid embedding any code inside the hook_menu and hook_theme in the .module file.  
  *  Hence can stay independent of the main module code.
@@ -35,7 +36,7 @@ function tripal_phylotree_block_view($delta='') {
       //a heading
       $block['subject'] = t('<span align="center" style="font-size:100%">Phylotree: Gene Family Search</span>');
       // block text from f()
-      $block['content'] = theblock_contents();
+      $block['content'] = tripal_phylotree_userinfo_block_contents(); //prefix the fn name with block-id/module name to avoid namespace conflict
       break;
   }
   return $block;
@@ -46,8 +47,8 @@ function tripal_phylotree_block_view($delta='') {
   * the userinfo block content 
   * return string
   */
-function theblock_contents() {
-  return '<span style="font-family:times">HELLO USERINFO BLOCK VIA .INC Search for gene families starting from a Phytozome family ID (phytozome_10_2.59192412) or a word from the gene description/name/function, e.g., iron homeostasis or chlorophyll binding protein.  </span>(<a href="/search/phylotree/userinfo" arget="_blank">More help</a>)';
+function tripal_phylotree_userinfo_block_contents() {
+  return '<span style="font-family:times">Search for gene families starting from a Phytozome family ID (phytozome_10_2.59192412) or a word from the gene description/name/function, e.g., iron homeostasis or chlorophyll binding protein.  </span>(<a href="/search/phylotree/userinfo" arget="_blank">More help</a>)';
 }
 
 /* End: block at the top with user help info*/
