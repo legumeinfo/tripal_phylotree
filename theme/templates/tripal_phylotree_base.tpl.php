@@ -40,10 +40,12 @@ if( ! empty($phylotree->comment) ) {
 <p>
 Click on colored terminal nodes to get more information about legume
 genes. Click on internal (white) nodes to view the "genomic context" for
-the genes included in the subtree for that node. The genomic context
+the genes included in the subtree for that node. Click on the root node (gray
+with black outline at base of tree) for an option to get to the multiple
+sequence alignment behind the tree. The genomic context
 viewer shows flanking genes and allows exploration of syntenic regions
-from all included legume genomes. You can access the Phytozome family
-through the "Cross Reference" tab.
+from all included legume genomes. You can access the Phytozome family from
+which this tree was derived through the "Cross Reference" tab.
 </p>
 
 <div id="phylonode_popup_dialog" style="display: none;">
