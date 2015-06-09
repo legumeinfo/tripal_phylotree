@@ -48,7 +48,7 @@ function tripal_phylotree_block_view($delta='') {
   * return string
   */
 function tripal_phylotree_userinfo_block_contents() {
-  return '<span style="font-family:times">Search for gene families starting from a Phytozome family ID (phytozome_10_2.59192412) or a word from the gene description/name/function, e.g., iron homeostasis or chlorophyll binding protein.  </span>(<a href="/search/phylotree/userinfo" arget="_blank">More help</a>)';
+  return '<span style="font-family:times">Search for gene families starting from a family ID (e.g. phytozome_10_2.59192412), using words from the family description (e.g., iron homeostasis or chlorophyll binding protein), or using the "count" filters to find families by size or species composition.  </span>(<a href="/search/phylotree/userinfo">More help</a>)';
 }
 
 /* End: block at the top with user help info*/
