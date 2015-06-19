@@ -171,7 +171,10 @@ LEFT JOIN count_glyma_genes ON phylotree.phylotree_id = count_glyma_genes.phylot
 LEFT JOIN count_phavu_genes ON phylotree.phylotree_id = count_phavu_genes.phylotree_id
 LEFT JOIN count_cajca_genes ON phylotree.phylotree_id = count_cajca_genes.phylotree_id
 LEFT JOIN count_aradu_genes ON phylotree.phylotree_id = count_aradu_genes.phylotree_id
-LEFT JOIN count_araip_genes ON phylotree.phylotree_id = count_araip_genes.phylotree_id";
+LEFT JOIN count_araip_genes ON phylotree.phylotree_id = count_araip_genes.phylotree_id
+JOIN analysis a ON phylotree.analysis_id=a.analysis_id JOIN analysisprop ap ON ap.analysis_id=a.analysis_id JOIN cvterm ct ON ap.type_id=ct.cvterm_id
+WHERE ct.name='is_current'
+";
 
         //Table Phylotree User Search  description
 
@@ -319,7 +322,9 @@ LEFT JOIN count_glyma_genes ON phylotree.phylotree_id = count_glyma_genes.phylot
 LEFT JOIN count_phavu_genes ON phylotree.phylotree_id = count_phavu_genes.phylotree_id
 LEFT JOIN count_cajca_genes ON phylotree.phylotree_id = count_cajca_genes.phylotree_id
 LEFT JOIN count_aradu_genes ON phylotree.phylotree_id = count_aradu_genes.phylotree_id
-LEFT JOIN count_araip_genes ON phylotree.phylotree_id = count_araip_genes.phylotree_id";
+LEFT JOIN count_araip_genes ON phylotree.phylotree_id = count_araip_genes.phylotree_id
+JOIN analysis a ON phylotree.analysis_id=a.analysis_id JOIN analysisprop ap ON ap.analysis_id=a.analysis_id JOIN cvterm ct ON ap.type_id=ct.cvterm_id
+WHERE ct.name='is_current_tree'";
 
     //Table Phylotree User Search  description
 
