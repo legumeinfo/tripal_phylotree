@@ -171,7 +171,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['phylotree_comment']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['phylotree_comment']['field'] = 'phylotree_comment';
     if ($result->count > 0) {
-        /* Field: gene: Domains */
+        /* Field: gene: Domains/Interpro term */
         $handler->display->display_options['fields']['domains']['id'] = 'domains';
         $handler->display->display_options['fields']['domains']['table'] = 'phylotree_count';
         $handler->display->display_options['fields']['domains']['field'] = 'domains';
@@ -268,7 +268,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     );
     $handler->display->display_options['filters']['phylotree_comment']['max_length'] = '40';
     if ($result->count > 0) {
-        /* Filter criterion: gene: Domains */
+        /* Filter criterion: gene: Domains/Interpro term */
         $handler->display->display_options['filters']['domains']['id'] = 'domains';
         $handler->display->display_options['filters']['domains']['table'] = 'phylotree_count';
         $handler->display->display_options['filters']['domains']['field'] = 'domains';
@@ -276,8 +276,8 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         $handler->display->display_options['filters']['domains']['group'] = 1;
         $handler->display->display_options['filters']['domains']['exposed'] = TRUE;
         $handler->display->display_options['filters']['domains']['expose']['operator_id'] = 'domains_op';
-        $handler->display->display_options['filters']['domains']['expose']['label'] = 'Domains';
-        $handler->display->display_options['filters']['domains']['expose']['description'] = '(e.g. [Contains]: PF05659)';
+        $handler->display->display_options['filters']['domains']['expose']['label'] = 'Domains/Interpro term';
+        $handler->display->display_options['filters']['domains']['expose']['description'] = '(e.g. [Contains]: PF05659 ,[Contains]:IPR027278)';
         $handler->display->display_options['filters']['domains']['expose']['use_operator'] = TRUE;
         $handler->display->display_options['filters']['domains']['expose']['operator'] = 'domains_op';
         $handler->display->display_options['filters']['domains']['expose']['identifier'] = 'domains';
