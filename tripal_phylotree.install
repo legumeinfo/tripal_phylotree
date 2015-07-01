@@ -244,7 +244,7 @@ WHERE ct.name='is_current'
 function tripal_phylotree_add_mview(){
     //Materialized view addition
 
-    $sql_t2d = "select string_agg(DISTINCT(f1.name), E' '), t.phylotree_id
+    $sql_t2d = "select string_agg(DISTINCT(f1.name),E' ') AS domains, t.phylotree_id, string_agg(DISTINCT(d.iprterm),E' ') AS ipr
  FROM feature f1
  JOIN cvterm cvt1
  ON cvt1.cvterm_id = f1.type_id
@@ -258,6 +258,8 @@ function tripal_phylotree_add_mview(){
  ON n.feature_id=f2.feature_id
  JOIN phylotree t
  ON n.phylotree_id=t.phylotree_id
+ JOIN domain d
+ ON d.feature_name=f1.name
  WHERE cvt1.name in ('protein_hmm_match', 'protein_match') AND 
 cvt2.name = 'polypeptide'
  GROUP BY t.phylotree_id";
@@ -273,8 +275,13 @@ cvt2.name = 'polypeptide'
                 'type' => 'int',
                 'not null' => 'FASLE',
             ),
-        ),
-        'indexes' => array (
+            'ipr' => array (
+            'type' => 'text',
+            'not null' => false,
+            ),
+
+         ),
+         'indexes' => array (
             't2d_indx0' => array (
                 0 => 'phylotree_id',
             ),
@@ -311,7 +318,7 @@ count_phavu_genes.count as phavu_count,
 count_cajca_genes.count as cajca_count, 
 count_aradu_genes.count as aradu_count, 
 count_araip_genes.count as araip_count,
-t2d.domains
+t2d.domains || ' ' || t2d.ipr as domains
 FROM chado.phylotree phylotree
 LEFT JOIN tree2domain t2d ON phylotree.phylotree_id = t2d.phylotree_id
 LEFT JOIN chado_phylotree chado_phylotree ON phylotree.phylotree_id = chado_phylotree.phylotree_id
