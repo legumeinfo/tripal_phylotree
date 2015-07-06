@@ -1,0 +1,796 @@
+<?php
+/**
+ * @file
+ * Installation of the phylotree module
+ */
+
+/**
+ * Implementation of hook_requirements().
+ *
+ * @ingroup tripal_phylotree
+ */
+function tripal_phylotree_requirements($phase) {
+  $requirements = array();
+  if ($phase == 'install') {
+    // make sure chado is installed
+    if (!$GLOBALS["chado_is_installed"]) {
+      $requirements ['tripal_phylotree'] = array(
+        'title' => "tripal_phylotree",
+        'value' => "ERROR: Chado must be installed before this module can be enabled",
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+  }
+  return $requirements;
+}
+
+/**
+ * Implements hook_install()
+ * Allows installation of the tripal_gene module
+ */
+
+function tripal_phylotree_install() {
+  $sql_count ="select count(f.feature_id) as count
+        from feature f left join cvterm cvt
+        on f.type_id=cvt.cvterm_id
+      where cvt.name = :name";
+
+  $args = array(':name' => 'polypeptide_domain');
+  $result = chado_query($sql_count, $args)->fetchObject();
+  if ($result->count > 0) {
+      
+    // add the materializedviews
+    tripal_phylotree_add_mview();  
+
+    // we want to integrate the materialized views so that they
+    // are available for Drupal Views, upon which our search forms are built
+    tripal_phylotree_integrate_view();
+
+    $mview_id =  tripal_get_mview_id('tree2domain');
+    print "\nPopulating tree2domain mview.....\n";
+    tripal_populate_mview($mview_id);
+  } else {
+      // add the materialized view with no domain data
+      tripal_phylotree_add_domainless_mview();
+
+      // we want to integrate the materialized views so that they
+      // are available for Drupal Views, upon which our search forms are built
+      tripal_phylotree_integrate_view();
+  }      
+
+    
+    $mview_id =  tripal_get_mview_id('phylotree_count');   
+    print "\nPopulating phylotree_count mview.....\n";  
+    tripal_populate_mview($mview_id);
+
+}
+
+/**
+ * Implementation of hook_schema().
+ * Standard tripal linker table between a node and a phylotree record.
+ * @ingroup tripal_phylotree
+ */
+function tripal_phylotree_schema() {
+  $schema['chado_phylotree'] = array(
+    'fields' => array(
+      'vid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'phylotree_id' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0
+      )
+    ),
+    'indexes' => array(
+      'chado_phylotree_idx1' => array('phylotree_id')
+    ),
+    'unique keys' => array(
+      'chado_phylotree_uq1' => array('nid', 'vid'),
+      'chado_phylotree_uq2' => array('vid')
+    ),
+    'primary key' => array('nid'),
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function tripal_phylotree_uninstall() {
+
+    // Drop the MView table if it exists
+    $mview_id =  tripal_get_mview_id('phylotree_count');
+    if ($mview_id) {
+        tripal_delete_mview($mview_id);
+    }
+    //Remove views integration
+    // Note: tripal_remove_views_intergration accepts table_name and priority in a key value form. 
+
+    $delete_view=array(
+        'table_name' => 'phylotree_count',
+        'priority' => '-1',
+    );
+    tripal_remove_views_integration($delete_view); 
+
+    // Drop the MView table if it exists
+    $mview_id =  tripal_get_mview_id('tree2domain');
+    if ($mview_id) {
+        tripal_delete_mview($mview_id);
+
+        //Remove views integration
+        // Note: tripal_remove_views_intergration accepts table_name and priority in a key value form.
+
+        $delete_view=array(
+            'table_name' => 'tree2domain',
+            'priority' => '-1',
+        );
+        tripal_remove_views_integration($delete_view);
+    }
+}
+
+
+function tripal_phylotree_add_domainless_mview(){
+    //Materialized view addition
+
+        $sql_query="WITH count_genes as (select count(*) count, t.phylotree_id from phylotree t, phylonode n where n.phylotree_id=t.phylotree_id and n.label is not null group by t.phylotree_id),
+count_medtr_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'medtr.%' group by t.phylotree_id),
+count_cicar_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'cicar.%' group by t.phylotree_id),
+count_cajca_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'cajca.%' group by t.phylotree_id),
+count_phavu_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'phavu.%' group by t.phylotree_id),
+count_aradu_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'aradu.%' group by t.phylotree_id),
+count_araip_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'araip.%' group by t.phylotree_id),
+count_glyma_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'glyma.%' group by t.phylotree_id)
+SELECT
+phylotree.phylotree_id AS phylotree_phylotree_id,
+phylotree.name AS phylotree_name,
+phylotree.comment AS phylotree_comment,
+count_genes.count as total_count,
+count_medtr_genes.count as medtr_count,
+count_cicar_genes.count as cicar_count,
+count_glyma_genes.count as glyma_count,
+count_phavu_genes.count as phavu_count,
+count_cajca_genes.count as cajca_count,
+count_aradu_genes.count as aradu_count,
+count_araip_genes.count as araip_count
+FROM chado.phylotree phylotree
+LEFT JOIN chado_phylotree chado_phylotree ON phylotree.phylotree_id = chado_phylotree.phylotree_id
+LEFT JOIN count_genes count_genes ON phylotree.phylotree_id = count_genes.phylotree_id
+LEFT JOIN count_medtr_genes ON phylotree.phylotree_id = count_medtr_genes.phylotree_id
+LEFT JOIN count_cicar_genes ON phylotree.phylotree_id = count_cicar_genes.phylotree_id
+LEFT JOIN count_glyma_genes ON phylotree.phylotree_id = count_glyma_genes.phylotree_id
+LEFT JOIN count_phavu_genes ON phylotree.phylotree_id = count_phavu_genes.phylotree_id
+LEFT JOIN count_cajca_genes ON phylotree.phylotree_id = count_cajca_genes.phylotree_id
+LEFT JOIN count_aradu_genes ON phylotree.phylotree_id = count_aradu_genes.phylotree_id
+LEFT JOIN count_araip_genes ON phylotree.phylotree_id = count_araip_genes.phylotree_id";
+
+        //Table Phylotree User Search  description
+
+        $schema = array (
+            'table' => 'phylotree_count',
+            'fields' => array(
+                'phylotree_phylotree_id' => array(
+                    'type' => 'int',
+                    'not null' => FALSE,
+                ),
+                'phylotree_name' => array(
+                    'type' => 'text',
+                    'not null' => FALSE,
+                ),
+                'phylotree_comment' => array(
+                    'type' => 'text',
+                    'not null' => FALSE,
+                ),
+                'total_count' => array(
+                    'type' => 'int',
+                    'not null' => TRUE,
+                ),
+                'medtr_count' => array(
+                    'type' => 'int',
+                    'not null' => TRUE,
+                ),
+                'cicar_count' => array(
+                    'type' => 'int',
+                    'not null' => TRUE,
+                ),
+                'glyma_count' => array(
+                    'type' => 'int',
+                    'not null' => TRUE,
+                ),
+                'phavu_count' => array(
+                    'type' => 'int',
+                    'not null' => TRUE,
+                ),
+                'cajca_count' => array(
+                    'type' => 'int',
+                    'not null' => TRUE,
+                ),
+                'aradu_count' => array(
+                    'type' => 'int',
+                    'not null' => TRUE,
+                ),
+                'araip_count' => array(
+                    'type' => 'int',
+                    'not null' => TRUE,
+                ),
+            ),
+            'primary key' => array('phylotree_phylotree_id'),
+        );
+
+        // add a comment to make sure this view makes sense to the site administator
+        $comment = t('This view is used to provide a table for Phylotree User Search with total- and per species- counts.');
+        tripal_add_mview(
+            'phylotree_count', // name of materialized view
+            'tripal_phylotree', // name of module submitting view
+            $schema,      // schema api array representation
+            $sql_query,         // sql query that loads the mview
+            $comment );
+
+}
+
+
+function tripal_phylotree_add_mview(){
+    //Materialized view addition
+
+    $sql_t2d = "select string_agg(DISTINCT(f1.name), E' '), t.phylotree_id
+ FROM feature f1
+ JOIN cvterm cvt1
+ ON cvt1.cvterm_id = f1.type_id
+ JOIN featureloc
+ ON featureloc.feature_id = f1.feature_id
+ JOIN feature f2
+ ON featureloc.srcfeature_id = f2.feature_id
+ JOIN cvterm cvt2
+ ON cvt2.cvterm_id = f2.type_id
+ JOIN phylonode n
+ ON n.feature_id=f2.feature_id
+ JOIN phylotree t
+ ON n.phylotree_id=t.phylotree_id
+ WHERE cvt1.name in ('protein_hmm_match', 'protein_match') AND 
+cvt2.name = 'polypeptide'
+ GROUP BY t.phylotree_id";
+
+    $schema_t2d = array (
+        'table' => 'tree2domain',
+        'fields' => array (
+            'domains' => array (
+                'type' => 'text',
+                'not null' => false,
+            ),
+            'phylotree_id' => array (
+                'type' => 'int',
+                'not null' => 'FASLE',
+            ),
+        ),
+        'indexes' => array (
+            't2d_indx0' => array (
+                0 => 'phylotree_id',
+            ),
+        ),
+    );
+    
+    $comment_t2d = t('This view is used to provide a helper table for mapping phylotrees to domains.
+                          The view is queried by the phylotree_count mview\'s sql so it needs to be created and populated before the population of phylotree_count mview.');
+
+    tripal_add_mview(
+        'tree2domain', // name of materialized view
+        'tripal_phylotree', // name of module submitting view
+        $schema_t2d,      // schema api array representation
+        $sql_t2d,         // sql query that loads the mview
+        $comment_t2d );
+    
+    $sql_query="WITH count_genes as (select count(*) count, t.phylotree_id from phylotree t, phylonode n where n.phylotree_id=t.phylotree_id and n.label is not null group by t.phylotree_id),
+count_medtr_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'medtr.%' group by t.phylotree_id),
+count_cicar_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'cicar.%' group by t.phylotree_id),
+count_cajca_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'cajca.%' group by t.phylotree_id),
+count_phavu_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'phavu.%' group by t.phylotree_id),
+count_aradu_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'aradu.%' group by t.phylotree_id),
+count_araip_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'araip.%' group by t.phylotree_id),
+count_glyma_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'glyma.%' group by t.phylotree_id)
+SELECT 
+phylotree.phylotree_id AS phylotree_phylotree_id, 
+phylotree.name AS phylotree_name, 
+phylotree.comment AS phylotree_comment, 
+count_genes.count as total_count, 
+count_medtr_genes.count as medtr_count, 
+count_cicar_genes.count as cicar_count, 
+count_glyma_genes.count as glyma_count, 
+count_phavu_genes.count as phavu_count, 
+count_cajca_genes.count as cajca_count, 
+count_aradu_genes.count as aradu_count, 
+count_araip_genes.count as araip_count,
+t2d.domains
+FROM chado.phylotree phylotree
+LEFT JOIN tree2domain t2d ON phylotree.phylotree_id = t2d.phylotree_id
+LEFT JOIN chado_phylotree chado_phylotree ON phylotree.phylotree_id = chado_phylotree.phylotree_id
+LEFT JOIN count_genes count_genes ON phylotree.phylotree_id = count_genes.phylotree_id
+LEFT JOIN count_medtr_genes ON phylotree.phylotree_id = count_medtr_genes.phylotree_id
+LEFT JOIN count_cicar_genes ON phylotree.phylotree_id = count_cicar_genes.phylotree_id
+LEFT JOIN count_glyma_genes ON phylotree.phylotree_id = count_glyma_genes.phylotree_id
+LEFT JOIN count_phavu_genes ON phylotree.phylotree_id = count_phavu_genes.phylotree_id
+LEFT JOIN count_cajca_genes ON phylotree.phylotree_id = count_cajca_genes.phylotree_id
+LEFT JOIN count_aradu_genes ON phylotree.phylotree_id = count_aradu_genes.phylotree_id
+LEFT JOIN count_araip_genes ON phylotree.phylotree_id = count_araip_genes.phylotree_id";
+
+    //Table Phylotree User Search  description
+
+     $schema = array (
+    'table' => 'phylotree_count',
+     'fields' => array(
+      'phylotree_phylotree_id' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+      'phylotree_name' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+      ),   
+      'phylotree_comment' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+      ),
+      'total_count' => array(
+        'type' => 'int',
+        'not null' => TRUE, 
+      ),
+      'medtr_count' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'cicar_count' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'glyma_count' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'phavu_count' => array(
+          'type' => 'int',
+          'not null' => TRUE,
+      ),
+      'cajca_count' => array(
+          'type' => 'int',
+          'not null' => TRUE,
+      ),
+      'aradu_count' => array(
+          'type' => 'int',
+          'not null' => TRUE,
+      ),
+      'araip_count' => array(
+          'type' => 'int',
+          'not null' => TRUE,
+      ),
+      'domains' => array (
+          'type' => 'text',
+          'not null' => false,
+      ),
+   ),
+   'primary key' => array('phylotree_phylotree_id'),
+    'indexes' => array (
+        'phylotree_indx0' => array (
+            0 => 'phylotree_name',
+        ),
+        'phylotree_indx2' => array (
+            0 => 'domains',
+        ),
+    ),
+  );
+
+   // add a comment to make sure this view makes sense to the site administator
+  $comment = t('This view is used to provide a table for Phylotree User Search with total- and per species- counts.');
+  tripal_add_mview(
+    'phylotree_count', // name of materialized view
+    'tripal_phylotree', // name of module submitting view
+    $schema,      // schema api array representation
+    $sql_query,         // sql query that loads the mview
+    $comment );
+  
+}
+
+/**
+ * Integrate the qtl_search materialized view for use by Drupal Views and
+ * our search form
+ */
+
+function tripal_phylotree_integrate_view(){
+
+    $integration_t2d = array (
+        'table' => 'tree2domain',
+        'name' => 'tree2domain',
+        'type' => 'chado',
+        'description' => '',
+        'priority' => '-1',
+        'base_table' => '1',
+        'fields' => array (
+            'phylotree_id' => array (
+                'name' => 'phylotree_id',
+                'title' => 'phylotree_id',
+                'description' => 'Phylotree ID',
+                'type' => 'int',
+                'handlers' => array (
+                    'filter' => array (
+                        'name' => 'views_handler_filter_numeric',
+                    ),
+                    'field' => array (
+                        'name' => 'views_handler_field_numeric',
+                    ),
+                    'sort' => array (
+                        'name' => 'views_handler_sort',
+                    ),
+                    'argument' => array (
+                        'name' => 'views_handler_argument_numeric',
+                    ),
+                    'relationship' => array (
+                        'name' => 'views_handler_relationship',
+                    ),
+                ),
+                'joins' => array (
+                ),
+            ),
+            'domains' => array (
+                'name' => 'domains',
+                'title' => 'Domains',
+                'description' => 'Domains',
+                'type' => 'text',
+                'handlers' => array (
+                    'filter' => array (
+                        'name' => 'tripal_views_handler_filter_select_string',
+                    ),
+                    'field' => array (
+                        'name' => 'views_handler_field',
+                    ),
+                    'sort' => array (
+                        'name' => 'views_handler_sort',
+                    ),
+                    'argument' => array (
+                        'name' => 'views_handler_argument_string',
+                    ),
+                    'relationship' => array (
+                        'name' => 'views_handler_relationship',
+                    ),
+                ),
+                'joins' => array (
+                ),
+            ),
+        ),
+    );
+    // add the array above that will integrate our qtl_search materialized view
+    // for use with Drupal Views
+    tripal_add_views_integration($integration_t2d);
+    
+    $integration = array (
+    'table' => 'phylotree_count',
+    'name' => 'phylotree_count',
+    'type' => 'chado',
+    'description' => '',
+    'priority' => '-1',
+    'base_table' => '1',
+    'fields' => array (
+      'phylotree_phylotree_id' => array (
+          'name' => 'phylotree_phylotree_id',
+          'title' => 'Phylotree ID',
+          'description' => 'Phylotree ID',
+          'type' => 'int',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'views_handler_filter_numeric',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field_numeric',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_numeric',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+
+      'phylotree_name' => array (
+          'name' => 'phylotree_name',
+          'title' => 'Family ID',
+          'description' => 'Family ID',
+          'type' => 'text',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'tripal_views_handler_filter_select_string',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_string',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+
+      'phylotree_comment' => array (
+          'name' => 'phylotree_comment',
+          'title' => 'Description',
+          'description' => 'Description',
+          'type' => 'text',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'tripal_views_handler_filter_select_string',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_string',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+ 
+      'total_count' => array (
+          'name' => 'total_count',
+          'title' => 'Total count',
+          'description' => 'Total count',
+          'type' => 'int',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'views_handler_filter_numeric',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_numeric',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+
+      'medtr_count' => array (
+          'name' => 'medtr_count',
+          'title' => 'Medtr count',
+          'description' => 'Medtr count',
+          'type' => 'int',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'views_handler_filter_numeric',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_numeric',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+
+      'cicar_count' => array (
+          'name' => 'cicar_count',
+          'title' => 'Cicar count',
+          'description' => 'Cicar count',
+          'type' => 'int',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'views_handler_filter_numeric',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_numeric',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+
+      'glyma_count' => array (
+          'name' => 'glyma_count',
+          'title' => 'Glyma count',
+          'description' => 'Glyma count',
+          'type' => 'int',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'views_handler_filter_numeric',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_numeric',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+
+      'phavu_count' => array (
+          'name' => 'phavu_count',
+          'title' => 'Phavu count',
+          'description' => 'Phavu count',
+          'type' => 'int',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'views_handler_filter_numeric',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_numeric',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+
+      'cajca_count' => array (
+          'name' => 'cajca_count',
+          'title' => 'Cajca count',
+          'description' => 'Cajca count',
+          'type' => 'int',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'views_handler_filter_numeric',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_numeric',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+
+      'aradu_count' => array (
+          'name' => 'aradu_count',
+          'title' => 'Aradu count',
+          'description' => 'Aradu count',
+          'type' => 'int',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'views_handler_filter_numeric',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_numeric',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+
+      'araip_count' => array (
+          'name' => 'araip_count',
+          'title' => 'Araip count',
+          'description' => 'Araip count',
+          'type' => 'int',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'views_handler_filter_numeric',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_numeric',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+      
+      'domains' => array (
+          'name' => 'domains',
+          'title' => 'Domains',
+          'description' => 'Domains',
+          'type' => 'text',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'tripal_views_handler_filter_select_string',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_string',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+    ), 
+    );
+// add the array above that will integrate our qtl_search materialized view
+    // for use with Drupal Views
+    tripal_add_views_integration($integration);
+
+}
