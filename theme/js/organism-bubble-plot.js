@@ -8,29 +8,29 @@ options : {  fill : color function for each node,
              height : svg height }
 */
 
-function organismBubblePlot( selector, data, options ) {
+function organismBubblePlot(selector, data, options) {
   
-  /* flatten the tree structure to sum organisms. the bubble layout
+  /* Flatten the tree structure to sum organisms. the bubble layout
    * expects a name property, but the organismColor function expects
    * the abbreviation property to exist as well. */
   var organisms = {};
   var countOrganisms = function(node, i, arr) {
-    if (node.organism_id) {
-      if( ! organisms[ node.organism_id ] ) {
-        // copy only the organisms related metadata, discarding feature info
-        organisms[ node.organism_id ] = {
-          'organism_id' : node.organism_id,
-          'name' : node.abbreviation,
-          'abbreviation' : node.abbreviation,
-          'genus' : node.genus,
-          'species' : node.species,
-          'common_name' : node.common_name,
-          'organism_node_id' : node.organism_node_id,
+    if (node.fo_organism_id) {
+      if (!organisms[node.fo_organism_id]) {
+        // Copy only the organisms related metadata, discarding feature info.
+        organisms[node.fo_organism_id] = {
+          'organism_id' : node.fo_organism_id,
+          'name' : node.fo_abbreviation,
+          'abbreviation' : node.fo_abbreviation,
+          'genus' : node.fo_genus,
+          'species' : node.fo_species,
+          'common_name' : node.fo_common_name,
+          'organism_node_id' : node.fo_organism_node_id,
           'value' : 1 // count
         };
       }
       else {
-        organisms[ node.organism_id ]['value']++;
+        organisms[node.fo_organism_id]['value']++;
       }
     }
     if(node.children) {

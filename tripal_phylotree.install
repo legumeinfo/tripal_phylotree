@@ -181,6 +181,60 @@ function tripal_phylotree_add_cvterms() {
     ),
     array('update_existing' => TRUE)
   );
+
+  // ----------------------------------------------
+  // Add the terms for importing NCBI taxonomy data
+  $values = array(
+    'name' => 'taxonomy',
+    'description' => 'The NCBI Taxonomy Database is a curated classification and nomenclature for all of the organisms in the public sequence databases. This currently represents about 10% of the described species of life on the planet.',
+    'url' => 'http://www.ncbi.nlm.nih.gov/taxonomy',
+    'urlprefix' => 'http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=',
+  );
+  tripal_insert_db($values);
+  tripal_insert_cv('taxonomy', 'A taxonomy for NCBI taxonomy ranks');
+
+  $terms = array('rank', 'taxid', 'class', 'cohort', 'family', 'forma', 'genus', 'infraclass',
+    'infraorder', 'kingdom', 'no rank', 'order', 'parvorder', 'phylum',
+    'species', 'species group', 'species subgroup', 'subclass', 'subcohort',
+    'subfamily', 'subgenus', 'subkingdom', 'suborder', 'subphylum',
+    'subspecies', 'subtribe', 'superclass', 'superfamily', 'superkingdom',
+    'superorder', 'superphylum', 'tribe', 'varietas');
+  $options = array('update_existing' => TRUE);
+  foreach ($terms as $term) {
+    $value = array(
+      'name' => $term,
+      'definition' => '',
+      'cv_name' => 'taxonomy',
+      'is_relationship' => 0,
+      'db_name' => 'taxonomy'
+    );
+    tripal_insert_cvterm($value, $options);
+  }
+
+  $terms = array(
+    'lineage',
+    'genetic_code',
+    'genetic_code_name',
+    'mitochondrial_genetic_code',
+    'mitochondrial_genetic_code_name',
+    'division',
+    'genbank_common_name',
+    'synonym',
+    'other_name',
+    'equivalent_name',
+    'anamorph'
+  );
+  $options = array('update_existing' => TRUE);
+  foreach ($terms as $term) {
+    $value = array(
+      'name' => $term,
+      'definition' => '',
+      'cv_name' => 'organism_property',
+      'is_relationship' => 0,
+      'db_name' => 'tripal'
+    );
+    tripal_insert_cvterm($value, $options);
+  }
 }
 
 
@@ -436,4 +490,17 @@ function tripal_phylotree_add_custom_tables() {
     ),
   );
   chado_create_custom_table('phylotreeprop', $schema, TRUE);
+}
+
+/**
+ * Adds the vocabulary needed for storing taxonmies.
+ */
+function tripal_phylotree_update_7200() {
+  try {
+    tripal_phylotree_add_cvterms();
+  }
+  catch (\PDOException $e) {
+    $error = $e->getMessage();
+    throw new DrupalUpdateException('Failed to complete update' . $error);
+  }
 }

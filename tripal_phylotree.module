@@ -12,11 +12,12 @@
  * Integrates the Chado Phylotree module with Drupal Nodes
  * @}
  */
+require_once 'api/tripal_phylotree.api.inc';
 require_once 'theme/tripal_phylotree.theme.inc';
 require_once 'includes/tripal_phylotree.admin.inc';
 require_once 'includes/tripal_phylotree.chado_node.inc';
 require_once 'includes/tripal_phylotree.import_tree.inc';
-require_once 'includes/api/tripal_phylotree.api.inc';
+require_once 'includes/tripal_phylotree.taxonomy_import.inc';
 
 /**
  * Implements hook_permission().
@@ -81,7 +82,17 @@ function tripal_phylotree_menu() {
     'page arguments' => array('tripal_phylotree_admin'),
     'access arguments' => array('administer tripal phylotree'),
     'type' => MENU_LOCAL_TASK,
-    'weight' => 5
+    'weight' => 1
+  );
+
+  $items['admin/tripal/extension/tripal_phylotree/plots'] = array(
+    'title' => 'Plot Defaults',
+    'description' => 'Set defaults for the trees, dendrograms and bubble plot',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tripal_phylotree_default_plots_form'),
+    'access arguments' => array('administer tripal phylotree'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2
   );
 
   // sync menu item (will be rendered as a tab by tripal)
@@ -92,31 +103,50 @@ function tripal_phylotree_menu() {
     'page arguments' => array('chado_node_sync_form', 'tripal_phylotree', 'chado_phylotree'),
     'access arguments' => array('administer tripal phylotree'),
     'type' => MENU_LOCAL_TASK,
-    'weight' => 2
+    'weight' => 3
   );
-  
+
   // Enable admin view
-  $items['admin/tripal/chado/tripal_phylotree/views/phylotree/enable'] = array(
+  $items['admin/tripal/extension/tripal_phylotree/views/phylotree/enable'] = array(
     'title' => 'Enable Phylotree Administrative View',
     'page callback' => 'tripal_enable_view',
     'page arguments' => array('tripal_phylotree_admin_phylotree', 'admin/tripal/chado/tripal_phylotree'),
     'access arguments' => array('administer tripal phylotree'),
     'type' => MENU_CALLBACK,
   );
-  
+
   $items['chado_phylotree/%'] = array(
     'page callback' => 'phylotree_by_name',
     'page arguments' => array(1),
     'access callback' => TRUE // allow all anonymous http clients
   );
-  
+
    // create a route for viewing json of all phylonodes having this phylotree_id
    $items['chado_phylotree/%/json'] = array(
     'page callback' => 'phylotree_json',
     'page arguments' => array(1),
     'access callback' => TRUE // allow all anonymous http clients
    );
-   
+
+   // Data Loaders
+   $items['admin/tripal/loaders/newic_tree_loader'] = array(
+     'title' => 'Phylogenetic Trees',
+     'description' => 'Loads phylogenetic trees. (Redirects to create a phylogenetic tree content type)',
+     'page callback' => 'drupal_goto',
+     'page arguments' => array('node/add/chado-phylotree'),
+     'access arguments' => array('administer tripal phylotree'),
+     'type' => MENU_NORMAL_ITEM,
+   );
+   $items['admin/tripal/loaders/taxonomy_loader'] = array(
+     'title' => 'NCBI Taxonomy Loader',
+     'description' => 'Loads taxonomic details about installed organisms.',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('tripal_phylotree_taxonomy_load_form'),
+     'access arguments' => array('administer tripal phylotree'),
+     'file' => '/includes/tripal_phylotree.taxonomy_import.inc',
+     'type' => MENU_NORMAL_ITEM,
+   );
+
   return $items;
 }
 
@@ -170,16 +200,22 @@ function tripal_phylotree_theme($existing, $type, $theme, $path) {
       'base hook' => 'node',
       'path' => "$core_path/theme/templates",
     ),
-    // base template for this page (default tab) includes the phylogram 
+    // base template for this page (default tab) includes the phylogram
     'tripal_phylotree_base' => array(
       'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_base',
       'path' => "$path/theme/templates",
     ),
-    // template for the phylogram
+    // Template for the phylogram.
     'tripal_phylotree_phylogram' => array(
       'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_phylogram',
+      'path' => "$path/theme/templates",
+    ),
+    // Template for the taxonomic tree.
+    'tripal_phylotree_taxonomic_tree' => array(
+      'variables' => array('node' => NULL),
+      'template' => 'tripal_phylotree_taxonomic_tree',
       'path' => "$path/theme/templates",
     ),
     // partial for organisms block
@@ -212,6 +248,12 @@ function tripal_phylotree_theme($existing, $type, $theme, $path) {
       'template' => 'tripal_phylotree_teaser',
       'path' => "$path/theme/templates",
     ),
+
+    // FORM THEMES
+    // Theme function for the project table in admin projects form
+    'tripal_phylotree_admin_org_color_tables' => array(
+      'render element' => 'element',
+    )
   );
   return $items;
 }
@@ -230,3 +272,5 @@ function tripal_phylotree_help ($path, $arg) {
 
 // hack to suppress the 'Submitted by...' info drupal adds to nodes
 $variables['display_submitted'] = FALSE;
+
+
