@@ -34,6 +34,14 @@ function tripal_phylotree_views_default_views() {
  * @ingroup tripal_phylotree
  */
 function tripal_phylotree_defaultvalue_user_phylotrees() {
+   $sql_count ="select count(f.feature_id) as count
+   from {feature} f left join {cvterm} cvt
+   on f.type_id=cvt.cvterm_id
+   where cvt.name = :name";
+
+   $args = array(':name' => 'polypeptide_domain');
+   $result = chado_query($sql_count, $args)->fetchObject();
+
     $view = new view();
     $view->name = 'phylotree';
     $view->description = '';
@@ -162,6 +170,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['phylotree_comment']['id'] = 'phylotree_comment';
     $handler->display->display_options['fields']['phylotree_comment']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['phylotree_comment']['field'] = 'phylotree_comment';
+    if ($result->count > 0) {
+        /* Field: gene: Domains/Interpro term */
+        $handler->display->display_options['fields']['domains']['id'] = 'domains';
+        $handler->display->display_options['fields']['domains']['table'] = 'phylotree_count';
+        $handler->display->display_options['fields']['domains']['field'] = 'domains';
+        $handler->display->display_options['fields']['domains']['exclude'] = TRUE;
+    }
     /* Field: phylotree_count: Total count */
     $handler->display->display_options['fields']['total_count']['id'] = 'total_count';
     $handler->display->display_options['fields']['total_count']['table'] = 'phylotree_count';
@@ -252,6 +267,27 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         4 => 0,
     );
     $handler->display->display_options['filters']['phylotree_comment']['max_length'] = '40';
+    if ($result->count > 0) {
+        /* Filter criterion: gene: Domains/Interpro term */
+        $handler->display->display_options['filters']['domains']['id'] = 'domains';
+        $handler->display->display_options['filters']['domains']['table'] = 'phylotree_count';
+        $handler->display->display_options['filters']['domains']['field'] = 'domains';
+        $handler->display->display_options['filters']['domains']['operator'] = 'contains';
+        $handler->display->display_options['filters']['domains']['group'] = 1;
+        $handler->display->display_options['filters']['domains']['exposed'] = TRUE;
+        $handler->display->display_options['filters']['domains']['expose']['operator_id'] = 'domains_op';
+        $handler->display->display_options['filters']['domains']['expose']['label'] = 'Domains/Interpro term';
+        $handler->display->display_options['filters']['domains']['expose']['description'] = '(e.g. [Contains]: PF05659 ,[Contains]:IPR027278)';
+        $handler->display->display_options['filters']['domains']['expose']['use_operator'] = TRUE;
+        $handler->display->display_options['filters']['domains']['expose']['operator'] = 'domains_op';
+        $handler->display->display_options['filters']['domains']['expose']['identifier'] = 'domains';
+        $handler->display->display_options['filters']['domains']['expose']['remember_roles'] = array(
+            2 => '2',
+            1 => 0,
+            4 => 0,
+        );
+        $handler->display->display_options['filters']['domains']['max_length'] = '40';
+    }
     /* Filter criterion: phylotree_count: Total count */
     $handler->display->display_options['filters']['total_count']['id'] = 'total_count';
     $handler->display->display_options['filters']['total_count']['table'] = 'phylotree_count';
