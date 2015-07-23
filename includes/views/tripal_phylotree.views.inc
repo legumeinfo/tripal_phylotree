@@ -176,7 +176,15 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         $handler->display->display_options['fields']['domains']['table'] = 'phylotree_count';
         $handler->display->display_options['fields']['domains']['field'] = 'domains';
         $handler->display->display_options['fields']['domains']['exclude'] = TRUE;
-    }
+       
+       /*Field: phylotree_count: Domains_con */    
+       $handler->display->display_options['fields']['domains_con']['id'] = 'domains_con';
+        $handler->display->display_options['fields']['domains_con']['table'] = 'phylotree_count';
+        $handler->display->display_options['fields']['domains_con']['field'] = 'domains_con';
+        $handler->display->display_options['fields']['domains_con']['exclude'] = TRUE;
+
+
+     }
     /* Field: phylotree_count: Total count */
     $handler->display->display_options['fields']['total_count']['id'] = 'total_count';
     $handler->display->display_options['fields']['total_count']['table'] = 'phylotree_count';
@@ -287,7 +295,29 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
             4 => 0,
         );
         $handler->display->display_options['filters']['domains']['max_length'] = '40';
-    }
+    
+     /*Filter criterion hidden: Domains_con */
+        $handler->display->display_options['filters']['domains_con']['id'] = 'domains_con';
+        $handler->display->display_options['filters']['domains_con']['table'] = 'phylotree_count';
+        $handler->display->display_options['filters']['domains_con']['field'] = 'domains_con';
+        $handler->display->display_options['filters']['domains_con']['operator'] = 'contains';
+        $handler->display->display_options['filters']['domains_con']['group'] = 1;
+        $handler->display->display_options['filters']['domains_con']['exposed'] = TRUE;
+        $handler->display->display_options['filters']['domains_con']['expose']['operator_id'] = 'domains_con_op';
+        $handler->display->display_options['filters']['domains_con']['expose']['label'] = 'Domains_con term';
+        $handler->display->display_options['filters']['domains_con']['expose']['description'] = '(e.g. [Contains]: PF05659 )';
+        $handler->display->display_options['filters']['domains_con']['expose']['use_operator'] = TRUE;
+        $handler->display->display_options['filters']['domains_con']['expose']['operator'] = 'domains_con_op';
+        $handler->display->display_options['filters']['domains_con']['expose']['identifier'] = 'domains_con';
+        $handler->display->display_options['filters']['domains_con']['expose']['remember_roles'] = array(
+            2 => '2',
+            1 => 0,
+            4 => 0,
+        );
+        $handler->display->display_options['filters']['domains_con']['max_length'] = '40'; 
+
+
+     }
     /* Filter criterion: phylotree_count: Total count */
     $handler->display->display_options['filters']['total_count']['id'] = 'total_count';
     $handler->display->display_options['filters']['total_count']['table'] = 'phylotree_count';
