@@ -2,7 +2,7 @@
 
 <h1>HOW TO: Gene Family Search</h1>
 (<a href="/search/phylotree">Go to</a> gene family search)
-<div style="font-family:times">
+<div>
 <p>This page lets you search for gene families starting from a Phytozome gene family ID (e.g., phytozome_10_2.59192412) or words from the description of the gene family (e.g., iron homeostasis or chlorophyll binding protein); family descriptions are derived from homology-based functional analysis of the hidden markov model representing the known sequences in the family, and include Interpro and Gene Ontology identifiers which may be included in the search.  You may leave any of the search fields blank if you don't care about the field, or specify several criteria together (all filters will be ANDed together). The gene families are based on <a href="http://phytozome.jgi.doe.gov/pz/portal.html" target="_blank">Phytozome version 10.2</a>.  You can further refine or restrict the search results by family size or species composition by choosing the count fields under different species (e.g. the maximum number of members in a particular species).</p>
 
 <h2>The result table</h2>
