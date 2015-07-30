@@ -177,7 +177,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         $handler->display->display_options['fields']['domains']['field'] = 'domains';
         $handler->display->display_options['fields']['domains']['exclude'] = TRUE;
        
-       /*Field: phylotree_count: Domains_con */    
+       /*Field: phylotree_count: Domains for consensus trees */    
        $handler->display->display_options['fields']['domains_con']['id'] = 'domains_con';
         $handler->display->display_options['fields']['domains_con']['table'] = 'phylotree_count';
         $handler->display->display_options['fields']['domains_con']['field'] = 'domains_con';
@@ -296,13 +296,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         );
         $handler->display->display_options['filters']['domains']['max_length'] = '40';
     
-     /*Filter criterion hidden: Domains_con */
+     /*Filter criterion : Domains for consensus trees*/
         $handler->display->display_options['filters']['domains_con']['id'] = 'domains_con';
         $handler->display->display_options['filters']['domains_con']['table'] = 'phylotree_count';
         $handler->display->display_options['filters']['domains_con']['field'] = 'domains_con';
         $handler->display->display_options['filters']['domains_con']['operator'] = 'contains';
         $handler->display->display_options['filters']['domains_con']['group'] = 1;
-        $handler->display->display_options['filters']['domains_con']['exposed'] = TRUE;
+        $handler->display->display_options['filters']['total_count']['exposed'] = TRUE;
         $handler->display->display_options['filters']['domains_con']['expose']['operator_id'] = 'domains_con_op';
         $handler->display->display_options['filters']['domains_con']['expose']['label'] = 'Domains_con term';
         $handler->display->display_options['filters']['domains_con']['expose']['description'] = '(e.g. [Contains]: PF05659 )';
