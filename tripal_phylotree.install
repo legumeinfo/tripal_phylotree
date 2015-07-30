@@ -24,6 +24,21 @@ function tripal_phylotree_requirements($phase) {
   return $requirements;
 }
 
+
+/* hook_enable()*/
+
+function tripal_phylotree_enable(){
+$permissions = array('access chado_phylotree content');
+tripal_phylotree_grant_permissions(DRUPAL_AUTHENTICATED_RID, $permissions);
+$permissions_anonym = array('access chado_phylotree content');
+tripal_phylotree_grant_permissions(DRUPAL_ANONYMOUS_RID, $permissions_anonym);
+$permissions_admin = array('administer tripal phylotree');
+tripal_phylotree_grant_permissions (DRUPAL_AUTHENTICATED_RID, $permissions_admin);
+
+
+}
+
+
 /**
  * Implements hook_install()
  * Allows installation of the tripal_gene module
@@ -64,6 +79,36 @@ function tripal_phylotree_install() {
     tripal_populate_mview($mview_id);
 
 }
+
+
+/**
+ * Implementation of hook_grant_permissions(). peu added
+ */
+
+function tripal_phylotree_grant_permissions($rid, array $permissions = array()) {
+
+   // this line doesn't work on install / enable hooks
+     $modules = user_permission_get_modules();
+    // Grant new permissions for the role.
+    foreach ($permissions as $name) {
+        db_merge('role_permission')
+        ->key(array(
+            'rid' => $rid,
+            'permission' => $name,
+        ))
+        ->fields(array(
+      //hard-coded module name here as $modules was not working -peu
+           'module' => 'tripal_phylotree',
+       ))
+        ->execute();
+    }
+
+
+    // Clear the user access cache.
+    drupal_static_reset('user_access');
+    drupal_static_reset('user_role_permissions');
+}
+
 
 /**
  * Implementation of hook_schema().
