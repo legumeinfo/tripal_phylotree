@@ -304,7 +304,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         $handler->display->display_options['filters']['domains_con']['group'] = 1;
         $handler->display->display_options['filters']['domains_con']['exposed'] = TRUE;
         $handler->display->display_options['filters']['domains_con']['expose']['operator_id'] = 'domains_con_op';
-        $handler->display->display_options['filters']['domains_con']['expose']['label'] = 'Domains for consensus trees;
+        $handler->display->display_options['filters']['domains_con']['expose']['label'] = 'Domains for consensus trees';
         $handler->display->display_options['filters']['domains_con']['expose']['description'] = '(e.g. [Contains]: PF05659 )';
         $handler->display->display_options['filters']['domains_con']['expose']['use_operator'] = TRUE;
         $handler->display->display_options['filters']['domains_con']['expose']['operator'] = 'domains_con_op';
