@@ -353,7 +353,7 @@ count_phavu_genes as (select count(n.phylonode_id) count, t.phylotree_id from ph
 count_aradu_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'aradu.%' group by t.phylotree_id),
 count_araip_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'araip.%' group by t.phylotree_id),
 count_glyma_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'glyma.%' group by t.phylotree_id),
-consensus2domain as (select string_agg(DISTINCT(f.name),E' ') domains_con , phylotree_id from feature f JOIN cvterm cvt1 ON cvt1.cvterm_id=f.type_id JOIN featureloc floc ON f.feature_id=floc.feature_id JOIN feature f2 ON floc.srcfeature_id=f2.feature_id JOIN cvterm cvt2 ON cvt2.cvterm_id=f2.type_id JOIN phylotree ON f2.name = phylotree.name || '-consensus' WHERE cvt2.name='consensus_region' and (cvt1.name='protein_match' OR cvt1.name='protein_hmm_match') group by phylotree.phylotree_id)
+consensus2domain as (select string_agg(DISTINCT(f.name),E' ') domains_con ,string_agg(DISTINCT(d.iprterm),E' ') AS ipr2, phylotree_id from feature f JOIN cvterm cvt1 ON cvt1.cvterm_id=f.type_id JOIN featureloc floc ON f.feature_id=floc.feature_id JOIN feature f2 ON floc.srcfeature_id=f2.feature_id JOIN cvterm cvt2 ON cvt2.cvterm_id=f2.type_id JOIN phylotree ON f2.name = phylotree.name || '-consensus' JOIN domain d ON d.feature_name=f.name WHERE cvt2.name='consensus_region' and (cvt1.name='protein_match' OR cvt1.name='protein_hmm_match') group by phylotree.phylotree_id)
 SELECT 
 phylotree.phylotree_id AS phylotree_phylotree_id, 
 phylotree.name AS phylotree_name, 
@@ -366,10 +366,9 @@ count_phavu_genes.count as phavu_count,
 count_cajca_genes.count as cajca_count, 
 count_aradu_genes.count as aradu_count, 
 count_araip_genes.count as araip_count,
-t2d.domains || ' ' || t2d.ipr as domains,
-c2d.domains_con as domains_con
+c2d.domains_con || ' ' || coalesce(c2d.ipr2, '') as domains_con
 FROM chado.phylotree phylotree
-LEFT JOIN tree2domain t2d ON phylotree.phylotree_id = t2d.phylotree_id
+LEFT JOIN consensus2domain c2d ON phylotree.phylotree_id = c2d.phylotree_id
 LEFT JOIN chado_phylotree chado_phylotree ON phylotree.phylotree_id = chado_phylotree.phylotree_id
 LEFT JOIN count_genes count_genes ON phylotree.phylotree_id = count_genes.phylotree_id
 LEFT JOIN count_medtr_genes ON phylotree.phylotree_id = count_medtr_genes.phylotree_id
@@ -379,7 +378,6 @@ LEFT JOIN count_phavu_genes ON phylotree.phylotree_id = count_phavu_genes.phylot
 LEFT JOIN count_cajca_genes ON phylotree.phylotree_id = count_cajca_genes.phylotree_id
 LEFT JOIN count_aradu_genes ON phylotree.phylotree_id = count_aradu_genes.phylotree_id
 LEFT JOIN count_araip_genes ON phylotree.phylotree_id = count_araip_genes.phylotree_id
-LEFT JOIN consensus2domain c2d ON phylotree.phylotree_id = c2d.phylotree_id
 JOIN analysis a ON phylotree.analysis_id=a.analysis_id JOIN analysisprop ap ON ap.analysis_id=a.analysis_id JOIN cvterm ct ON ap.type_id=ct.cvterm_id
 WHERE ct.name='is_current'";
 
@@ -432,10 +430,6 @@ WHERE ct.name='is_current'";
           'type' => 'int',
           'not null' => TRUE,
       ),
-      'domains' => array (
-          'type' => 'text',
-          'not null' => false,
-      ),
 
      'domains_con' => array (
           'type' => 'text',
@@ -453,7 +447,7 @@ WHERE ct.name='is_current'";
             0 => 'phylotree_name',
         ),
         'phylotree_indx2' => array (
-            0 => 'domains',
+            0 => 'domains_con',
         ),
     ),
   );
@@ -836,31 +830,6 @@ function tripal_phylotree_integrate_view(){
           ),
       ),
       
-      'domains' => array (
-          'name' => 'domains',
-          'title' => 'Domains',
-          'description' => 'Domains',
-          'type' => 'text',
-          'handlers' => array (
-              'filter' => array (
-                  'name' => 'tripal_views_handler_filter_select_string',
-              ),
-              'field' => array (
-                  'name' => 'views_handler_field',
-              ),
-              'sort' => array (
-                  'name' => 'views_handler_sort',
-              ),
-              'argument' => array (
-                  'name' => 'views_handler_argument_string',
-              ),
-              'relationship' => array (
-                  'name' => 'views_handler_relationship',
-              ),
-          ),
-          'joins' => array (
-          ),
-      ),
 
 
      'domains_con' => array (
