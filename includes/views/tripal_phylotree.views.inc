@@ -60,6 +60,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['cache']['type'] = 'none';
     $handler->display->display_options['query']['type'] = 'views_query';
     $handler->display->display_options['exposed_form']['type'] = 'basic';
+    $handler->display->display_options['exposed_form']['options']['reset_button'] = TRUE;
     $handler->display->display_options['pager']['type'] = 'full';
     $handler->display->display_options['pager']['options']['items_per_page'] = '10';
     $handler->display->display_options['style_plugin'] = 'table';
@@ -171,18 +172,18 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['phylotree_comment']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['phylotree_comment']['field'] = 'phylotree_comment';
     if ($result->count > 0) {
-        /* Field: gene: Domains/Interpro term */
+        /* Field: phylotree_count: Domains/Interpro term */
+        
         $handler->display->display_options['fields']['domains']['id'] = 'domains';
         $handler->display->display_options['fields']['domains']['table'] = 'phylotree_count';
         $handler->display->display_options['fields']['domains']['field'] = 'domains';
         $handler->display->display_options['fields']['domains']['exclude'] = TRUE;
        
-       /*Field: phylotree_count: Domains for consensus trees */    
-       $handler->display->display_options['fields']['domains_con']['id'] = 'domains_con';
+       /*Field: phylotree_count: Domains/Interpro terms for family consensus */
+        $handler->display->display_options['fields']['domains_con']['id'] = 'domains_con';
         $handler->display->display_options['fields']['domains_con']['table'] = 'phylotree_count';
         $handler->display->display_options['fields']['domains_con']['field'] = 'domains_con';
         $handler->display->display_options['fields']['domains_con']['exclude'] = TRUE;
-
 
      }
     /* Field: phylotree_count: Total count */
@@ -277,6 +278,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['filters']['phylotree_comment']['max_length'] = '40';
     if ($result->count > 0) {
         /* Filter criterion: gene: Domains/Interpro term */
+       /*
         $handler->display->display_options['filters']['domains']['id'] = 'domains';
         $handler->display->display_options['filters']['domains']['table'] = 'phylotree_count';
         $handler->display->display_options['filters']['domains']['field'] = 'domains';
@@ -295,8 +297,8 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
             4 => 0,
         );
         $handler->display->display_options['filters']['domains']['max_length'] = '40';
-    
-     /*Filter criterion : Domains for consensus trees*/
+        */
+     /*Filter criterion : Domains/Interpro terms for family consensus*/
         $handler->display->display_options['filters']['domains_con']['id'] = 'domains_con';
         $handler->display->display_options['filters']['domains_con']['table'] = 'phylotree_count';
         $handler->display->display_options['filters']['domains_con']['field'] = 'domains_con';
@@ -304,8 +306,8 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         $handler->display->display_options['filters']['domains_con']['group'] = 1;
         $handler->display->display_options['filters']['domains_con']['exposed'] = TRUE;
         $handler->display->display_options['filters']['domains_con']['expose']['operator_id'] = 'domains_con_op';
-        $handler->display->display_options['filters']['domains_con']['expose']['label'] = 'Domains for consensus trees';
-        $handler->display->display_options['filters']['domains_con']['expose']['description'] = '(e.g. [Contains]: PF05659 )';
+        $handler->display->display_options['filters']['domains_con']['expose']['label'] = 'Domains/Interpro terms for family consensus';
+        $handler->display->display_options['filters']['domains_con']['expose']['description'] = '(e.g. [Contains]: PF05659 ,[Contains]:IPR027278)';
         $handler->display->display_options['filters']['domains_con']['expose']['use_operator'] = TRUE;
         $handler->display->display_options['filters']['domains_con']['expose']['operator'] = 'domains_con_op';
         $handler->display->display_options['filters']['domains_con']['expose']['identifier'] = 'domains_con';
