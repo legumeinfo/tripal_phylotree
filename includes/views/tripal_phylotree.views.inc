@@ -307,7 +307,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         $handler->display->display_options['filters']['domains_con']['exposed'] = TRUE;
         $handler->display->display_options['filters']['domains_con']['expose']['operator_id'] = 'domains_con_op';
         $handler->display->display_options['filters']['domains_con']['expose']['label'] = 'Domains/Interpro terms for family consensus';
-        $handler->display->display_options['filters']['domains_con']['expose']['description'] = '(e.g. [Contains]: PF05659 ,[Contains]: IPR027278 ,[Contains all words]: PF00931 PF00560)';
+        $handler->display->display_options['filters']['domains_con']['expose']['description'] = '(e.g. [Contains all words]: PF00931 PF00560, [Contains]: IPR027278)';
         $handler->display->display_options['filters']['domains_con']['expose']['use_operator'] = TRUE;
         $handler->display->display_options['filters']['domains_con']['expose']['operator'] = 'domains_con_op';
         $handler->display->display_options['filters']['domains_con']['expose']['identifier'] = 'domains_con';
