@@ -186,7 +186,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         $handler->display->display_options['fields']['domains_con']['exclude'] = TRUE;
 
      }
-    /* Field: phylotree_count: Total count */
+    /* Field: phylotree_count: Gene count */
     $handler->display->display_options['fields']['total_count']['id'] = 'total_count';
     $handler->display->display_options['fields']['total_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['total_count']['field'] = 'total_count';
@@ -307,7 +307,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         $handler->display->display_options['filters']['domains_con']['exposed'] = TRUE;
         $handler->display->display_options['filters']['domains_con']['expose']['operator_id'] = 'domains_con_op';
         $handler->display->display_options['filters']['domains_con']['expose']['label'] = 'Domains/Interpro terms for family consensus';
-        $handler->display->display_options['filters']['domains_con']['expose']['description'] = '(e.g. [Contains]: PF05659 ,[Contains]:IPR027278)';
+        $handler->display->display_options['filters']['domains_con']['expose']['description'] = '(e.g. [Contains]: PF05659 ,[Contains]: IPR027278 ,[Contains all words]: PF00931 PF00560)';
         $handler->display->display_options['filters']['domains_con']['expose']['use_operator'] = TRUE;
         $handler->display->display_options['filters']['domains_con']['expose']['operator'] = 'domains_con_op';
         $handler->display->display_options['filters']['domains_con']['expose']['identifier'] = 'domains_con';
@@ -320,14 +320,14 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
 
 
      }
-    /* Filter criterion: phylotree_count: Total count */
+    /* Filter criterion: phylotree_count: Gene count */
     $handler->display->display_options['filters']['total_count']['id'] = 'total_count';
     $handler->display->display_options['filters']['total_count']['table'] = 'phylotree_count';
     $handler->display->display_options['filters']['total_count']['field'] = 'total_count';
     $handler->display->display_options['filters']['total_count']['group'] = 1;
     $handler->display->display_options['filters']['total_count']['exposed'] = TRUE;
     $handler->display->display_options['filters']['total_count']['expose']['operator_id'] = 'total_count_op';
-    $handler->display->display_options['filters']['total_count']['expose']['label'] = 'Total count';
+    $handler->display->display_options['filters']['total_count']['expose']['label'] = 'Gene count';
     $handler->display->display_options['filters']['total_count']['expose']['use_operator'] = TRUE;
     $handler->display->display_options['filters']['total_count']['expose']['operator'] = 'total_count_op';
     $handler->display->display_options['filters']['total_count']['expose']['identifier'] = 'total_count';
