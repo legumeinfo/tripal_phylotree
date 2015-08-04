@@ -624,8 +624,8 @@ function tripal_phylotree_integrate_view(){
  
       'total_count' => array (
           'name' => 'total_count',
-          'title' => 'Total count',
-          'description' => 'Total count',
+          'title' => 'Gene count',
+          'description' => 'Gene count',
           'type' => 'int',
           'handlers' => array (
               'filter' => array (
