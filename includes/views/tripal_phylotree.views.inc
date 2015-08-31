@@ -69,8 +69,12 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         'phylotree_comment' => 'phylotree_comment',
         'total_count' => 'total_count',
         'medtr_count' => 'medtr_count',
+        'lotja_count' => 'lotja_count',
+        'cicar_count' => 'cicar_count',
         'glyma_count' => 'glyma_count',
         'phavu_count' => 'phavu_count',
+        'cajca_count' => 'cajca_count',
+        'vigra_count' => 'vigra_count',
         'aradu_count' => 'aradu_count',
         'araip_count' => 'araip_count',
     );
@@ -98,6 +102,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
             'empty_column' => 0,
         ),
         'medtr_count' => array(
+            'sortable' => 1,
+            'default_sort_order' => 'asc',
+            'align' => '',
+            'separator' => '',
+            'empty_column' => 0,
+        ),
+        'lotja_count' => array(
             'sortable' => 1,
             'default_sort_order' => 'asc',
             'align' => '',
@@ -133,6 +144,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
             'empty_column' => 0,
         ),
         'cajca_count' => array(
+            'sortable' => 1,
+            'default_sort_order' => 'asc',
+            'align' => '',
+            'separator' => '',
+            'empty_column' => 0,
+        ),
+        'vigra_count' => array(
             'sortable' => 1,
             'default_sort_order' => 'asc',
             'align' => '',
@@ -199,6 +217,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['medtr_count']['alter']['make_link'] = TRUE;
     $handler->display->display_options['fields']['medtr_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Med. truncatula';
     $handler->display->display_options['fields']['medtr_count']['alter']['absolute'] = TRUE;
+    /* Field: phylotree_count: Lotja count */
+    $handler->display->display_options['fields']['lotja_count']['id'] = 'lotja_count';
+    $handler->display->display_options['fields']['lotja_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['fields']['lotja_count']['field'] = 'lotja_count';
+    $handler->display->display_options['fields']['lotja_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['lotja_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Lot. japnoicus';
+    $handler->display->display_options['fields']['lotja_count']['alter']['absolute'] = TRUE;
     /* Field: phylotree_count: Cicar count */
     $handler->display->display_options['fields']['cicar_count']['id'] = 'cicar_count';
     $handler->display->display_options['fields']['cicar_count']['table'] = 'phylotree_count';
@@ -225,6 +250,12 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['cajca_count']['field'] = 'cajca_count';
     $handler->display->display_options['fields']['cajca_count']['alter']['make_link'] = TRUE;
     $handler->display->display_options['fields']['cajca_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Caj. cajan';
+    /* Field: phylotree_count: Vigra count */
+    $handler->display->display_options['fields']['vigra_count']['id'] = 'vigra_count';
+    $handler->display->display_options['fields']['vigra_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['fields']['vigra_count']['field'] = 'vigra_count';
+    $handler->display->display_options['fields']['vigra_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['vigra_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Vig. radiata';
     /* Field: phylotree_count: Aradu count */
     $handler->display->display_options['fields']['aradu_count']['id'] = 'aradu_count';
     $handler->display->display_options['fields']['aradu_count']['table'] = 'phylotree_count';
@@ -352,6 +383,22 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
+    /* Filter criterion: phylotree_count: Lotja count */
+    $handler->display->display_options['filters']['lotja_count']['id'] = 'lotja_count';
+    $handler->display->display_options['filters']['lotja_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['filters']['lotja_count']['field'] = 'lotja_count';
+    $handler->display->display_options['filters']['lotja_count']['group'] = 1;
+    $handler->display->display_options['filters']['lotja_count']['exposed'] = TRUE;
+    $handler->display->display_options['filters']['lotja_count']['expose']['operator_id'] = 'lotja_count_op';
+    $handler->display->display_options['filters']['lotja_count']['expose']['label'] = 'Lotja count';
+    $handler->display->display_options['filters']['lotja_count']['expose']['use_operator'] = TRUE;
+    $handler->display->display_options['filters']['lotja_count']['expose']['operator'] = 'lotja_count_op';
+    $handler->display->display_options['filters']['lotja_count']['expose']['identifier'] = 'lotja_count';
+    $handler->display->display_options['filters']['lotja_count']['expose']['remember_roles'] = array(
+        2 => '2',
+        1 => 0,
+        4 => 0,
+    );
     /* Filter criterion: phylotree_count: Cicar count */
     $handler->display->display_options['filters']['cicar_count']['id'] = 'cicar_count';
     $handler->display->display_options['filters']['cicar_count']['table'] = 'phylotree_count';
@@ -412,6 +459,22 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['filters']['cajca_count']['expose']['operator'] = 'cajca_count_op';
     $handler->display->display_options['filters']['cajca_count']['expose']['identifier'] = 'cajca_count';
     $handler->display->display_options['filters']['cajca_count']['expose']['remember_roles'] = array(
+        2 => '2',
+        1 => 0,
+        4 => 0,
+    );
+    /* Filter criterion: phylotree_count: Vigra count */
+    $handler->display->display_options['filters']['vigra_count']['id'] = 'vigra_count';
+    $handler->display->display_options['filters']['vigra_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['filters']['vigra_count']['field'] = 'vigra_count';
+    $handler->display->display_options['filters']['vigra_count']['group'] = 1;
+    $handler->display->display_options['filters']['vigra_count']['exposed'] = TRUE;
+    $handler->display->display_options['filters']['vigra_count']['expose']['operator_id'] = 'vigra_count_op';
+    $handler->display->display_options['filters']['vigra_count']['expose']['label'] = 'Vigra count';
+    $handler->display->display_options['filters']['vigra_count']['expose']['use_operator'] = TRUE;
+    $handler->display->display_options['filters']['vigra_count']['expose']['operator'] = 'vigra_count_op';
+    $handler->display->display_options['filters']['vigra_count']['expose']['identifier'] = 'vigra_count';
+    $handler->display->display_options['filters']['vigra_count']['expose']['remember_roles'] = array(
         2 => '2',
         1 => 0,
         4 => 0,
