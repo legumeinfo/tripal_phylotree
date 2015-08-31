@@ -8,7 +8,7 @@
   "Cajanus cajan" : "#ffbb78",
   "Cicer arietinum" : "#2ca02c",
   "Lens culinaris" : "#98df8a",
-  "Lotus japonicus" : "#d62728",
+  "Lotus japonicus" : "#17becf",
   "Lupinus albus" : "#ff9896",
   "Lupinus angustifolius" : "#9467bd",
   "Medicago sativa" : "#c5b0d5",
@@ -18,5 +18,6 @@
   "Pisum sativum" :  "#f7b6d2",
   "Trifolium pratense" : "#7f7f7f",
   "Vicia faba" : "#c7c7c7",
+  "Vigna radiata" : "#d62728",
   "Vigna unguiculata" : "#dbdb8d"
 }
