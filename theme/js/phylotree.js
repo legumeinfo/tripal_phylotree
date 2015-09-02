@@ -12,9 +12,14 @@
     // function to generate color based on the organism genus and species
     // on graph node d
     var organismColor = function(d) {
-      var color = legumeColors[d.genus + ' ' + d.species];
-      if(color) { return color; }
-      else { return 'grey'; }
+      var organism = legumeColors[d.common_name];
+      if(! organism) {
+	return legumeColors['default'].color;
+      }
+      if( ! organism.color) {
+	return legumeColors['default'].color;	
+      }
+      return organism.color;
     };
 
     // callback for mouseover event on graph node d
@@ -168,13 +173,19 @@
       });
     };
 
-    $.getJSON(pathToTheme +'/theme/js/legume-colors.json', function(colorData) {
-      legumeColors = colorData;
-      $.getJSON(phylotreeDataURL, function(treeData) {
-        displayData(treeData);
-        $('.phylogram-ajax-loader').remove();
-      });
-    });
+    // colors.json and phylotree data json could be fetched in
+    // parallel with promises, but for now, fetch them sequentially
+    d3.json(pathToTheme +'/theme/js/colors.json',
+	    function(error, colorData) {
+	      if(error) { return console.warn(error); }
+	      legumeColors = colorData;
+	      d3.json(phylotreeDataURL,
+		      function(error, treeData) {
+			if(error) { return console.warn(error); }
+			displayData(treeData);
+			$('.phylogram-ajax-loader').remove();
+		      });
+	    });
                      
     function displayData(treeData) {
       height = graphHeight(treeData);
