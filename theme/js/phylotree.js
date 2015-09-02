@@ -8,10 +8,14 @@
   $(document).ready( function () {
     
     var legumeColors = null;
-
+    var phylogramOrganisms = {};
+    
     // function to generate color based on the organism genus and species
     // on graph node d
     var organismColor = function(d) {
+      // create map of species in this graph, for use in legend later.
+      phylogramOrganisms[d.common_name] = true;
+      
       var organism = legumeColors[d.common_name];
       if(! organism) {
 	return legumeColors['default'].color;
@@ -183,10 +187,58 @@
 		      function(error, treeData) {
 			if(error) { return console.warn(error); }
 			displayData(treeData);
+			displayLegend(colorData)
 			$('.phylogram-ajax-loader').remove();
 		      });
 	    });
-                     
+    
+    function displayLegend(organismColorData) {
+      // first convert to array for d3 use
+      var organismList = [];
+      for(var key in organismColorData) {
+	if(key !== 'default' && key !== 'comment' ) {
+	  var org = organismColorData[key];
+	  if(org.common_name in phylogramOrganisms) {
+	    // only list in legend those organisms appear
+	    var o = organismColorData[key];
+	    var litem  = {
+	      'label' : species5(o) + ' (' + o.genus + ' '+ o.species +
+		', ' + o.common_name + ')',
+	      'color' : organismColor(o),
+	      'data' : o,
+	    };
+	    organismList.push(litem);
+	  }
+	}
+      }
+
+      organismList.sort( function(a,b) {
+	return a.label.localeCompare(b.label);
+      });
+      
+      var container = d3.selectAll('.organism-legend');
+      var rows = container.selectAll('div')
+	  .data(organismList)
+	  .enter()
+	  .append('div')
+          .attr('class', 'organism-legend-row');
+      rows.append('span')
+	.attr('class', 'legend-organism-color')
+  	.html("&nbsp;&nbsp;&nbsp;")
+	.attr('style', function(d) {
+	  return 'background-color: '+ d.color;
+	});
+      rows.append('span')
+	.attr('class', 'legend-organism-label')
+  	.html(function(d) { return d.label; });
+    }
+
+    function species5(d)  {
+      // the 5 letter abbreviation -- YMMV
+      var label = d.genus.substring(0, 3) + d.species.substring(0, 2);
+      return label.toLowerCase();
+    }
+    
     function displayData(treeData) {
       height = graphHeight(treeData);
       d3.phylogram.build('#phylogram', treeData, {

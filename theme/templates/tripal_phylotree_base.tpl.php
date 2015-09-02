@@ -40,7 +40,7 @@ if( ! empty($phylotree->comment) ) {
   <img src="/<?php print $my_path ?>/image/ajax-loader.gif"
        class="phylogram-ajax-loader"/>
 </div>
-
+    
 <p>
 Click on colored terminal nodes to get more information about legume
 genes. Click on internal (white) nodes to view the "genomic context" for
@@ -51,6 +51,11 @@ viewer shows flanking genes and allows exploration of syntenic regions
 from all included legume genomes. You can access the Phytozome family from
 which this tree was derived through the "Cross Reference" tab.
 </p>
+    
+<div class="organism-legend">
+    <!-- d3js will add content to this div -->
+    <h3>Legend</h3>
+</div>
 
 <div id="phylonode_popup_dialog" style="display: none;">
   <!-- these links are for leaf nodes only -->
