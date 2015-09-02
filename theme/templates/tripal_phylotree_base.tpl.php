@@ -72,7 +72,7 @@ which this tree was derived through the "Cross Reference" tab.
 /* this template depends on d3js, but i am not putting it into
 tripal_phylotree.info scripts[] because that results in the script
 getting loaded *on every drupal request*! */
-drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.4.8/d3.min.js',
+drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js',
           'external');
 
 drupal_add_js('/'. $my_path . '/theme/js/d3.phylogram.js');
