@@ -3,7 +3,7 @@
   "default" : {"color": "grey"},
   "white lupin" : {"organism_id":29,"abbreviation":"Lup. albus","genus":"Lupinus","species":"albus","common_name":"white lupin", "color" : "#ff9896"},
   "scarlet runner bean" : {"organism_id":23,"abbreviation":"Pha. coccineus","genus":"Phaseolus","species":"coccineus","common_name":"scarlet runner bean",   "color" : "#c49c94"},
-  "mung bean" : {"organism_id":26,"abbreviation":"Vig. radiata","genus":"Vigna","species":"radiata","common_name":"mung bean", "color" : "#d62728"},
+  "mungbean" : {"organism_id":26,"abbreviation":"Vig. radiata","genus":"Vigna","species":"radiata","common_name":"mungbean", "color" : "#d62728"},
   "rice" : {"organism_id":9,"abbreviation":"Ory. sativa","genus":"Oryza","species":"sativa","common_name":"rice"},
   "mouse-ear cress" : {"organism_id":6,"abbreviation":"Ara. thaliana","genus":"Arabidopsis","species":"thaliana","common_name":"mouse-ear cress"},
   "red clover" :  {"organism_id":30,"abbreviation":"Tri. pratense","genus":"Trifolium","species":"pratense","common_name":"Red clover",  "color" : "#7f7f7f"},
