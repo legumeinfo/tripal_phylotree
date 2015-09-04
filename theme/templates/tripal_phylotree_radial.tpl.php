@@ -14,9 +14,3 @@ if( ! empty($phylotree->comment) ) {
 <div id="phylotree-radial-graph">
   <!-- d3 will add svg to this div -->
 </div>
-
-<div class="organism-legend">
-    <!-- d3js will add content to this div -->
-    <h3>Legend</h3>
-</div>
-    

@@ -52,9 +52,10 @@ from all included legume genomes. You can access the Phytozome family from
 which this tree was derived through the "Cross Reference" tab.
 </p>
     
-<div class="organism-legend">
+<div id="organism-legend-dialog" style="display: none">
     <!-- d3js will add content to this div -->
-    <h3>Legend</h3>
+    <div class="organism-legend">
+    </div>
 </div>
 
 <div id="phylonode_popup_dialog" style="display: none;">

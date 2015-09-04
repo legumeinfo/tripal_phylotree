@@ -4,6 +4,9 @@
 }
 
 .organism-legend-row {
+    line-height: 1.4;
+    white-space: nowrap;
+    font-size: 0.7rem;
 }
 
 .legend-organism-color {

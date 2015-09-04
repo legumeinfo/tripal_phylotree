@@ -164,13 +164,10 @@
           });
 
         } //linkout eof
-
-
       }
-    
       dialog.dialog( {
         title : title,
-        closeOnEscape : false,
+        closeOnEscape : true,
         modal : false,
         position : { my : 'center center', at : 'center center', of : el },
         show : { effect: 'blind', direction: 'down', duration: 200 }
@@ -211,12 +208,30 @@
 	  }
 	}
       }
-
       organismList.sort( function(a,b) {
-	return a.label.localeCompare(b.label);
+	if(! a.data.order || ! b.data.order) {
+	  return a.label.localeCompare(b.label);
+	}
+	if(a.data.order > b.data.order) {
+	  return 1;
+	}
+	if(a.data.order < b.data.order) {
+	  return -1;
+	}
+	return 0;
       });
-      
       var container = d3.selectAll('.organism-legend');
+      var legendForGraph = null;
+      var url = window.location.href;
+      if(url.indexOf('pane=phylotree_circ_dendrogram') !== -1) {
+	legendForGraph = $('#phylotree-radial-graph');
+      }
+      else if (url.indexOf('pane=phylotree_organisms') !== -1) {
+	legendForGraph = $('#phylotree-organisms');
+      }
+      else {
+	legendForGraph = $('#phylogram')
+      }
       var rows = container.selectAll('div')
 	  .data(organismList)
 	  .enter()
@@ -231,6 +246,18 @@
       rows.append('span')
 	.attr('class', 'legend-organism-label')
   	.html(function(d) { return d.label; });
+      var dialog = $('#organism-legend-dialog');
+      dialog.dialog( {
+        title : 'Legend',
+        closeOnEscape : true,
+        modal : false,
+	width: '300px',
+        position : {
+	  my : 'center center',
+	  at : 'right center',
+	  of : legendForGraph,
+	},
+      });
     }
 
     function species5(d)  {
