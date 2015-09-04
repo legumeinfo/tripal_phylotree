@@ -253,8 +253,8 @@
         modal : false,
 	width: '300px',
         position : {
-	  my : 'center center',
-	  at : 'right center',
+	  my : 'right top',
+	  at : 'right top',
 	  of : legendForGraph,
 	},
       });
