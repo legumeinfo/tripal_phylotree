@@ -247,11 +247,20 @@
 	.attr('class', 'legend-organism-label')
   	.html(function(d) { return d.label; });
       var dialog = $('#organism-legend-dialog');
+      //allows re-open of dialog, basically a toggle between this element and the dialog being visible
+      $('.organism-legend-show').click(function() {
+	      var dialog = $('#organism-legend-dialog');
+			dialog.dialog('open');
+			$('.organism-legend-show').hide();
+		});
       dialog.dialog( {
         title : 'Legend',
         closeOnEscape : true,
         modal : false,
 	width: '300px',
+	close: function enablelegendshow() {
+		$('.organism-legend-show').show();
+	},
         position : {
 	  my : 'right top',
 	  at : 'right top',

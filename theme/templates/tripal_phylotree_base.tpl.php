@@ -33,6 +33,9 @@ if( ! empty($phylotree->comment) ) {
 }
 ?>
 </div>
+<div class="organism-legend-show" style="display: none">
+	<a>Show Legend</a>
+</div>
 
 <div id="phylogram">
     <!-- d3js will add svg to this div, and remove the loader gif
