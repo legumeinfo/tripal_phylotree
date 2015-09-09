@@ -230,7 +230,7 @@
 	legendForGraph = $('#phylotree-organisms');
       }
       else {
-	legendForGraph = $('#phylogram')
+	legendForGraph = $('#phylogram');
       }
       var rows = container.selectAll('div')
 	  .data(organismList)
