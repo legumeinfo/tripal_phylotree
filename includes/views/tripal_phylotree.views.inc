@@ -222,7 +222,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['lotja_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['lotja_count']['field'] = 'lotja_count';
     $handler->display->display_options['fields']['lotja_count']['alter']['make_link'] = TRUE;
-    $handler->display->display_options['fields']['lotja_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Lot. japnoicus';
+    $handler->display->display_options['fields']['lotja_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Lot. japonicus';
     $handler->display->display_options['fields']['lotja_count']['alter']['absolute'] = TRUE;
     /* Field: phylotree_count: Cicar count */
     $handler->display->display_options['fields']['cicar_count']['id'] = 'cicar_count';
