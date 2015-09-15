@@ -22,4 +22,3 @@ Quickstart
 * sync features of type = 'polypeptide'
 * default view for searching and browsing is chado/phylotree
 
-* remote change (test)
