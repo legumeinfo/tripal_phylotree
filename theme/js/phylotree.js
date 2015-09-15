@@ -190,6 +190,25 @@
 	    });
     
     function displayLegend(organismColorData) {
+      // early out if the current pane is analysis or cross references
+      // because no legend should be shown
+      var url = window.location.href;
+      if(url.indexOf('pane=phylotree_analysis') !== -1 ||
+	 url.indexOf('pane=phylotree_references') !== -1) {
+	return;
+      }
+      var legendForGraph = null;
+      if(url.indexOf('pane=phylotree_circ_dendrogram') !== -1) {
+	legendForGraph = $('#phylotree-radial-graph');
+      }
+      else if (url.indexOf('pane=phylotree_organisms') !== -1) {
+	legendForGraph = $('#phylotree-organisms');
+      }
+      else {
+	// pane=base, or the default url with no pane= parameter.
+	legendForGraph = $('#phylogram');
+      }
+      
       // first convert to array for d3 use
       var organismList = [];
       for(var key in organismColorData) {
@@ -221,17 +240,6 @@
 	return 0;
       });
       var container = d3.selectAll('.organism-legend');
-      var legendForGraph = null;
-      var url = window.location.href;
-      if(url.indexOf('pane=phylotree_circ_dendrogram') !== -1) {
-	legendForGraph = $('#phylotree-radial-graph');
-      }
-      else if (url.indexOf('pane=phylotree_organisms') !== -1) {
-	legendForGraph = $('#phylotree-organisms');
-      }
-      else {
-	legendForGraph = $('#phylogram');
-      }
       var rows = container.selectAll('div')
 	  .data(organismList)
 	  .enter()
