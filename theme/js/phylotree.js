@@ -3,12 +3,28 @@
 (function ($) {
   
   var width = 550;
-  var height = 0; // will be dynamically sized
+  var height = 0; // will be dynamically sized in displayData
+  var pane = null;
+  var legumeColors = null;
+  var phylogramOrganisms = {};
+  
+  function currentPane() {
+    // parse the url hash to see which sub-pane the navigation is on
+    var url = window.location.href;
+    var matches = url.match(/pane=phylotree_(\w+)&?/i);
+    if(! matches) {
+      return 'base';
+    }
+    return matches[1];
+  }
   
   $(document).ready( function () {
-    
-    var legumeColors = null;
-    var phylogramOrganisms = {};
+
+    pane = currentPane();
+    if(['base', 'circ_dendrogram', 'organisms'].indexOf(pane) === -1) {
+      // early out if the current pane does not have a d3 phylotree graph
+      return;
+    }
     
     // function to generate color based on the organism genus and species
     // on graph node d
@@ -190,23 +206,17 @@
 	    });
     
     function displayLegend(organismColorData) {
-      // early out if the current pane is analysis or cross references
-      // because no legend should be shown
-      var url = window.location.href;
-      if(url.indexOf('pane=phylotree_analysis') !== -1 ||
-	 url.indexOf('pane=phylotree_references') !== -1) {
-	return;
-      }
-      var legendForGraph = null;
-      if(url.indexOf('pane=phylotree_circ_dendrogram') !== -1) {
-	legendForGraph = $('#phylotree-radial-graph');
-      }
-      else if (url.indexOf('pane=phylotree_organisms') !== -1) {
-	legendForGraph = $('#phylotree-organisms');
-      }
-      else {
-	// pane=base, or the default url with no pane= parameter.
-	legendForGraph = $('#phylogram');
+      var legendTarget = null;
+      switch(pane) {
+      case 'base':
+	legendTarget = $('#phylogram');
+	break;
+      case 'circ_dendrogram':
+	legendTarget = $('#phylotree-radial-graph');
+	break;
+      case 'organisms':
+	legendTarget = $('#phylotree-organisms');
+	break;
       }
       
       // first convert to array for d3 use
@@ -272,7 +282,7 @@
         position : {
 	  my : 'right top',
 	  at : 'right top',
-	  of : legendForGraph,
+	  of : legendTarget,
 	},
       });
     }
@@ -285,29 +295,37 @@
     
     function displayData(treeData) {
       height = graphHeight(treeData);
-      d3.phylogram.build('#phylogram', treeData, {
-        'width' : width,
-        'height' : height,
-        'fill' : organismColor,
-        'nodeMouseOver' : nodeMouseOver,
-        'nodeMouseOut' : nodeMouseOut,
-        'nodeMouseDown' : nodeMouseDown
-      });
-      d3.phylogram.buildRadial('#phylotree-radial-graph', treeData, {
-        'width' : width, // square graph 
-        'fill' : organismColor,
-        'nodeMouseOver' : nodeMouseOver,
-        'nodeMouseOut' : nodeMouseOut,
-        'nodeMouseDown' : nodeMouseDown
-      });
-      organismBubblePlot('#phylotree-organisms', treeData, {
-        'height' : width, // square graph
-        'width' : width, 
-        'fill' : organismColor,
-        'nodeMouseOver' : nodeMouseOver,
-        'nodeMouseOut' : nodeMouseOut,
-        'nodeMouseDown' : nodeMouseDown
-      });
+      switch(pane) {
+      case 'base':
+	d3.phylogram.build('#phylogram', treeData, {
+          'width' : width,
+          'height' : height,
+          'fill' : organismColor,
+          'nodeMouseOver' : nodeMouseOver,
+          'nodeMouseOut' : nodeMouseOut,
+          'nodeMouseDown' : nodeMouseDown
+	});
+	break;
+      case 'circ_dendrogram':
+	d3.phylogram.buildRadial('#phylotree-radial-graph', treeData, {
+          'width' : width, // square graph 
+          'fill' : organismColor,
+          'nodeMouseOver' : nodeMouseOver,
+          'nodeMouseOut' : nodeMouseOut,
+          'nodeMouseDown' : nodeMouseDown
+	});
+	break;
+      case 'organisms':
+	organismBubblePlot('#phylotree-organisms', treeData, {
+          'height' : width, // square graph
+          'width' : width, 
+          'fill' : organismColor,
+          'nodeMouseOver' : nodeMouseOver,
+          'nodeMouseOut' : nodeMouseOut,
+          'nodeMouseDown' : nodeMouseDown
+	});
+	break;
+      }
     }
 
     /* graphHeight() generate graph height based on leaf nodes */
