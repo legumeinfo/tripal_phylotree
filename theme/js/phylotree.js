@@ -26,9 +26,9 @@
 	    'phylotree_organisms'].indexOf(pane) !== -1;
   }
 
-  function displayLegend(organismColorData) {
+  function displayLegend(organismColorData, forPane) {
     var legendTarget = null;
-    switch(pane) {
+    switch(forPane) {
     case 'base':
       legendTarget = $('#phylogram');
       break;
@@ -38,7 +38,7 @@
     case 'phylotree_organisms':
       legendTarget = $('#phylotree-organisms');
       break;
-    }    
+    }
     // first convert to array for d3 use
     var organismList = [];
     for(var key in organismColorData) {
@@ -134,15 +134,19 @@
     
     // when user navigates to a sub-panel without a graph, hide any popups
     $(".tripal_toc_list_item_link").click(function(){
+      var dialog = $('#organism-legend-dialog');
+      dialog.dialog('close');
       var newPane = $(this).attr('id');
-      if (! d3GraphOnPane(newPane)) {
-	var dialog = $('#organism-legend-dialog');
-	dialog.dialog('close');
+      if (d3GraphOnPane(newPane)) {
+	setTimeout(function() {
+	  // wait until panel is displayed, to display the legend 
+	  displayLegend(legumeColors, newPane);
+	}, 10);
       }
       // always close the interior node  popup
       var dialog = $('#phylonode_popup_dialog');
       dialog.dialog('close');
-    })
+    });
       
     // callback for mouseover event on graph node d
     var nodeMouseOver = function(d) {
@@ -303,7 +307,7 @@
 			if(error) { return console.warn(error); }
 			displayData(treeData);
 			if(d3GraphOnPane(pane)) {
-			  displayLegend(colorData)
+			  displayLegend(colorData, pane)
 			}
 			$('.phylogram-ajax-loader').remove();
 		      });
