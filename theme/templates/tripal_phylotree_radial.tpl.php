@@ -1,8 +1,8 @@
 <div class="tripal_phylotree-data-block-desc tripal-data-block-desc">
-<?php
+<b><?php
 $phylotree = $variables['node']->phylotree;
 print $phylotree->name;
-?>
+?></b>
 <br/>
 <?php
 if( ! empty($phylotree->comment) ) {

@@ -23,9 +23,9 @@ printf('var pathToTheme = "/%s";', $my_path);
 </script>
 
 <div class="tripal_phylotree-data-block-desc tripal-data-block-desc">
-<?php
+<b><?php
 print $phylotree->name;
-?>
+?></b>
 <br/>
 <?php
 if( ! empty($phylotree->comment) ) {
@@ -36,7 +36,6 @@ if( ! empty($phylotree->comment) ) {
 <div class="organism-legend-show" style="display: none">
 	<a>Show Legend</a>
 </div>
-
 <div id="phylogram">
     <!-- d3js will add svg to this div, and remove the loader gif
      prefix with / for absolute url -->
