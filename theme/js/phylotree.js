@@ -9,39 +9,141 @@
   var phylogramOrganisms = {};
   
   function currentPane() {
-    // parse the url hash to see which sub-pane the navigation is on
+    // parse the url hash, or the href query string to see which
+    // sub-pane the navigation is on (the pane can appear in either
+    // the hash or the query string)
     var url = window.location.href;
-    var matches = url.match(/pane=phylotree_(\w+)&?/i);
+    var matches = url.match(/pane=(\w+)/i);
     if(! matches) {
       return 'base';
     }
     return matches[1];
   }
-  
+
+  function d3GraphOnPane(pane) {
+    return ['base',
+	    'phylotree_circ_dendrogram',
+	    'phylotree_organisms'].indexOf(pane) !== -1;
+  }
+
+  function displayLegend(organismColorData) {
+    var legendTarget = null;
+    switch(pane) {
+    case 'base':
+      legendTarget = $('#phylogram');
+      break;
+    case 'phylotree_circ_dendrogram':
+      legendTarget = $('#phylotree-radial-graph');
+      break;
+    case 'phylotree_organisms':
+      legendTarget = $('#phylotree-organisms');
+      break;
+    }    
+    // first convert to array for d3 use
+    var organismList = [];
+    for(var key in organismColorData) {
+      if(key !== 'default' && key !== 'comment' ) {
+	var org = organismColorData[key];
+	if(org.common_name in phylogramOrganisms) {
+	  // only list in legend those organisms appear
+	  var o = organismColorData[key];
+	  var litem  = {
+	    'label' : species5(o) + ' (' + o.genus + ' '+ o.species +
+	      ', ' + o.common_name + ')',
+	    'color' : organismColor(o),
+	    'data' : o,
+	  };
+	  organismList.push(litem);
+	}
+      }
+    }
+    organismList.sort( function(a,b) {
+      if(! a.data.order || ! b.data.order) {
+	return a.label.localeCompare(b.label);
+      }
+      if(a.data.order > b.data.order) {
+	return 1;
+      }
+      if(a.data.order < b.data.order) {
+	return -1;
+      }
+      return 0;
+    });
+    var container = d3.selectAll('.organism-legend');
+    var rows = container.selectAll('div')
+	.data(organismList)
+	.enter()
+	.append('div')
+        .attr('class', 'organism-legend-row');
+    rows.append('span')
+      .attr('class', 'legend-organism-color')
+      .html("&nbsp;&nbsp;&nbsp;")
+      .attr('style', function(d) {
+	return 'background-color: '+ d.color;
+      });
+    rows.append('span')
+      .attr('class', 'legend-organism-label')
+      .html(function(d) { return d.label; });
+    var dialog = $('#organism-legend-dialog');
+    //allows re-open of dialog, basically a toggle between this element and the dialog being visible
+    $('.organism-legend-show').click(function() {
+      var dialog = $('#organism-legend-dialog');
+      dialog.dialog('open');
+      $('.organism-legend-show').hide();
+    });
+    dialog.dialog( {
+      title : 'Legend',
+      closeOnEscape : true,
+      modal : false,
+      width: '300px',
+      close: function enablelegendshow() {
+	$('.organism-legend-show').show();
+      },
+      position : {
+	my : 'right top',
+	at : 'right top',
+	of : legendTarget,
+      },
+    });
+  }
+
+  function species5(d)  {
+    // the 5 letter abbreviation -- YMMV
+    var label = d.genus.substring(0, 3) + d.species.substring(0, 2);
+    return label.toLowerCase();
+  }
+
+  // function to generate color based on the organism genus and species
+  // on graph node d
+  function organismColor(d) {
+    // create map of species in this graph, for use in legend later.
+    phylogramOrganisms[d.common_name] = true;
+    var organism = legumeColors[d.common_name];
+    if(! organism) {
+      return legumeColors['default'].color;
+    }
+    if( ! organism.color) {
+      return legumeColors['default'].color;	
+    }
+    return organism.color;
+  }
+
   $(document).ready( function () {
 
     pane = currentPane();
-    if(['base', 'circ_dendrogram', 'organisms'].indexOf(pane) === -1) {
-      // early out if the current pane does not have a d3 phylotree graph
-      return;
-    }
     
-    // function to generate color based on the organism genus and species
-    // on graph node d
-    var organismColor = function(d) {
-      // create map of species in this graph, for use in legend later.
-      phylogramOrganisms[d.common_name] = true;
+    // when user navigates to a sub-panel without a graph, hide any popups
+    $(".tripal_toc_list_item_link").click(function(){
+      var newPane = $(this).attr('id');
+      if (! d3GraphOnPane(newPane)) {
+	var dialog = $('#organism-legend-dialog');
+	dialog.dialog('close');
+      }
+      // always close the interior node  popup
+      var dialog = $('#phylonode_popup_dialog');
+      dialog.dialog('close');
+    })
       
-      var organism = legumeColors[d.common_name];
-      if(! organism) {
-	return legumeColors['default'].color;
-      }
-      if( ! organism.color) {
-	return legumeColors['default'].color;	
-      }
-      return organism.color;
-    };
-
     // callback for mouseover event on graph node d
     var nodeMouseOver = function(d) {
       var el =$(this);
@@ -200,132 +302,43 @@
 		      function(error, treeData) {
 			if(error) { return console.warn(error); }
 			displayData(treeData);
-			displayLegend(colorData)
+			if(d3GraphOnPane(pane)) {
+			  displayLegend(colorData)
+			}
 			$('.phylogram-ajax-loader').remove();
 		      });
 	    });
     
-    function displayLegend(organismColorData) {
-      var legendTarget = null;
-      switch(pane) {
-      case 'base':
-	legendTarget = $('#phylogram');
-	break;
-      case 'circ_dendrogram':
-	legendTarget = $('#phylotree-radial-graph');
-	break;
-      case 'organisms':
-	legendTarget = $('#phylotree-organisms');
-	break;
-      }
-      
-      // first convert to array for d3 use
-      var organismList = [];
-      for(var key in organismColorData) {
-	if(key !== 'default' && key !== 'comment' ) {
-	  var org = organismColorData[key];
-	  if(org.common_name in phylogramOrganisms) {
-	    // only list in legend those organisms appear
-	    var o = organismColorData[key];
-	    var litem  = {
-	      'label' : species5(o) + ' (' + o.genus + ' '+ o.species +
-		', ' + o.common_name + ')',
-	      'color' : organismColor(o),
-	      'data' : o,
-	    };
-	    organismList.push(litem);
-	  }
-	}
-      }
-      organismList.sort( function(a,b) {
-	if(! a.data.order || ! b.data.order) {
-	  return a.label.localeCompare(b.label);
-	}
-	if(a.data.order > b.data.order) {
-	  return 1;
-	}
-	if(a.data.order < b.data.order) {
-	  return -1;
-	}
-	return 0;
-      });
-      var container = d3.selectAll('.organism-legend');
-      var rows = container.selectAll('div')
-	  .data(organismList)
-	  .enter()
-	  .append('div')
-          .attr('class', 'organism-legend-row');
-      rows.append('span')
-	.attr('class', 'legend-organism-color')
-  	.html("&nbsp;&nbsp;&nbsp;")
-	.attr('style', function(d) {
-	  return 'background-color: '+ d.color;
-	});
-      rows.append('span')
-	.attr('class', 'legend-organism-label')
-  	.html(function(d) { return d.label; });
-      var dialog = $('#organism-legend-dialog');
-      //allows re-open of dialog, basically a toggle between this element and the dialog being visible
-      $('.organism-legend-show').click(function() {
-	      var dialog = $('#organism-legend-dialog');
-			dialog.dialog('open');
-			$('.organism-legend-show').hide();
-		});
-      dialog.dialog( {
-        title : 'Legend',
-        closeOnEscape : true,
-        modal : false,
-	width: '300px',
-	close: function enablelegendshow() {
-		$('.organism-legend-show').show();
-	},
-        position : {
-	  my : 'right top',
-	  at : 'right top',
-	  of : legendTarget,
-	},
-      });
-    }
-
-    function species5(d)  {
-      // the 5 letter abbreviation -- YMMV
-      var label = d.genus.substring(0, 3) + d.species.substring(0, 2);
-      return label.toLowerCase();
-    }
     
     function displayData(treeData) {
+      // draw the d3 graphs. in the current tripal pane
+      // implementation, all content is drawn at page load, and then
+      // shown/hidden with javascript. so all d3 graphs will get drawn
+      // all the time.
       height = graphHeight(treeData);
-      switch(pane) {
-      case 'base':
-	d3.phylogram.build('#phylogram', treeData, {
-          'width' : width,
-          'height' : height,
-          'fill' : organismColor,
-          'nodeMouseOver' : nodeMouseOver,
-          'nodeMouseOut' : nodeMouseOut,
-          'nodeMouseDown' : nodeMouseDown
-	});
-	break;
-      case 'circ_dendrogram':
-	d3.phylogram.buildRadial('#phylotree-radial-graph', treeData, {
-          'width' : width, // square graph 
-          'fill' : organismColor,
-          'nodeMouseOver' : nodeMouseOver,
-          'nodeMouseOut' : nodeMouseOut,
-          'nodeMouseDown' : nodeMouseDown
-	});
-	break;
-      case 'organisms':
-	organismBubblePlot('#phylotree-organisms', treeData, {
-          'height' : width, // square graph
-          'width' : width, 
-          'fill' : organismColor,
-          'nodeMouseOver' : nodeMouseOver,
-          'nodeMouseOut' : nodeMouseOut,
-          'nodeMouseDown' : nodeMouseDown
-	});
-	break;
-      }
+      d3.phylogram.build('#phylogram', treeData, {
+        'width' : width,
+        'height' : height,
+        'fill' : organismColor,
+        'nodeMouseOver' : nodeMouseOver,
+        'nodeMouseOut' : nodeMouseOut,
+        'nodeMouseDown' : nodeMouseDown
+      });
+      d3.phylogram.buildRadial('#phylotree-radial-graph', treeData, {
+        'width' : width, // square graph 
+        'fill' : organismColor,
+        'nodeMouseOver' : nodeMouseOver,
+        'nodeMouseOut' : nodeMouseOut,
+        'nodeMouseDown' : nodeMouseDown
+      });
+      organismBubblePlot('#phylotree-organisms', treeData, {
+        'height' : width, // square graph
+        'width' : width, 
+        'fill' : organismColor,
+        'nodeMouseOver' : nodeMouseOver,
+        'nodeMouseOut' : nodeMouseOut,
+        'nodeMouseDown' : nodeMouseDown
+      });
     }
 
     /* graphHeight() generate graph height based on leaf nodes */
