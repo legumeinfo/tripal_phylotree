@@ -94,41 +94,43 @@
        .attr('class', 'org-legend-label')
       .html(function(d) { return d.label; });
 
-    var div = container.insert('div', ':first-child');
-    div.attr('class', 'org-legend-row')
-      .append('span')
-      .attr('class', 'org-legend-color')
-      .append('svg:svg')
-      .attr('width', 14)
-      .attr('height', 18)
-      .append('svg:circle')
-      .attr('cx', 7)
-      .attr('cy', 18)
-      .attr('r', 6)
-      .attr('stroke', 'dimgrey')
-      .attr('stroke-width', '2px')
-      .attr('fill', 'white');
-    div.append('span')
-      .attr('class', 'org-legend-label')
-      .html('internal node');
+    if(forPane !== 'phylotree_organisms') {
+      var div = container.insert('div', ':first-child');
+      div.attr('class', 'org-legend-row')
+	.append('span')
+	.attr('class', 'org-legend-color')
+	.append('svg:svg')
+	.attr('width', 14)
+	.attr('height', 18)
+	.append('svg:circle')
+	.attr('cx', 7)
+	.attr('cy', 18)
+	.attr('r', 6)
+	.attr('stroke', 'dimgrey')
+	.attr('stroke-width', '2px')
+	.attr('fill', 'white');
+      div.append('span')
+	.attr('class', 'org-legend-label')
+	.html('internal node');
 
-    div = container.insert('div', ':first-child');
-    div.attr('class', 'org-legend-row')
-      .append('span')
-      .attr('class', 'org-legend-color')
-      .append('svg:svg')
-      .attr('width', 14)
-      .attr('height', 18)
-      .append('svg:circle')
-      .attr('cx', 7)
-      .attr('cy', 18)
-      .attr('r', 6)
-      .attr('stroke', 'black')
-      .attr('stroke-width', '1px')
-      .attr('fill', 'dimgrey');
-    div.append('span')
-      .attr('class', 'org-legend-label')
-      .html('root node');
+      div = container.insert('div', ':first-child');
+      div.attr('class', 'org-legend-row')
+	.append('span')
+	.attr('class', 'org-legend-color')
+	.append('svg:svg')
+	.attr('width', 14)
+	.attr('height', 18)
+	.append('svg:circle')
+	.attr('cx', 7)
+	.attr('cy', 18)
+	.attr('r', 6)
+	.attr('stroke', 'black')
+	.attr('stroke-width', '1px')
+	.attr('fill', 'dimgrey');
+      div.append('span')
+	.attr('class', 'org-legend-label')
+	.html('root node');
+    }
     
     var dialog = $('#organism-legend-dialog');
     //allows re-open of dialog, basically a toggle between this element and the dialog being visible
