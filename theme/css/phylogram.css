@@ -3,15 +3,23 @@
     font-size: 0.75rem;
 }
 
-.organism-legend-row {
-    line-height: 1.4;
+.org-legend-row {
+    line-height: 0;
     white-space: nowrap;
     font-size: 0.7rem;
 }
 
-.legend-organism-color {
+.org-legend-label {
+    padding: 0.5em;
 }
 
-.legend-organism-label {
-    padding: 0.5em;
+/* vertical align the '?' image within the help button */
+a.phylogeny-help {
+    line-height: 22px;
+}
+a.phylogeny-help img {
+    margin: auto;
+    vertical-align: middle;
+    display: inline-block;
+    height: 22px;
 }

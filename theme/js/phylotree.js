@@ -70,20 +70,66 @@
       return 0;
     });
     var container = d3.selectAll('.organism-legend');
+    container.selectAll('div').remove();
+    
     var rows = container.selectAll('div')
 	.data(organismList)
 	.enter()
 	.append('div')
-        .attr('class', 'organism-legend-row');
+        .attr('class', 'org-legend-row');
     rows.append('span')
-      .attr('class', 'legend-organism-color')
-      .html("&nbsp;&nbsp;&nbsp;")
-      .attr('style', function(d) {
-	return 'background-color: '+ d.color;
-      });
+      .attr('class', 'org-legend-color')
+      .append('svg:svg')
+      .attr('width', 14)
+      .attr('height', 18)
+      .append('svg:circle')
+      .attr('class', 'legend-circle')
+      .attr('cx', 7)
+      .attr('cy', 18)
+      .attr('r', 6)
+      .attr('stroke', 'dimgrey')
+      .attr('stroke-width', '1px')
+      .attr('fill', function(d) { return d.color; });
     rows.append('span')
-      .attr('class', 'legend-organism-label')
+       .attr('class', 'org-legend-label')
       .html(function(d) { return d.label; });
+
+    var div = container.insert('div', ':first-child');
+    div.attr('class', 'org-legend-row')
+      .append('span')
+      .attr('class', 'org-legend-color')
+      .append('svg:svg')
+      .attr('width', 14)
+      .attr('height', 18)
+      .append('svg:circle')
+      .attr('cx', 7)
+      .attr('cy', 18)
+      .attr('r', 6)
+      .attr('stroke', 'dimgrey')
+      .attr('stroke-width', '2px')
+      .attr('fill', 'white');
+    div.append('span')
+      .attr('class', 'org-legend-label')
+      .html('internal node');
+
+    div = container.insert('div', ':first-child');
+    div.attr('class', 'org-legend-row')
+      .append('span')
+      .attr('class', 'org-legend-color')
+      .append('svg:svg')
+      .attr('width', 14)
+      .attr('height', 18)
+      .append('svg:circle')
+      .attr('cx', 7)
+      .attr('cy', 18)
+      .attr('r', 6)
+      .attr('stroke', 'black')
+      .attr('stroke-width', '1px')
+      .attr('fill', 'dimgrey');
+    div.append('span')
+      .attr('class', 'org-legend-label')
+      .html('root node');
+    
     var dialog = $('#organism-legend-dialog');
     //allows re-open of dialog, basically a toggle between this element and the dialog being visible
     $('.organism-legend-show').click(function() {
@@ -96,7 +142,7 @@
       closeOnEscape : true,
       modal : false,
       width: '300px',
-      close: function enablelegendshow() {
+      close: function() {
 	$('.organism-legend-show').show();
       },
       position : {
@@ -130,24 +176,44 @@
 
   $(document).ready( function () {
 
+    $('.phylogeny-help-btn').click(function() {
+      $('#phylogeny-help-dlg').dialog( {
+        title: 'Gene Family Help',
+        closeOnEscape : true,
+	width: '500px',
+        modal: false,
+        position: {
+	  my: 'center top', at: 'top', of: window
+	},
+        show: { effect: 'blind', direction: 'down', duration: 200 }
+      });
+    });
+    
     pane = currentPane();
     
     // when user navigates to a sub-panel without a graph, hide any popups
-    $(".tripal_toc_list_item_link").click(function(){
-      var dialog = $('#organism-legend-dialog');
-      dialog.dialog('close');
+    // and redisplay the legend if applicable.
+    $('.tripal_toc_list_item_link').click(function() {
+      $('#organism-legend-dialog').dialog('close');
       var newPane = $(this).attr('id');
       if (d3GraphOnPane(newPane)) {
-	setTimeout(function() {
-	  // wait until panel is displayed, to display the legend 
-	  displayLegend(legumeColors, newPane);
-	}, 10);
+	// redisplay the legend only if there is a d3 graph on new panel
+    	setTimeout(function() {
+    	  // wait until new panel is displayed, to popup the legend
+	  // because it needs to position wrt the current d3 graph
+    	  displayLegend(legumeColors, newPane);
+    	}, 100);
       }
-      // always close the interior node  popup
-      var dialog = $('#phylonode_popup_dialog');
-      dialog.dialog('close');
+      // always hide the Show Legend links by default (because Legend
+      // appears by default)
+      $('.organism-legend-show').hide();
+      // always close the interior node dialog
+      $('#phylonode_popup_dialog').dialog('close');
+      // always close the help dialog
+      $('#phylogeny-help-dlg').dialog('close');
+      return false;
     });
-      
+
     // callback for mouseover event on graph node d
     var nodeMouseOver = function(d) {
       var el =$(this);

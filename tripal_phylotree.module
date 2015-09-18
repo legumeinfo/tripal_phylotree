@@ -198,7 +198,7 @@ function tripal_phylotree_theme($existing, $type, $theme, $path) {
       'template' => 'tripal_phylotree_references',
       'path' => "$path/theme/templates",
     ),
-    // partial for cross references block
+    // partial for analysis block
     'tripal_phylotree_analysis' => array(
       'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_analysis',
