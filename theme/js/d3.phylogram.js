@@ -184,7 +184,7 @@ if (!d3) { throw "d3 wasn't included!"};
     })
     return yscale
   }
-  
+
   d3.phylogram.build = function(selector, nodes, options) {
     options = options || {}
     var w = options.width || d3.select(selector).style('width') || d3.select(selector).attr('width'),
@@ -301,26 +301,17 @@ if (!d3) { throw "d3 wasn't included!"};
       .attr('fill', 'white');
     
     if (!options.skipLabels) {
-      vis.selectAll('g.inner.node')
-        .append("svg:text")
-          .attr("dx", -6)
-          .attr("dy", -6)
-          .attr("text-anchor", 'end')
-          .attr('font-size', '9px')
-          .attr('fill', 'black')
-        //.text(function(d) { return d.length.toFixed(4); }); // hide length
-
-      vis.selectAll('g.leaf.node').append("svg:text")
+      vis.selectAll('g.leaf.node')
+	.append("svg:text")
         .attr("dx", 8)
         .attr("dy", 3)
         .attr("text-anchor", "start")
         .attr('font-family', 'Helvetica Neue, Helvetica, sans-serif')
         .attr('font-size', '10px')
         .attr('fill', 'black')
-        .text(function(d) {
-          // return d.name + ' (' + d.length.toFixed(4) + ')'; // hide length
-          return d.name;
-         });
+        .text(function(d) { return d.name; });
+
+      hiliteLeafNodes(vis, options);
     }
     return {tree: tree, vis: vis}
   }
@@ -386,8 +377,49 @@ if (!d3) { throw "d3 wasn't included!"};
         .attr("dx", function(d) { return d.x < 180 ? -6 : 6; })
         .attr("text-anchor", function(d) { return d.x < 180 ? "end" : "start"; })
         .attr("transform", function(d) { return d.x < 180 ? null : "rotate(180)"; });
+      hiliteLeafNodes(vis, options);
     }
     
     return {tree: tree, vis: vis}
   }
+
+  function hiliteLeafNodes(container, options) {
+    // if there is a hilited gene in the options, add a rectangular
+    // hilite behind it
+    if(! options.hiliteGene) { return; }
+    if( options.skipLabels) { return; }
+    
+    // some default values
+    var hiliteText = { padding: 5, width: 200, height: 25, color: 'khaki' };
+    var hilitedNodes = container.selectAll('g.leaf.node')
+	.filter(function(d) {
+       	  if(d.name.toLowerCase() == options.hiliteGene) {
+	    try {
+	      // get the exact size of the g.leaf.node, if available
+	      var thisBounds = this.getBBox();
+	      hiliteText.width = thisBounds.width + hiliteText.padding;
+	      hiliteText.height = thisBounds.height + hiliteText.padding;
+	    } catch(e) {
+	      // exception may be thrown if the svg element is not visible
+	      // in this case the default values will be applied
+	    }
+	    return true;
+	  }
+	})
+	.insert('svg:rect', ':first-child')
+	.attr('x', -hiliteText.padding + 'px')
+	.attr('y', hiliteText.height * -0.5 + 'px')
+	.attr('width', hiliteText.width +'px')
+	.attr('height', hiliteText.height +'px')
+	.attr('fill', hiliteText.color)
+        .attr('class', 'scrolltarget');
+    
+    if(hilitedNodes.length && jQuery) {
+      // use jquery to scroll to element, if possible
+      jQuery('html,body').animate({
+	scrollTop: jQuery('.scrolltarget').offset().top - 100,
+      },'slow');
+    }
+  }
+  
 }());

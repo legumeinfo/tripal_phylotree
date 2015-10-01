@@ -98,7 +98,8 @@ tripal_phylotree.info scripts[] because that results in the script
 getting loaded *on every drupal request*! */
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js',
           'external');
-
+drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/URI.js/1.16.1/URI.min.js',
+              'external');
 drupal_add_js('/'. $my_path . '/theme/js/d3.phylogram.js');
 drupal_add_js('/'. $my_path . '/theme/js/organism-bubble-plot.js');
 drupal_add_js('/'. $my_path . '/theme/js/phylotree.js');

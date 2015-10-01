@@ -20,6 +20,18 @@
     return matches[1];
   }
 
+  function hiliteGene() {
+    // parse the url query string for a hilite_gene parameter, e.g url like
+    // /chado_phylotree/phytozome_10_2.59026949?hilite_gene=zeama.GRMZM2G101689_P01#pane=base
+    // Using this robust library http://medialize.github.io/URI.js/
+    var uri = new URI(window.location.href);
+    var query = uri.query(true);
+    if(query.hilite_gene) {
+      return query.hilite_gene.toLowerCase();
+    }
+    return '';
+  }
+
   function d3GraphOnPane(pane) {
     return ['base',
 	    'phylotree_circ_dendrogram',
@@ -130,6 +142,26 @@
       div.append('span')
 	.attr('class', 'org-legend-label')
 	.html('root node');
+
+      var hilite = hiliteGene();
+      if(hilite) {
+	var div = container.append('div')
+	    .attr('class', 'org-legend-row');
+	div.append('span')
+	  .attr('class', 'org-legend-color')
+	  .append('svg:svg')
+  	  .attr('width', 14)
+	  .attr('height', 18)
+	  .append('svg:rect')
+	  .attr('x', 0)
+	  .attr('y', 10)
+	  .attr('width', 14)
+	  .attr('height', 10)
+	  .attr('fill', 'khaki');
+	div.append('span')
+	  .attr('class', 'org-legend-label')
+	  .html('hilite gene: '+ hilite);
+      }
     }
     
     var dialog = $('#organism-legend-dialog');
@@ -392,6 +424,7 @@
         'width' : width,
         'height' : height,
         'fill' : organismColor,
+	'hiliteGene' : hiliteGene(),
         'nodeMouseOver' : nodeMouseOver,
         'nodeMouseOut' : nodeMouseOut,
         'nodeMouseDown' : nodeMouseDown
@@ -399,6 +432,7 @@
       d3.phylogram.buildRadial('#phylotree-radial-graph', treeData, {
         'width' : width, // square graph 
         'fill' : organismColor,
+	'hiliteGene' : hiliteGene(),	
         'nodeMouseOver' : nodeMouseOver,
         'nodeMouseOut' : nodeMouseOut,
         'nodeMouseDown' : nodeMouseDown
