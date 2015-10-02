@@ -411,6 +411,7 @@ SQL;
     $phylotree_name = $r->name;
   }
 
+  // reminder: the chado_xxxx tables are tripal/drupal's linking tables
   $sql = <<<SQL
   SELECT n.phylonode_id, n.parent_phylonode_id, n.label AS name,
   n.distance AS length, f.feature_id, f.name AS feature_name,
