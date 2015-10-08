@@ -384,16 +384,16 @@ if (!d3) { throw "d3 wasn't included!"};
   }
 
   function hiliteLeafNodes(container, options) {
-    // if there is a hilited gene in the options, add a rectangular
+    // if there is a hilited node text in the options, add a rectangular
     // hilite behind it
-    if(! options.hiliteGene) { return; }
+    if(! options.hiliteNode) { return; }
     if( options.skipLabels) { return; }
     
     // some default values
     var hiliteText = { padding: 5, width: 200, height: 25, color: 'khaki' };
     var hilitedNodes = container.selectAll('g.leaf.node')
 	.filter(function(d) {
-       	  if(d.name.toLowerCase() == options.hiliteGene) {
+       	  if(d.name.toLowerCase() == options.hiliteNode) {
 	    try {
 	      // get the exact size of the g.leaf.node, if available
 	      var thisBounds = this.getBBox();
@@ -418,7 +418,7 @@ if (!d3) { throw "d3 wasn't included!"};
       // use jquery to scroll to element, if possible
       jQuery('html,body').animate({
 	scrollTop: jQuery('.scrolltarget').offset().top - 100,
-      },'slow');
+      },'fast');
     }
   }
   

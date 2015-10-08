@@ -20,14 +20,15 @@
     return matches[1];
   }
 
-  function hiliteGene() {
-    // parse the url query string for a hilite_gene parameter, e.g url like
-    // /chado_phylotree/phytozome_10_2.59026949?hilite_gene=zeama.GRMZM2G101689_P01#pane=base
+  function hiliteNode() {
+    // parse the url query string for a hilite_node parameter, e.g url like
+    // /chado_phylotree/phytozome_10_2.59131694?hilite_node=phavu.Phvul.003G072500.1
+    // /chado_phylotree/phytozome_10_2.59026949?hilite_node=zeama.GRMZM2G101689_P01#pane=base
     // Using this robust library http://medialize.github.io/URI.js/
     var uri = new URI(window.location.href);
     var query = uri.query(true);
-    if(query.hilite_gene) {
-      return query.hilite_gene.toLowerCase();
+    if(query.hilite_node) {
+      return query.hilite_node.toLowerCase();
     }
     return '';
   }
@@ -39,18 +40,6 @@
   }
 
   function displayLegend(organismColorData, forPane) {
-    var legendTarget = null;
-    switch(forPane) {
-    case 'base':
-      legendTarget = $('#phylogram');
-      break;
-    case 'phylotree_circ_dendrogram':
-      legendTarget = $('#phylotree-radial-graph');
-      break;
-    case 'phylotree_organisms':
-      legendTarget = $('#phylotree-organisms');
-      break;
-    }
     // first convert to array for d3 use
     var organismList = [];
     for(var key in organismColorData) {
@@ -143,7 +132,7 @@
 	.attr('class', 'org-legend-label')
 	.html('root node');
 
-      var hilite = hiliteGene();
+      var hilite = hiliteNode();
       if(hilite) {
 	var div = container.append('div')
 	    .attr('class', 'org-legend-row');
@@ -160,30 +149,56 @@
 	  .attr('fill', 'khaki');
 	div.append('span')
 	  .attr('class', 'org-legend-label')
-	  .html('hilite gene: '+ hilite);
+	  .html('hilite node: '+ hilite);
       }
     }
     
     var dialog = $('#organism-legend-dialog');
-    //allows re-open of dialog, basically a toggle between this element and the dialog being visible
+    //allows re-open of dialog, basically a toggle between this
+    //element and the dialog being visible
     $('.organism-legend-show').click(function() {
       var dialog = $('#organism-legend-dialog');
       dialog.dialog('open');
       $('.organism-legend-show').hide();
     });
-    dialog.dialog( {
+
+    var positionOf = null, positionMy = null, positionAt = null;
+    if(hilite) {
+      positionOf = $('.scrolltarget'); // d3.phylogram.js should have added this class to an el.
+      positionMy = 'left top';
+      positionAt = 'right';
+    }
+    if(! hilite || ! positionOf) {
+      switch(forPane) {
+      case 'base':
+	positionOf = $('#phylogram');
+	break;
+      case 'phylotree_circ_dendrogram':
+	positionOf = $('#phylotree-radial-graph');
+	break;
+      case 'phylotree_organisms':
+	positionOf = $('#phylotree-organisms');
+	break;
+      }
+      positionMy = 'right top';
+      positionAt = 'right top';
+    }
+    var position = {
+      my : positionMy,
+      at : positionAt,
+      of : positionOf,
+      collision : 'fit flip',
+      offset : '100 20',
+    };
+    dialog.dialog({
       title : 'Legend',
       closeOnEscape : true,
       modal : false,
-      width: '300px',
+      width : '300px',
       close: function() {
 	$('.organism-legend-show').show();
       },
-      position : {
-	my : 'right top',
-	at : 'right top',
-	of : legendTarget,
-      },
+      position : position,
     });
   }
 
@@ -424,7 +439,7 @@
         'width' : width,
         'height' : height,
         'fill' : organismColor,
-	'hiliteGene' : hiliteGene(),
+	'hiliteNode' : hiliteNode(),
         'nodeMouseOver' : nodeMouseOver,
         'nodeMouseOut' : nodeMouseOut,
         'nodeMouseDown' : nodeMouseDown
@@ -432,7 +447,7 @@
       d3.phylogram.buildRadial('#phylotree-radial-graph', treeData, {
         'width' : width, // square graph 
         'fill' : organismColor,
-	'hiliteGene' : hiliteGene(),	
+	'hiliteNode' : hiliteNode(),	
         'nodeMouseOver' : nodeMouseOver,
         'nodeMouseOut' : nodeMouseOut,
         'nodeMouseDown' : nodeMouseDown
