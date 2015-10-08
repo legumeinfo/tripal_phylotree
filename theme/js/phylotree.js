@@ -158,8 +158,16 @@
     //element and the dialog being visible
     $('.organism-legend-show').click(function() {
       var dialog = $('#organism-legend-dialog');
+      dialog.dialog('option', {
+	position: {
+	  my : 'left top',
+	  at : 'right top',
+	  of : $('.organism-legend-show'),
+	}
+      });
       dialog.dialog('open');
       $('.organism-legend-show').hide();
+      
     });
 
     var positionOf = null, positionMy = null, positionAt = null;
