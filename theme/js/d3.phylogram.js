@@ -393,6 +393,9 @@ if (!d3) { throw "d3 wasn't included!"};
     var hiliteText = { padding: 5, width: 200, height: 25, color: 'khaki' };
     var hilitedNodes = container.selectAll('g.leaf.node')
 	.filter(function(d) {
+	  if(! d) {
+	    return false;
+	  }
        	  if(d.name.toLowerCase() == options.hiliteNode) {
 	    try {
 	      // get the exact size of the g.leaf.node, if available
@@ -412,13 +415,16 @@ if (!d3) { throw "d3 wasn't included!"};
 	.attr('width', hiliteText.width +'px')
 	.attr('height', hiliteText.height +'px')
 	.attr('fill', hiliteText.color)
-        .attr('class', 'scrolltarget');
+        .attr('class', 'hilite-node');
     
     if(hilitedNodes.length && jQuery) {
-      // use jquery to scroll to element, if possible
-      jQuery('html,body').animate({
-	scrollTop: jQuery('.scrolltarget').offset().top - 100,
-      },'fast');
+      // use jquery to scroll to element, if any were created above
+      var target = jQuery('.hilite-node');
+      if(target && target.offset()) {
+	jQuery('html,body').animate({
+	  scrollTop: target.offset().top - 100,
+	},'fast');
+      }
     }
   }
   

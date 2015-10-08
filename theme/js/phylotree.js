@@ -133,6 +133,10 @@
 	.html('root node');
 
       var hilite = hiliteNode();
+      var warning = '';
+      if(! $('.hilite-node').length) {
+	warning = ' (FEATURE NOT FOUND)';
+      }
       if(hilite) {
 	var div = container.append('div')
 	    .attr('class', 'org-legend-row');
@@ -149,7 +153,7 @@
 	  .attr('fill', 'khaki');
 	div.append('span')
 	  .attr('class', 'org-legend-label')
-	  .html('hilite node: '+ hilite);
+	  .html('hilite node: '+ hilite + warning);
       }
     }
     
@@ -167,16 +171,15 @@
       });
       dialog.dialog('open');
       $('.organism-legend-show').hide();
-      
     });
 
     var positionOf = null, positionMy = null, positionAt = null;
     if(hilite) {
-      positionOf = $('.scrolltarget'); // d3.phylogram.js should have added this class to an el.
+      positionOf = $('.hilite-node'); // d3.phylogram.js *may* have added this class to an el.
       positionMy = 'left top';
       positionAt = 'right';
     }
-    if(! hilite || ! positionOf) {
+    if(! hilite || ! positionOf.length) {
       switch(forPane) {
       case 'base':
 	positionOf = $('#phylogram');
