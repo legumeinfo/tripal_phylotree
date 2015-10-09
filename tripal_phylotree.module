@@ -100,6 +100,16 @@ function tripal_phylotree_menu() {
     'access callback' => TRUE // allow all anonymous http clients
    );
 
+   // a menu hook to redirect to gene tree and hilight corresponding
+   // node name (polypep), e.g.:
+   // http://lis-dev.agron.iastate.edu/chado_gene_phylotree_v2/cicar.Ca_15218_gene
+   // http://lis-dev.agron.iastate.edu/chado_gene_phylotree_v2/lotja.Lj3g3v2923190
+   $items['chado_gene_phylotree_v2/%'] = array(
+    'page callback' => 'phylotree_redirect_by_gene',
+    'page arguments' => array(1),
+    'access callback' => TRUE // allow all anonymous http clients
+   );
+
    $items['chado_gene_phylotree/%/text'] = array(
     'page callback' => 'phylotree_by_genename_text',
     // found this strategy described here: http://stackoverflow.com/questions/2285944/returning-untemplated-output-in-drupal-from-menu-callback-function

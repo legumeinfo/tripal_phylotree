@@ -361,6 +361,52 @@ SQL;
 }
 
 /**
+ * phylotree_by_gene
+ *
+ * Lookup family by gene and redirect to the URL of the gene familty
+ * tree, with hilite_node set to the matching polypeptide name.
+ *
+ * @param string $gene
+ * @return string $family_name
+ * @ingroup tripal_phylotree
+ */
+function phylotree_redirect_by_gene($gene) {
+    // query for the gene family name
+    $sql = <<<SQL
+SELECT fp.value
+ FROM chado.featureprop fp, chado.feature f
+ WHERE f.uniquename = :gene
+ AND fp.feature_id = f.feature_id
+ AND fp.type_id = (SELECT cvterm_id FROM chado.cvterm WHERE NAME = 'gene family')
+SQL;
+    $args = array(':gene' => $gene);
+    $result = chado_query( $sql, $args );
+    $family = $result->fetchField();
+    if(! $family) {
+        drupal_not_found();
+        drupal_exit();
+    }
+    // query for the polypeptide (node name) for this gene
+    $sql = <<<SQL
+SELECT fp.value
+ FROM chado.featureprop fp, chado.feature f
+ WHERE f.uniquename = :gene
+ AND fp.feature_id = f.feature_id
+ AND fp.type_id = (SELECT cvterm_id FROM chado.cvterm WHERE NAME = 'family representative')
+SQL;
+    $args = array(':gene' => $gene);
+    $result = chado_query( $sql, $args );
+    $polypeptide = $result->fetchField();
+    $url = sprintf('/chado_phylotree/%s', $family);
+    if($polypeptide) {
+        $options = array('query' => array('hilite_node' => $polypeptide ));
+    } else {
+        $options = array();
+    }
+    drupal_goto($url, $options);
+}
+
+/**
  * phylotree_by_genename_text
  *
  * Lookup family by gene
@@ -382,8 +428,6 @@ SQL;
     $args = array(':gene' => $gene);
     $result = chado_query( $sql, $args );
     $family = $result->fetchField();
-    //got this method for returning plain text from stackoverflow:
-
     return $family;
 }
 
