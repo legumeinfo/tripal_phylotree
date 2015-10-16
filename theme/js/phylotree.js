@@ -20,17 +20,24 @@
     return matches[1];
   }
 
-  function hiliteNode() {
-    // parse the url query string for a hilite_node parameter, e.g url like
-    // /chado_phylotree/phytozome_10_2.59131694?hilite_node=phavu.Phvul.003G072500.1
-    // /chado_phylotree/phytozome_10_2.59026949?hilite_node=zeama.GRMZM2G101689_P01#pane=base
-    // Using this robust library http://medialize.github.io/URI.js/
+  function hiliteNodeNames(lowercase) {
+    // Using the URI.js library parse the url query string for a one
+    // or more hilite_node parameters. Return an object with
+    // properties set for each node name to hilite.
     var uri = new URI(window.location.href);
     var query = uri.query(true);
-    if(query.hilite_node) {
-      return query.hilite_node.toLowerCase();
+    if(! query.hilite_node) {
+      return {};
     }
-    return '';
+    if(_.isArray(query.hilite_node)) {
+      return _.zipObject(_.map(query.hilite_node, function(nodeName) {
+	return lowercase ?
+	  [nodeName.toLowerCase(), true] : [nodeName, true];
+      }));
+    }
+    return lowercase ?
+      _.zipObject([query.hilite_node.toLowerCase(), true]) :
+      _.zipObject([query.hilite_node, true]);
   }
 
   function d3GraphOnPane(pane) {
@@ -132,12 +139,13 @@
 	.attr('class', 'org-legend-label')
 	.html('root node');
 
-      var hilite = hiliteNode();
+      var hilites = hiliteNodeNames(false);
       var warning = '';
       if(! $('.hilite-node').length) {
 	warning = ' (FEATURE NOT FOUND)';
       }
-      if(hilite) {
+      var hiliteNames = _.keys(hilites);
+      if(hiliteNames && hiliteNames.length) {
 	var div = container.append('div')
 	    .attr('class', 'org-legend-row');
 	div.append('span')
@@ -153,7 +161,7 @@
 	  .attr('fill', 'khaki');
 	div.append('span')
 	  .attr('class', 'org-legend-label')
-	  .html('hilite node: '+ hilite + warning);
+	  .html('hilite: '+  hiliteNames.join(', ') + warning);
       }
     }
     
@@ -174,12 +182,14 @@
     });
 
     var positionOf = null, positionMy = null, positionAt = null;
-    if(hilite) {
-      positionOf = $('.hilite-node'); // d3.phylogram.js *may* have added this class to an el.
+    if(hiliteNames && hiliteNames.length) {
+      // d3.phylogram.js *may* have added this class to an el.
+      //      positionOf = $('.hilite-node').first();
+      positionOf = topmostElementIn('.hilite-node');
       positionMy = 'left top';
       positionAt = 'right';
     }
-    if(! hilite || ! positionOf.length) {
+    else {
       switch(forPane) {
       case 'base':
 	positionOf = $('#phylogram');
@@ -199,7 +209,7 @@
       at : positionAt,
       of : positionOf,
       collision : 'fit flip',
-      offset : '100 20',
+      offset : '1000 -20',
     };
     dialog.dialog({
       title : 'Legend',
@@ -211,6 +221,19 @@
       },
       position : position,
     });
+  }
+
+  function topmostElementIn(selector) {
+    var top = Infinity;
+    var topElem = null;
+    jQuery(selector).each(function() {
+      var offset = $(this).offset();
+      if(offset.top > 0 && offset.top < top) {
+	top = offset.top;
+	topElem = $(this);
+      }
+    });
+    return topElem;
   }
 
   function species5(d)  {
@@ -446,11 +469,12 @@
       // shown/hidden with javascript. so all d3 graphs will get drawn
       // all the time.
       height = graphHeight(treeData);
+      var hilites = hiliteNodeNames(true);
       d3.phylogram.build('#phylogram', treeData, {
         'width' : width,
         'height' : height,
         'fill' : organismColor,
-	'hiliteNode' : hiliteNode(),
+	'hiliteNodes' : hilites,
         'nodeMouseOver' : nodeMouseOver,
         'nodeMouseOut' : nodeMouseOut,
         'nodeMouseDown' : nodeMouseDown
@@ -458,7 +482,7 @@
       d3.phylogram.buildRadial('#phylotree-radial-graph', treeData, {
         'width' : width, // square graph 
         'fill' : organismColor,
-	'hiliteNode' : hiliteNode(),	
+	'hiliteNodes' : hilites,	
         'nodeMouseOver' : nodeMouseOver,
         'nodeMouseOut' : nodeMouseOut,
         'nodeMouseDown' : nodeMouseDown

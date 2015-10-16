@@ -311,7 +311,7 @@ if (!d3) { throw "d3 wasn't included!"};
         .attr('fill', 'black')
         .text(function(d) { return d.name; });
 
-      hiliteLeafNodes(vis, options);
+      hiliteLeafNodes(vis, options, true);
     }
     return {tree: tree, vis: vis}
   }
@@ -377,16 +377,16 @@ if (!d3) { throw "d3 wasn't included!"};
         .attr("dx", function(d) { return d.x < 180 ? -6 : 6; })
         .attr("text-anchor", function(d) { return d.x < 180 ? "end" : "start"; })
         .attr("transform", function(d) { return d.x < 180 ? null : "rotate(180)"; });
-      hiliteLeafNodes(vis, options);
+      hiliteLeafNodes(vis, options, false);
     }
     
     return {tree: tree, vis: vis}
   }
 
-  function hiliteLeafNodes(container, options) {
+  function hiliteLeafNodes(container, options, scrollToHighlight) {
     // if there is a hilited node text in the options, add a rectangular
     // hilite behind it
-    if(! options.hiliteNode) { return; }
+    if(! options.hiliteNodes) { return; }
     if( options.skipLabels) { return; }
     
     // some default values
@@ -396,7 +396,7 @@ if (!d3) { throw "d3 wasn't included!"};
 	  if(! d) {
 	    return false;
 	  }
-       	  if(d.name.toLowerCase() == options.hiliteNode) {
+       	  if(_.has(options.hiliteNodes, d.name.toLowerCase())) {
 	    try {
 	      // get the exact size of the g.leaf.node, if available
 	      var thisBounds = this.getBBox();
@@ -417,14 +417,18 @@ if (!d3) { throw "d3 wasn't included!"};
 	.attr('fill', hiliteText.color)
         .attr('class', 'hilite-node');
     
-    if(hilitedNodes.length && jQuery) {
+    if(scrollToHighlight && hilitedNodes.length && jQuery) {
       // use jquery to scroll to element, if any were created above
-      var target = jQuery('.hilite-node');
-      if(target && target.offset()) {
-	jQuery('html,body').animate({
-	  scrollTop: target.offset().top - 100,
-	},'fast');
+      var top = Infinity;
+      jQuery('.hilite-node').each(function() {
+	var offset = jQuery(this).offset();
+	if(offset.top > 0 && offset.top < top) {
+	  top = offset.top;
       }
+      });
+      jQuery('html,body').animate({
+       	scrollTop: top - 100,
+      },'fast');
     }
   }
   
