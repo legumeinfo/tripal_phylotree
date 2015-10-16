@@ -355,7 +355,7 @@ SQL;
     $args = array(':name' => $name);
     $result = chado_query( $sql, $args );
     $nid = $result->fetchField();
-    drupal_set_title(sprintf('LIS | Gene Family | %s', $name));
+    drupal_set_title(sprintf('Gene Family | %s', $name));
     $html = drupal_render(node_view(node_load($nid))); 
     print drupal_render_page($html);
 }
