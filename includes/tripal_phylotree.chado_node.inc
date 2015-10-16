@@ -344,7 +344,7 @@ function chado_phylotree_node_access($node, $op, $account) {
  * @ingroup tripal_phylotree
  */
 function phylotree_by_name($name) {
-    
+
     $sql = <<<SQL
  SELECT cp.nid as node_id 
  FROM chado.phylotree t
@@ -355,7 +355,7 @@ SQL;
     $args = array(':name' => $name);
     $result = chado_query( $sql, $args );
     $nid = $result->fetchField();
-
+    drupal_set_title(sprintf('LIS | Gene Family | %s', $name));
     $html = drupal_render(node_view(node_load($nid))); 
     print drupal_render_page($html);
 }
