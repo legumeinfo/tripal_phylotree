@@ -343,7 +343,8 @@
         if(d.phylonode_id) {
           var link = $('#phylonode_context_link');
           //note that the trailing slash is somewhat important to avoid apparent hanging due to the way django handles url pattern matching
-          link.attr('href', '/lis_gene_families/chado/context_viewer/' + d.phylonode_id + '/');
+	  var url = '/lis_context_viewer/index.html#/basic/' + d.phylonode_id;
+          link.attr('href', url);
           link.text('View Genomic Contexts for genes in this subtree');
           link.show();
         }
