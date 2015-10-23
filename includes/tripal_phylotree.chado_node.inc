@@ -361,49 +361,82 @@ SQL;
 }
 
 /**
- * phylotree_by_gene
+ * phylotree_redirect_by_gene
  *
- * Lookup family by gene and redirect to the URL of the gene familty
- * tree, with hilite_node set to the matching polypeptide name.
+ * Lookup family by gene and redirect to the URL of the gene family
+ * tree, with hilite_node set to the matching polypeptide name. Note:
+ * we are querying on both the feature.uniquename and feature.name,
+ * for flexibility in the different naming conventions. We are pretty
+ * sure this a sane thing to do considering how the chado database is
+ * loaded, i.e. feature.name should still be unique although the
+ * database does not enforce that with a unique key.
  *
- * @param string $gene
- * @return string $family_name
+ * @param string $gene: gene name or comma separated list of genes
+ * @return nothing: we redirect client
  * @ingroup tripal_phylotree
  */
-function phylotree_redirect_by_gene($gene) {
-    // query for the gene family name
+function phylotree_redirect_by_gene($gene_name) {
+    if(strpos($gene_name, ',') !== FALSE) {
+        // a comma separate list was requested
+        $gene_names = explode(',', $gene_name);
+    }
+    else {
+        // a single gene name was requested
+        $gene_names = array($gene_name);
+    }
+    
+    // query for the gene family name by gene name (taking only the
+    // first gene name from the list)
     $sql = <<<SQL
-SELECT fp.value
- FROM chado.featureprop fp, chado.feature f
- WHERE f.uniquename = :gene
- AND fp.feature_id = f.feature_id
- AND fp.type_id = (SELECT cvterm_id FROM chado.cvterm WHERE NAME = 'gene family')
+      SELECT fp.value
+      FROM chado.featureprop fp, chado.feature f
+      WHERE fp.type_id = (SELECT cvterm_id FROM chado.cvterm
+                          WHERE NAME = 'gene family')
+      AND (f.uniquename = :gene OR f.name = :gene)
+      AND fp.feature_id = f.feature_id
 SQL;
-    $args = array(':gene' => $gene);
-    $result = chado_query( $sql, $args );
+    $args = array(':gene' => $gene_names[0]);
+    $result = chado_query($sql, $args);
     $family = $result->fetchField();
     if(! $family) {
-        drupal_not_found();
+        drupal_not_found('test');
         drupal_exit();
     }
-    // query for the polypeptide (node name) for this gene
-    $sql = <<<SQL
-SELECT fp.value
- FROM chado.featureprop fp, chado.feature f
- WHERE f.uniquename = :gene
- AND fp.feature_id = f.feature_id
- AND fp.type_id = (SELECT cvterm_id FROM chado.cvterm WHERE NAME = 'family representative')
+    $polypeptide_names = array();
+    foreach ($gene_names as $n) {
+        // query for the polypeptide (node name) for this gene
+        $sql = <<<SQL
+          SELECT fp.value
+          FROM chado.featureprop fp, chado.feature f
+          WHERE fp.type_id = (SELECT cvterm_id FROM chado.cvterm 
+                              WHERE NAME = 'family representative')
+          AND (f.uniquename = :gene OR f.name = :gene)
+          AND fp.feature_id = f.feature_id
 SQL;
-    $args = array(':gene' => $gene);
-    $result = chado_query( $sql, $args );
-    $polypeptide = $result->fetchField();
-    $url = sprintf('/chado_phylotree/%s', $family);
-    if($polypeptide) {
-        $options = array('query' => array('hilite_node' => $polypeptide ));
-    } else {
-        $options = array();
+        $args = array(':gene' => $n);
+        $result = chado_query($sql, $args);
+        $pp_name = $result->fetchField();
+        $polypeptide_names[] = $pp_name;
     }
-    drupal_goto($url, $options);
+    // multiple family representatives appear to resolve to same
+    // polypeptide, so uniquify the array
+    $polypeptide_names = array_unique($polypeptide_names);
+    $url = sprintf('/chado_phylotree/%s', $family);
+    $encoded_names = array();
+    foreach(array_unique($polypeptide_names) as $name) {
+        $encoded_names[] = rawurlencode($name);
+    }
+    if(count($encoded_names) == 1) {
+        $url .= sprintf('?hilite_node=%s', $encoded_names[0]);
+    }
+    else {
+        $url .= '?hilite_node=' . join('&hilite_node=', $encoded_names);
+    }
+    // don't use drupal_goto() here because it will urlencode the
+    // entire query string, which is not going to work. instead
+    // redirect header directly.
+    header('Location: '. $url, TRUE, 302);
+    drupal_exit();
 }
 
 /**
