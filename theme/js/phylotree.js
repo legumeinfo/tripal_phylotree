@@ -35,6 +35,15 @@
 	  [nodeName.toLowerCase(), true] : [nodeName, true];
       }));
     }
+    if(query.hilite_node.indexOf(',') >= 0) {
+      // this appears to be a comma separated list
+      var hiliteNodes =  query.hilite_node.split(',');
+      return _.zipObject(_.map(hiliteNodes, function(nodeName) {
+	return lowercase ?
+	  [nodeName.toLowerCase(), true] : [nodeName, true];
+      }));
+    }
+    // else generate a single item list
     return lowercase ?
       _.zipObject([query.hilite_node.toLowerCase(), true]) :
       _.zipObject([query.hilite_node, true]);

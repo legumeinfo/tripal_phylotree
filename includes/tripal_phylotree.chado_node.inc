@@ -371,11 +371,12 @@ SQL;
  * loaded, i.e. feature.name should still be unique although the
  * database does not enforce that with a unique key.
  *
- * @param string $gene: gene name or comma separated list of genes
- * @return nothing: we redirect client
+ * @return nothing: we redirect the client
  * @ingroup tripal_phylotree
  */
-function phylotree_redirect_by_gene($gene_name) {
+function phylotree_redirect_by_gene() {
+    $q = drupal_get_query_parameters();
+    $gene_name = $q['gene_name'];
     if(strpos($gene_name, ',') !== FALSE) {
         // a comma separate list was requested
         $gene_names = explode(',', $gene_name);
@@ -384,7 +385,6 @@ function phylotree_redirect_by_gene($gene_name) {
         // a single gene name was requested
         $gene_names = array($gene_name);
     }
-    
     // query for the gene family name by gene name (taking only the
     // first gene name from the list)
     $sql = <<<SQL
@@ -399,12 +399,13 @@ SQL;
     $result = chado_query($sql, $args);
     $family = $result->fetchField();
     if(! $family) {
-        drupal_not_found('test');
+        drupal_add_http_header('Status', '404 Not Found');
+        print("Error: gene family not found\n");
         drupal_exit();
     }
-    $polypeptide_names = array();
+    $pp_names = array();
     foreach ($gene_names as $n) {
-        // query for the polypeptide (node name) for this gene
+        // query for the polypeptide (node name) for each gene name
         $sql = <<<SQL
           SELECT fp.value
           FROM chado.featureprop fp, chado.feature f
@@ -415,22 +416,22 @@ SQL;
 SQL;
         $args = array(':gene' => $n);
         $result = chado_query($sql, $args);
-        $pp_name = $result->fetchField();
-        $polypeptide_names[] = $pp_name;
+        $name = $result->fetchField();
+        $pp_names[] = $name;
     }
     // multiple family representatives appear to resolve to same
     // polypeptide, so uniquify the array
-    $polypeptide_names = array_unique($polypeptide_names);
+    $pp_names = array_unique($pp_names);
     $url = sprintf('/chado_phylotree/%s', $family);
     $encoded_names = array();
-    foreach(array_unique($polypeptide_names) as $name) {
+    foreach(array_unique($pp_names) as $name) {
         $encoded_names[] = rawurlencode($name);
     }
     if(count($encoded_names) == 1) {
         $url .= sprintf('?hilite_node=%s', $encoded_names[0]);
     }
     else {
-        $url .= '?hilite_node=' . join('&hilite_node=', $encoded_names);
+        $url .= '?hilite_node=' . join(',', $encoded_names);
     }
     // don't use drupal_goto() here because it will urlencode the
     // entire query string, which is not going to work. instead
