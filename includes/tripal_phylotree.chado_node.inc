@@ -377,6 +377,12 @@ SQL;
 function phylotree_redirect_by_gene() {
     $q = drupal_get_query_parameters();
     $gene_name = $q['gene_name'];
+    if(empty($gene_name)) {
+        // handle the case where the URL ends with /geneName instead
+        // of a query string ?gene_name=...
+        $url_parts = explode('/', $_SERVER['REQUEST_URI']);
+        $gene_name = array_pop($url_parts);
+    }
     if(strpos($gene_name, ',') !== FALSE) {
         // a comma separate list was requested
         $gene_names = explode(',', $gene_name);
