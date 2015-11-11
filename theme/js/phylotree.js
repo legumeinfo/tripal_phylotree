@@ -361,23 +361,12 @@
           // this shouldn't happen but ok
           $('#phylonode_context_link').hide();
         }
-        if(d.phylotree_name) {
-          var link = $('#msa_link');
-          link.attr('href', '/lis_gene_families/chado/msa/'+ d.phylotree_name +'-consensus/');
-          link.text('View Multiple Sequence Alignment for this Gene Family');
-          link.show();
-        }
-        else {
-          // this shouldn't happen but ok
-          $('#msa_link').hide();
-        }
         
         // show dialog content relevant for interior node
 	// go_link not ready for prime time
         // $('#phylonode_go_link').show();
         $('#phylonode_go_link').hide();
         $('#phylonode_context_link').show();
-        $('#msa_link').show();
         
         // hide dialog content which is only applicable to leaf nodes
         $('#phylonode_organism_link').hide();
@@ -393,7 +382,6 @@
         // hide dialog content which is only applicable to interior nodes
         $('#phylonode_go_link').hide();
         $('#phylonode_context_link').hide();
-        $('#msa_link').hide();
         
         if(d.feature_node_id) {
           var link = $('#phylonode_feature_link');

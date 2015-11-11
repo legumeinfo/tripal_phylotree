@@ -41,6 +41,9 @@ if( ! empty($phylotree->comment) ) {
   <a href="#" class="button organism-legend-show" style="display: none">
     Show Legend
   </a>
+  <a href="/lis_gene_families/chado/msa/<?php print $phylotree->name ?>-concensus/">
+    View Multiple Sequence Alignment for this gene family
+  </a>
 </div>
 
 <div id="phylogram">
