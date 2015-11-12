@@ -485,13 +485,24 @@
 	  return _.get(legumeColors[d.common_name], 'color', false) ?
 	    true : false;
 	});
-	
 	if(legumes.length) {
+	  /* context viewer */
 	  var url = '/lis_context_viewer/index.html#/basic/'+node.phylonode_id;
 	  var linkAttr = {
 	    id : 'context_viewer_link_out_',
 	    href : url,
 	    text : 'View Genomic Contexts for genes in this subtree',
+	    tabindex: '-1', /* prevent link being hilited by default */
+	  };
+	  var a = $('<a/>', linkAttr);
+	  dialogElem.append(a);
+	  dialogElem.append($('<br/>'));
+	  /* cmtv */
+	  var url = 'http://velarde.ncgr.org:7070/isys/launch?svc=org.ncgr.cmtv.isys.CompMapViewerService%40--style%40http://velarde.ncgr.org:7070/isys/bin/Components/cmtv/conf/cmtv_combined_map_style.xml%40--combined_display%40' + window.location.origin + '/lis_gene_families/chado/phylo/node/gff_download/' + node.phylonode_id;
+	  var linkAttr = {
+	    id : 'cmtv_link_out',
+	    href : url,
+	    text : 'View Genomic Distribution for genes in this subtree',
 	    tabindex: '-1', /* prevent link being hilited by default */
 	  };
 	  var a = $('<a/>', linkAttr);
