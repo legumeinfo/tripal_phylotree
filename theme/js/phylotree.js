@@ -341,105 +341,16 @@
     var nodeMouseDown = function(d) {
       var el = $(this);
       var dialog = $('#phylonode_popup_dialog');
-      var title = (! d.children ) ? d.name : 'interior node ' + d.phylonode_id;
-
-      // remove previously generated external links for nodes with different phylonode_id:
-      $("div#linkout a[id!='^phylonode_linkout_"+d.phylonode_id+"']").remove();
-      $("div#linkout br").remove();
-
-      if(d.children) {
-        // interior node
-        if(d.phylonode_id) {
-          var link = $('#phylonode_context_link');
-          //note that the trailing slash is somewhat important to avoid apparent hanging due to the way django handles url pattern matching
-	  var url = '/lis_context_viewer/index.html#/basic/' + d.phylonode_id;
-          link.attr('href', url);
-          link.text('View Genomic Contexts for genes in this subtree');
-          link.show();
-        }
-        else {
-          // this shouldn't happen but ok
-          $('#phylonode_context_link').hide();
-        }
-        
-        // show dialog content relevant for interior node
-	// go_link not ready for prime time
-        // $('#phylonode_go_link').show();
-        $('#phylonode_go_link').hide();
-        $('#phylonode_context_link').show();
-        
-        // hide dialog content which is only applicable to leaf nodes
-        $('#phylonode_organism_link').hide();
-        $('#phylonode_feature_link').hide();
-      }
-      else {
-        // leaf node
-
-        // show dialog content relevant for leaf node
-        $('#phylonode_organism_link').show();
-        $('#phylonode_feature_link').show();
-        
-        // hide dialog content which is only applicable to interior nodes
-        $('#phylonode_go_link').hide();
-        $('#phylonode_context_link').hide();
-        
-        if(d.feature_node_id) {
-          var link = $('#phylonode_feature_link');
-          link.attr('href', '?q=node/' + d.feature_node_id);
-          link.text('view feature: ' + d.feature_name);
-          link.show();
-        }
-        else {
-          // this shouldn't happen but ok
-          $('#phylonode_feature_link').hide();
-        }
-
-        // view organism bof
-        if(d.organism_node_id) {
-          var link = $('#phylonode_organism_link');
-          link.attr('href', d.organism_node_id ?
-                    '?q=node/' + d.organism_node_id : '#');
-          link.text('view organism: ' + d.genus + ' '+
-                    d.species + ( d.common_name ? ' (' + d.common_name + ')' : '' ) );
-          link.show();
-        } else {
-          $('#phylonode_organism_link').hide();
-        } // view organism eof
-
-
-        // Linkout bof:
-	if (d.feature_name) {
-
-          //FIXME: hack depending on typical naming conventions. we can certainly do better
-          var transcript = d.feature_name.replace(/^.....\./, "");
-          var gene = transcript.replace(/\.\d+$/, "");
-          // The ajax call should be at the end after generating #phylonode_feature_link, #phylonode_organism_link, etc.
-          $.ajax({
-            type: "GET",
-            url: window.location.origin+"/phylotree_links/"+d.genus+"/"+d.species+"/"+gene+"/"+transcript+"/json",
-            success:function(data) {
-
-              if (data.length > 0) {
-                $.each(data, function( index, value ) {
-                  var existinglink = $("a#phylonode_linkout_"+d.phylonode_id+"_"+index);
-                  
-                  if (existinglink.length == 0) {
-                    var $link = $("<a id='phylonode_linkout_"+d.phylonode_id+"_"+index+"' href='"+value.href+"' tabindex='-1'>"+value.text+"</a></br>");
-                    $("div#linkout").append($link);
-                  }
-                });
-              }
-            },
-          });
-
-        } //linkout eof
-      }
-      dialog.dialog( {
-        title : title,
+      dialog.empty();
+      addTripalOrganismLink(dialog, d);
+      addTripalFeatureLink(dialog, d);
+      addExternalLinks(dialog, d);
+      dialog.dialog({
+        title : (! d.children ) ? d.name : 'interior node',
+        position : { my : 'center center', at : 'center center', of : el },
+        show : { effect: 'blind', direction: 'down', duration: 200 },
         closeOnEscape : true,
         modal : false,
-        position : { my : 'center center', at : 'center center', of : el },
-        show : { effect: 'blind', direction: 'down', duration: 200 }
       });
     };
 
@@ -466,7 +377,7 @@
       // implementation, all content is drawn at page load, and then
       // shown/hidden with javascript. so all d3 graphs will get drawn
       // all the time.
-      height = graphHeight(treeData);
+      height = 22 * leafNodes(treeData).length;
       var hilites = hiliteNodeNames(true);
       d3.phylogram.build('#phylogram', treeData, {
         'width' : width,
@@ -495,20 +406,129 @@
       });
     }
 
-    /* graphHeight() generate graph height based on leaf nodes */
-    function graphHeight(data) {
-      function countLeafNodes(node) {
-        if(! node.children) {
-          return 1;
-        }
-        var ct = 0;
-        node.children.forEach( function(child) {
-          ct+= countLeafNodes(child);
-        });
-        return ct;
+    function leafNodes(node) {
+      /* for a root or interior node, return an array of leaf nodes. a leaf 
+       * node by definition has no children
+       */
+      function _trampoline(f) {
+	while (f && f instanceof Function) {
+	  f = f();
+	}
+	return f;
       }
-      var leafNodeCt = countLeafNodes(data);
-      return 22 * leafNodeCt;
+      function _collectLeaves(n, result) {
+	if(! n.children) {
+	  result.push(n);
+	  return result;
+	}
+	else {
+	  return function() {
+	    _.each(n.children, function(n) {
+	      result = _trampoline(_collectLeaves.bind(null, n, result))
+	    });
+	    return result;
+	  }
+	}
+      }
+      return _trampoline(_collectLeaves.bind(null,node,[]))
     }
+
+    function addTripalOrganismLink(dialogElem, node) {
+      /* add a tripal organism link to the dialog element, if this is a
+       * leaf node and organism is known. 
+       */
+      if(node.children || ! node.organism_node_id) {
+	// either this is an interior node, or the organism is not known.
+	// don't add an organism link.
+	return;
+      }
+      var linkAttr = {
+	id:  'organism_link',
+	href: '/node/' + node.organism_node_id,
+	text: 'view organism: ' + node.genus + ' '+
+	  node.species + ( node.common_name ?
+			   '(' + node.common_name + ')' : '' ),
+	tabindex: '-1', /* prevent link from being hilited by default */
+      };
+      var a = $('<a/>', linkAttr);
+      dialogElem.append(a);
+      dialogElem.append($('<br/>'));
+    }
+
+    function addTripalFeatureLink(dialogElem, node) {
+      /* add a tripal feature link to the dialog element, if this is a
+       * leaf node and the feature is known.
+       */
+      if(node.children || ! node.feature_node_id) {
+	// either this is an interior node, or the feature is not known.
+	// don't add a feature link.
+	return;
+      }
+      var linkAttr = {
+	id:  'feature_link',
+	href: '/node/' + node.feature_node_id,
+	text: 'view feature: ' + node.feature_name,
+	tabindex: '-1',	 /* prevent link from being hilited by default */
+      };
+      var a = $('<a/>', linkAttr);
+      dialogElem.append(a);
+      dialogElem.append($('<br/>'));
+    }
+
+    function addExternalLinks(dialogElem, node) {
+      /* contact LIS link-out service for json list of href,text linkouts
+       */
+      if(node.children) {
+	// interior node link outs (if any)
+	var leaves = leafNodes(node);
+	var legumes = _.filter(leaves, function(d) {
+	  return _.get(legumeColors[d.common_name], 'color', false) ?
+	    true : false;
+	});
+	
+	if(legumes.length) {
+	  var url = '/lis_context_viewer/index.html#/basic/'+node.phylonode_id;
+	  var linkAttr = {
+	    id : 'context_viewer_link_out_',
+	    href : url,
+	    text : 'View Genomic Contexts for genes in this subtree',
+	    tabindex: '-1', /* prevent link being hilited by default */
+	  };
+	  var a = $('<a/>', linkAttr);
+	  dialogElem.append(a);
+	  dialogElem.append($('<br/>'));
+	}
+	else {
+	  var p  = dialogElem.append($('<p>'));
+	  p.html('Sorry, no resources are available for this sub-tree. ' +
+		 'Please try another node.');
+	}
+      }
+      else {
+	// leaf node link outs
+	var transcript = node.feature_name.replace(/^.....\./, "");
+	var gene = transcript.replace(/\.\d+$/, "");
+	var url = "/phylotree_links/"+node.genus+"/"+node.species+"/"+
+	    gene+"/"+transcript+"/json";
+	$.ajax({
+          type: "GET",
+          url: url,
+          success: function(data) {
+            _.each(data, function(value, index) {
+	      var linkAttr = {
+		id : 'feature_link_out_' + index,
+		href : value.href,
+		text : value.text,
+		tabindex: '-1', /* prevent link being hilited by default */
+	      };
+	      var a = $('<a/>', linkAttr);
+	      dialogElem.append(a);
+	      dialogElem.append($('<br/>'));
+            });
+          },
+	});
+      }
+    }
+    
   });
 })(jQuery);
