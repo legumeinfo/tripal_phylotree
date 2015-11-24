@@ -9,6 +9,9 @@ if(empty($my_path)) {
   $my_path = 'sites/all/modules/tripal/tripal_phylogeny';
 }
 drupal_add_css( $my_path . '/theme/css/phylogram.css');
+drupal_add_css('//cdnjs.cloudflare.com/ajax/libs/hopscotch/0.2.5/css/hopscotch.min.css',
+               'external');
+
 $phylotree = $variables['node']->phylotree;
 ?>
 <script>
@@ -41,7 +44,8 @@ if( ! empty($phylotree->comment) ) {
   <a href="#" class="button organism-legend-show" style="display: none">
     Show Legend
   </a>
-  <a href="/lis_gene_families/chado/msa/<?php print $phylotree->name ?>-consensus/">
+  <a id="msa-link"
+    href="/lis_gene_families/chado/msa/<?php print $phylotree->name ?>-consensus/">
     View Multiple Sequence Alignment for this gene family
   </a>
 </div>
@@ -53,22 +57,19 @@ if( ! empty($phylotree->comment) ) {
        class="phylogram-ajax-loader"/>
 </div>
 
-<div id="phylogeny-help-dlg" style="display: none">
+<div style="display: none" id="phylogeny-help-dlg">
+  <p style="font-size: 0.9rem" id="hopscotch-tour-link">
+    <a href="#"
+       onclick="showHopscotchTour(); jQuery('#phylogeny-help-dlg').dialog('close');"
+       style="text-decoration: underline">
+    View Quick Tour
+    </a>
+  </p>
+    
   <p style="font-size: 0.9rem">
-    Click on colored terminal nodes to get more information about
-    legume genes. Click on internal (white) nodes to view the "genomic
-    context" for the genes included in the subtree for that
-    node. Click on the root node (gray with black outline at base of
-    tree) for an option to get to the multiple sequence alignment
-    behind the tree. The genomic context viewer shows flanking genes
-    and allows exploration of syntenic regions from all included
-    legume genomes. You can access the Phytozome family from which
-    this tree was derived through the Cross References tab at left.
-    You can access the Analysis description and metadata through the
-    Analysis tab at left.
-  <a href="/search/phylotree/userinfo" target="_blank"
-     style="text-decoration: underline">
-    View more help on searching gene families...</a>
+    <a href="/search/phylotree/userinfo" target="_blank"
+    style="text-decoration: underline">
+    View complete help on searching gene families...</a>
   </p>
 </div>
     
@@ -93,9 +94,12 @@ drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/URI.js/1.17.0/URI.min.js',
               'external');
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js',
               'external');
+drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/hopscotch/0.2.5/js/hopscotch.min.js',
+              'external');
 drupal_add_js('/'. $my_path . '/theme/js/d3.phylogram.js');
 drupal_add_js('/'. $my_path . '/theme/js/organism-bubble-plot.js');
 drupal_add_js('/'. $my_path . '/theme/js/phylotree.js');
+drupal_add_js('/'. $my_path . '/theme/js/tour.js');
 
 drupal_add_library('system', 'ui.dialog');
 
