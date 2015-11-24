@@ -8,12 +8,10 @@
       setTimeout(waitForPhylogram, 100);
       return;
     }
-    showHopscotchTour();
-          
-    //if(! hopscotch.getState()) {
+    if(! hopscotch.getState()) {
       // no saved state, so user has not seen the your yet.
-      //showHopscotchTour();
-    //}
+      showHopscotchTour();
+    }
   }
 })(jQuery);
 
@@ -24,7 +22,7 @@ function showHopscotchTour() {
     steps: [
       {
       	title: 'Welcome',
-      	content: 'This quick tour will aquaint you with the phylogeny tree \
+      	content: 'This quick tour will acquaint you with the phylogeny tree \
                viewer and other resources available in this section.',
       	target: 'base',
       	placement: 'bottom',
