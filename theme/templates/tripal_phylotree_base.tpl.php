@@ -82,12 +82,14 @@ if( ! empty($phylotree->comment) ) {
 </div>
 
 <?php
-/* this template depends on d3js, but i am not putting it into
-tripal_phylotree.info scripts[] because that results in the script
-getting loaded *on every drupal request*! */
-drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js',
+/* 
+ * this template depends on a few javascript libraries, but i am not
+ * putting it into tripal_phylotree.info scripts[] because that results
+ * in the script getting loaded *on every drupal request* which is wasteful 
+ */
+drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.5.9/d3.min.js',
           'external');
-drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/URI.js/1.16.1/URI.min.js',
+drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/URI.js/1.17.0/URI.min.js',
               'external');
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js',
               'external');
