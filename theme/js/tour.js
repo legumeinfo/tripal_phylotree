@@ -89,7 +89,10 @@ function showHopscotchTour() {
       {
         title: 'Root Node',
         content: 'The root node is also an interior node, although it \
-                  is colored differently for reference.',
+                  is colored differently for reference. (Note: this root is \
+                  only one of several possible root choices, and may not be \
+                  the oldest common ancestor. It is the result of midpoint \
+                  rooting of the tree.)',
         target: document.querySelector('.root circle'),
         placement: 'top',
       },
