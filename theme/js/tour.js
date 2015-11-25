@@ -1,8 +1,8 @@
 /* show the hopscotch tour, if user has not seen it already. */
 
+var tourId = 'lis-phylogeny-tour';
 (function($) {
-
-  if(hopscotch.getState()) {
+  if(hopscotch.getState(tourId)) {
     // user has already seen tour, so don't automatically reveal it.
     return;
   }
@@ -39,7 +39,7 @@ function showHopscotchTour() {
   forceTripalNavigation();
   
   var tour = {
-    id: 'lis-phylogeny-tour',
+    id: tourId,
     steps: [
       {
       	title: 'Welcome',
@@ -61,45 +61,44 @@ function showHopscotchTour() {
       {
       	title: 'Phylogram',
 	content:  'The phylogram view displays a phylogenetic tree with \
-                  branch spans proportional to the amount of character \
-                  change, including both legumes and selected non-legumes.',
+         branch spans proportional to the amount of character \
+         change, including both legumes and selected non-legumes.',
       	target: document.querySelector('svg'),
       	placement: 'top',
       },
       {
         title: 'Terminal Nodes',
-        content: 'The tree nodes on the right are terminal nodes\
-                  Click on a (colored) node to \
-                  see more information about legume genes including links to \
-                  organism, gene, genomic context, and various \
-                  resources and viewers. For example, the genomic context \
-                  viewer shows flanking genes and allows exploration of \
-                  syntenic regions from all included legume genomes.',
+        content: 'The tree nodes on the right are terminal nodes \
+         Click on a (colored) node to see more information about legume \
+         genes including links to organism, gene, genomic context, and \
+         various resources and viewers. For example, the genomic context \
+         viewer shows flanking genes and allows exploration of syntenic \
+         regions from all included legume genomes.',
         target: document.querySelector('.legume-leaf-node'),
         placement: 'top',
       },
       {
         title: 'Interior Nodes',
         content: 'The other tree nodes are \'interior\' nodes. Click on \
-               a (white) interior node to view genomic context and genomic \
-                  distribution for the node\'s sub-tree.',
+         a (white) interior node to view genomic context and genomic \
+         distribution for the node\'s sub-tree.',
         target: document.querySelector('.inner circle'),
         placement: 'top',
       },
       {
         title: 'Root Node',
         content: 'The root node is also an interior node, although it \
-                  is colored differently for reference. (Note: this root is \
-                  only one of several possible root choices, and may not be \
-                  the oldest common ancestor. It is the result of midpoint \
-                  rooting of the tree.)',
+         is colored differently for reference. (Note: this root is \
+         only one of several possible root choices, and may not be \
+         the oldest common ancestor. It is the result of midpoint \
+         rooting of the tree.)',
         target: document.querySelector('.root circle'),
         placement: 'top',
       },
       {
         title: 'MSA',
         content: 'The multiple sequence aligment for the family \
-                  is available via this link.',
+         is available via this link.',
         target: 'msa-link',
         placement: 'top',
       },
@@ -116,22 +115,22 @@ function showHopscotchTour() {
       {
         title: 'Organisms',
         content: 'You can display the membership counts per species in a \
-          diagram illustrating their relative abundances (helpful for \
-          very large families)',
+         diagram illustrating their relative abundances (helpful for \
+         very large families)',
         target: 'phylotree_organisms',
         placement: 'bottom',
       },
       {
         title: 'Cross References',
         content: 'You can access the Phytozome family from which this tree \
-                   was derived via this link.',
+         was derived via this link.',
         target: 'phylotree_references',
         placement: 'bottom',
       },
       {
         title: 'Analysis',
         content: 'You can access the Analysis description and metadata  \
-                  via this link.',
+         via this link.',
         target: 'phylotree_analysis',
         placement: 'bottom',
       },
@@ -146,8 +145,8 @@ function showHopscotchTour() {
         content: 'You can restart this tour anytime from the Gene Family Help \
           button. In addition there is a more detailed Help page: \
           <a href="/search/phylotree/userinfo" target="_blank" \
-            style="text-decoration: underline"> \
-            View more help on searching gene families...</a>',
+          style="text-decoration: underline"> \
+          View more help on searching gene families...</a>',
         target: document.querySelector('.phylogeny-help'),
         placement: 'top',
       },
