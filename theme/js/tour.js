@@ -1,21 +1,42 @@
+/* show the hopscotch tour, if user has not seen it already. */
+
 (function($) {
 
-  // wait for the dom to be ready
-  $(document).ready( waitForPhylogram );
+  if(hopscotch.getState()) {
+    // user has already seen tour, so don't automatically reveal it.
+    return;
+  }
 
+  // wait for the dom to be ready
+  $(document).ready(waitForPhylogram);
+  
   function waitForPhylogram() {
+    // dont start the tour until the d3 tree is finished rendering
+    // because the tour needs to attach to the dom.
     if(! $('#phylogram svg').length || ! $('.leaf circle').length) {
       setTimeout(waitForPhylogram, 100);
       return;
     }
-    if(! hopscotch.getState()) {
-      // no saved state, so user has not seen the your yet.
-      showHopscotchTour();
-    }
+    showHopscotchTour();
   }
 })(jQuery);
 
+function forceTripalNavigation() {
+  /* tripal doesn't expose navigation state of it's sub-panes, so use
+   * jquery to ensure that the phylogram (base pane) is visible */
+  (function($) {
+    if($('#base-tripal-data-pane').is(':visible')) {
+      return;
+    }
+    $('.tripal-data-pane').hide();
+    $('#base-tripal-data-pane').show();
+    window.location.hash = 'pane=base';
+  })(jQuery);
+}
+
 function showHopscotchTour() {
+  
+  forceTripalNavigation();
   
   var tour = {
     id: 'lis-phylogeny-tour',
@@ -54,7 +75,7 @@ function showHopscotchTour() {
                   resources and viewers. For example, the genomic context \
                   viewer shows flanking genes and allows exploration of \
                   syntenic regions from all included legume genomes.',
-        target: document.querySelector('.leaf circle'),
+        target: document.querySelector('.legume-leaf-node'),
         placement: 'top',
       },
       {
@@ -138,5 +159,5 @@ function showHopscotchTour() {
     ],
     showPrevButton: true,
   };
-  hopscotch.startTour(tour);
+  hopscotch.startTour(tour, 0);
 }

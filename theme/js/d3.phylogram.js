@@ -288,7 +288,13 @@ if (!d3) { throw "d3 wasn't included!"};
       .attr("r", 6)
       .attr('stroke', 'dimgrey')
       .attr('fill', fill)
-      .attr('stroke-width', '2px');
+      .attr('stroke-width', '2px')
+      .attr('class', function(d) {
+	if(fill(d) != fill('default')) {
+	  // this is a total hack
+	  return 'legume-leaf-node';
+	}
+      });
 
     vis.selectAll('g.inner.node')
       .on('click', nodeMouseDown)

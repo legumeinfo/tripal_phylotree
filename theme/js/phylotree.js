@@ -377,7 +377,8 @@
       // implementation, all content is drawn at page load, and then
       // shown/hidden with javascript. so all d3 graphs will get drawn
       // all the time.
-      height = 22 * leafNodes(treeData).length;
+      var leaves = leafNodes(treeData);
+      height = 22 * leaves.length;
       var hilites = hiliteNodeNames(true);
       d3.phylogram.build('#phylogram', treeData, {
         'width' : width,
