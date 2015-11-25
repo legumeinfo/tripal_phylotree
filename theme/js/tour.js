@@ -1,8 +1,8 @@
 /* show the hopscotch tour, if user has not seen it already. */
 
+var tourId = 'lis-phylogeny-tour';
 (function($) {
-
-  if(hopscotch.getState()) {
+  if(hopscotch.getState(tourId)) {
     // user has already seen tour, so don't automatically reveal it.
     return;
   }
@@ -39,7 +39,7 @@ function showHopscotchTour() {
   forceTripalNavigation();
   
   var tour = {
-    id: 'lis-phylogeny-tour',
+    id: tourId,
     steps: [
       {
       	title: 'Welcome',
