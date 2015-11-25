@@ -94,14 +94,6 @@ function showHopscotchTour() {
         placement: 'top',
       },
       {
-        title: 'Legend',
-        content: 'The legend explains the symbology of the legume nodes. The \
-                  dialog can be moved or closed if it is \
-                  obscuring your view',
-        target: 'organism-legend-dialog',
-        placement: 'left',
-      },
-      {
         title: 'MSA',
         content: 'The multiple sequence aligment for the family \
                   is available via this link.',
