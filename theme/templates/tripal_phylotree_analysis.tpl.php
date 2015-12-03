@@ -13,7 +13,7 @@ if( ! empty($phylotree->comment) ) {
 
 <div>
   <a href="#" class="button phylogeny-help phylogeny-help-btn">
-    <img src="/sites/all/modules/tripal/tripal_phylogeny/image/help.png"></img>
+    <img src="/sites/all/modules/tripal/tripal_phylogeny/image/help.png">
     Gene Family Help
   </a>
   <a href="#" class="button organism-legend-show" style="display: none">

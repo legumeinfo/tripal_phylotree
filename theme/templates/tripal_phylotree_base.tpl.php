@@ -38,7 +38,7 @@ if( ! empty($phylotree->comment) ) {
 
 <div>
   <a href="#" class="button phylogeny-help phylogeny-help-btn">
-    <img src="/sites/all/modules/tripal/tripal_phylogeny/image/help.png"></img>
+    <img src="/sites/all/modules/tripal/tripal_phylogeny/image/help.png"/>
     Gene Family Help
   </a>
   <a href="#" class="button organism-legend-show" style="display: none">
@@ -74,9 +74,9 @@ if( ! empty($phylotree->comment) ) {
 </div>
     
 <div id="organism-legend-dialog" style="display: none">
-    <!-- d3js will add content to this div -->
-    <div class="organism-legend">
-    </div>
+  <!-- d3js will add content to this div -->
+  <div class="organism-legend">
+  </div>
 </div>
 
 <div id="phylonode_popup_dialog" style="display: none;">
@@ -104,5 +104,3 @@ drupal_add_js('/'. $my_path . '/theme/js/tour.js');
 drupal_add_library('system', 'ui.dialog');
 
 ?>
-
-
