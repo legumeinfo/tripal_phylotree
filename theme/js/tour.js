@@ -2,7 +2,7 @@
 
 var tourId = 'lis-phylogeny-tour';
 (function($) {
-  if(hopscotch.getState(tourId)) {
+  if(hopscotch.getState(tourId) != null) { //n.b. checks for null or undefined
     // user has already seen tour, so don't automatically reveal it.
     return;
   }
