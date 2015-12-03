@@ -37,6 +37,9 @@ function forceTripalNavigation() {
 function showHopscotchTour() {
   
   forceTripalNavigation();
+
+  // start tour on the id=base element, or a hilite node, if there is one
+  var baseEl = document.querySelector('.hilite-node') || 'base';
   
   var tour = {
     id: tourId,
@@ -45,7 +48,7 @@ function showHopscotchTour() {
       	title: 'Welcome',
       	content: 'This quick tour will acquaint you with the phylogeny tree \
                viewer and other resources available in this section.',
-      	target: 'base',
+        target: baseEl,
       	placement: 'bottom',
       },
       {
