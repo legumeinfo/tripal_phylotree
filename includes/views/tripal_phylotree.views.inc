@@ -215,60 +215,60 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['medtr_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['medtr_count']['field'] = 'medtr_count';
     $handler->display->display_options['fields']['medtr_count']['alter']['make_link'] = TRUE;
-    $handler->display->display_options['fields']['medtr_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Med. truncatula';
+    $handler->display->display_options['fields']['medtr_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=medtr';
     $handler->display->display_options['fields']['medtr_count']['alter']['absolute'] = TRUE;
     /* Field: phylotree_count: Lotja count */
     $handler->display->display_options['fields']['lotja_count']['id'] = 'lotja_count';
     $handler->display->display_options['fields']['lotja_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['lotja_count']['field'] = 'lotja_count';
     $handler->display->display_options['fields']['lotja_count']['alter']['make_link'] = TRUE;
-    $handler->display->display_options['fields']['lotja_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Lot. japonicus';
+    $handler->display->display_options['fields']['lotja_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=lotja';
     $handler->display->display_options['fields']['lotja_count']['alter']['absolute'] = TRUE;
     /* Field: phylotree_count: Cicar count */
     $handler->display->display_options['fields']['cicar_count']['id'] = 'cicar_count';
     $handler->display->display_options['fields']['cicar_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['cicar_count']['field'] = 'cicar_count';
     $handler->display->display_options['fields']['cicar_count']['alter']['make_link'] = TRUE;
-    $handler->display->display_options['fields']['cicar_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Cic. arietinum';
+    $handler->display->display_options['fields']['cicar_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=cicar';
     $handler->display->display_options['fields']['cicar_count']['alter']['absolute'] = TRUE;
     /* Field: phylotree_count: Glyma count */
     $handler->display->display_options['fields']['glyma_count']['id'] = 'glyma_count';
     $handler->display->display_options['fields']['glyma_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['glyma_count']['field'] = 'glyma_count';
     $handler->display->display_options['fields']['glyma_count']['alter']['make_link'] = TRUE;
-    $handler->display->display_options['fields']['glyma_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Gly. max';
+    $handler->display->display_options['fields']['glyma_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=glyma';
     $handler->display->display_options['fields']['glyma_count']['alter']['absolute'] = TRUE;
     /* Field: phylotree_count: Phavu count */
     $handler->display->display_options['fields']['phavu_count']['id'] = 'phavu_count';
     $handler->display->display_options['fields']['phavu_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['phavu_count']['field'] = 'phavu_count';
     $handler->display->display_options['fields']['phavu_count']['alter']['make_link'] = TRUE;
-    $handler->display->display_options['fields']['phavu_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Pha. vulgaris';
+    $handler->display->display_options['fields']['phavu_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=phavu';
     /* Field: phylotree_count: Cajca count */
     $handler->display->display_options['fields']['cajca_count']['id'] = 'cajca_count';
     $handler->display->display_options['fields']['cajca_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['cajca_count']['field'] = 'cajca_count';
     $handler->display->display_options['fields']['cajca_count']['alter']['make_link'] = TRUE;
-    $handler->display->display_options['fields']['cajca_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Caj. cajan';
+    $handler->display->display_options['fields']['cajca_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=cajca';
     /* Field: phylotree_count: Vigra count */
     $handler->display->display_options['fields']['vigra_count']['id'] = 'vigra_count';
     $handler->display->display_options['fields']['vigra_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['vigra_count']['field'] = 'vigra_count';
     $handler->display->display_options['fields']['vigra_count']['alter']['make_link'] = TRUE;
-    $handler->display->display_options['fields']['vigra_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Vig. radiata';
+    $handler->display->display_options['fields']['vigra_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=vigra';
     /* Field: phylotree_count: Aradu count */
     $handler->display->display_options['fields']['aradu_count']['id'] = 'aradu_count';
     $handler->display->display_options['fields']['aradu_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['aradu_count']['field'] = 'aradu_count';
     $handler->display->display_options['fields']['aradu_count']['alter']['make_link'] = TRUE;
-    $handler->display->display_options['fields']['aradu_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Ara. duranensis';
+    $handler->display->display_options['fields']['aradu_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=aradu';
     $handler->display->display_options['fields']['aradu_count']['alter']['absolute'] = TRUE;
     /* Field: phylotree_count: Araip count */
     $handler->display->display_options['fields']['araip_count']['id'] = 'araip_count';
     $handler->display->display_options['fields']['araip_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['araip_count']['field'] = 'araip_count';
     $handler->display->display_options['fields']['araip_count']['alter']['make_link'] = TRUE;
-    $handler->display->display_options['fields']['araip_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=Ara. ipaensis';
+    $handler->display->display_options['fields']['araip_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=araip';
     $handler->display->display_options['fields']['araip_count']['alter']['absolute'] = TRUE;
     /* Filter criterion: phylotree_count: Family ID */
     $handler->display->display_options['filters']['phylotree_name']['id'] = 'phylotree_name';
