@@ -96,6 +96,9 @@ drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js',
               'external');
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/hopscotch/0.2.5/js/hopscotch.min.js',
               'external');
+drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.0.4/js.cookie.min.js',
+              'external');
+
 drupal_add_js('/'. $my_path . '/theme/js/d3.phylogram.js');
 drupal_add_js('/'. $my_path . '/theme/js/organism-bubble-plot.js');
 drupal_add_js('/'. $my_path . '/theme/js/phylotree.js');

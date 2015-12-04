@@ -2,9 +2,9 @@
 
 var tourId = 'lis-phylogeny-tour';
 (function($) {
-  var tourState = hopscotch.getState(tourId);
-  if(tourState !== null && tourState != undefined) {
-    // user has already seen tour, so don't automatically reveal it.
+
+  if(Cookies.get(tourId)) {
+    // user seems to have already seen tour, so don't open automatically.
     return;
   }
 
@@ -158,4 +158,5 @@ function showHopscotchTour() {
     showPrevButton: true,
   };
   hopscotch.startTour(tour, 0);
+  Cookies.set(tourId, true);
 }
