@@ -158,5 +158,5 @@ function showHopscotchTour() {
     showPrevButton: true,
   };
   hopscotch.startTour(tour, 0);
-  Cookies.set(tourId, true);
+  Cookies.set(tourId, true, { expires: 365 });
 }
