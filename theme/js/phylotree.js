@@ -5,9 +5,8 @@
   var width = 550;
   var height = 0; // will be dynamically sized in displayData
   var pane = null;
-  var legumeColors = null;
-  var phylogramOrganisms = {};
-  
+  var organisms = {}; // lazily build hash of organisms, for displ. on legend
+      
   function currentPane() {
     // parse the url hash, or the href query string to see which
     // sub-pane the navigation is on (the pane can appear in either
@@ -55,42 +54,33 @@
 	    'phylotree_organisms'].indexOf(pane) !== -1;
   }
 
-  function displayLegend(organismColorData, forPane) {
-    // first convert to array for d3 use
-    var organismList = [];
-    for(var key in organismColorData) {
-      if(key !== 'default' && key !== 'comment' ) {
-	var org = organismColorData[key];
-	if(org.common_name in phylogramOrganisms) {
-	  // only list in legend those organisms appear
-	  var o = organismColorData[key];
-	  var litem  = {
-	    'label' : species5(o) + ' (' + o.genus + ' '+ o.species +
-	      ', ' + o.common_name + ')',
-	    'color' : organismColor(o),
-	    'data' : o,
-	  };
-	  organismList.push(litem);
-	}
-      }
-    }
-    organismList.sort( function(a,b) {
-      if(! a.data.order || ! b.data.order) {
-	return a.label.localeCompare(b.label);
-      }
-      if(a.data.order > b.data.order) {
-	return 1;
-      }
-      if(a.data.order < b.data.order) {
-	return -1;
-      }
+  function displayLegend(forPane) {
+
+    var litems = [];
+    _.each(organisms, function(val, key) {
+      litems.push(val);
+    });
+    
+    litems.sort( function(a,b) {
       return 0;
     });
+    
+    litems.sort( function(a,b) {
+
+      if(a.isLegume && ! b.isLegume) {
+	return -1;
+      }
+      if(! a.isLegume && b.isLegume) {
+	return 1;
+      }
+      return a.label.localeCompare(b.label);      
+    });
+    
     var container = d3.selectAll('.organism-legend');
     container.selectAll('div').remove();
     
     var rows = container.selectAll('div')
-	.data(organismList)
+	.data(litems)
 	.enter()
 	.append('div')
         .attr('class', 'org-legend-row');
@@ -250,22 +240,48 @@
     var label = d.genus.substring(0, 3) + d.species.substring(0, 2);
     return label.toLowerCase();
   }
-
-  // function to generate color based on the organism genus and species
-  // on graph node d
-  function organismColor(d) {
-    // create map of species in this graph, for use in legend later.
-    phylogramOrganisms[d.common_name] = true;
-    var organism = legumeColors[d.common_name];
-    if(! organism) {
-      return legumeColors['default'].color;
+  
+  // function to generate color based on the organism genus and
+  // species on graph node d, using taxonColor js library. lazily make
+  // a hash of all organisms for display on legend.
+  function getColor(d) {
+    var color = null;
+    
+    // check for odd 'default' value, haven't been able to track it down.
+    if(! _.has(d, 'name')) { return; }
+    
+    var taxon = d.genus + ' ' + d.species;
+    var isLegume = false;
+    // check if this is a legume, if so colorize with taxonChroma library.
+    if(_.has(taxonChroma.legumeGenera, d.genus.toLowerCase())) {
+      isLegume = true;
+      color = taxonChroma.get(taxon.toLowerCase(), {
+	'overrides' : {
+	  // we have 2 species of arachis which are not distinguishable
+	  // in the phylotree context, so force one to be a different
+	  // shade, but same hue.
+	  'arachis ipaensis' : 'rgb(170, 171, 0)',
+	}});
     }
-    if( ! organism.color) {
-      return legumeColors['default'].color;	
+    else {
+      color = taxonChroma.defaultColor;
     }
-    return organism.color;
+    var abbrev = species5(d);
+    
+    if(! organisms[abbrev]) {
+      // lazily add to legend
+      var litem  = {
+	label : abbrev + ' (' + d.genus + ' '+ d.species +
+	  ', ' + d.common_name + ')',
+	color : color,
+	data : d,
+	isLegume : isLegume,
+      };
+      organisms[abbrev] = litem;
+    }
+    return color;
   }
-
+  
   $(document).ready( function () {
 
     $('.phylogeny-help-btn').click(function() {
@@ -293,7 +309,7 @@
     	setTimeout(function() {
     	  // wait until new panel is displayed, to popup the legend
 	  // because it needs to position wrt the current d3 graph
-    	  displayLegend(legumeColors, newPane);
+    	  displayLegend(newPane);
     	}, 100);
       }
       // always hide the Show Legend links by default (because Legend
@@ -311,8 +327,8 @@
       var el =$(this);
       el.attr('cursor', 'pointer');
       var circle = el.find('circle');
-      // highlight in yellow no matter if leaf or interior node
-      circle.attr('fill', 'yellow');
+      // highlight node no matter if leaf or interior node
+      circle.attr('fill', 'dimgrey');
       if(! d.children) {
         // only leaf nodes have descriptive text
         var txt = el.find('text');
@@ -327,7 +343,7 @@
       var circle = el.find('circle');
       if(! d.children) {
         // restore the color based on organism id for leaf nodes
-        circle.attr('fill', organismColor(d));
+        circle.attr('fill', getColor(d));
         var txt = el.find('text');
         txt.attr('font-weight', 'normal');
       }
@@ -354,24 +370,16 @@
       });
     };
 
-    // colors.json and phylotree data json could be fetched in
-    // parallel with promises, but for now, fetch them sequentially
-    d3.json(pathToTheme +'/theme/js/colors.json',
-	    function(error, colorData) {
+    d3.json(phylotreeDataURL,
+	    function(error, treeData) {
 	      if(error) { return console.warn(error); }
-	      legumeColors = colorData;
-	      d3.json(phylotreeDataURL,
-		      function(error, treeData) {
-			if(error) { return console.warn(error); }
-			displayData(treeData);
-			if(d3GraphOnPane(pane)) {
-			  displayLegend(colorData, pane)
-			}
-			$('.phylogram-ajax-loader').remove();
-		      });
+	      displayData(treeData);
+	      if(d3GraphOnPane(pane)) {
+		displayLegend(pane)
+	      }
+	      $('.phylogram-ajax-loader').remove();
 	    });
-    
-    
+
     function displayData(treeData) {
       // draw the d3 graphs. in the current tripal pane
       // implementation, all content is drawn at page load, and then
@@ -383,7 +391,7 @@
       d3.phylogram.build('#phylogram', treeData, {
         'width' : width,
         'height' : height,
-        'fill' : organismColor,
+        'fill' : getColor,
 	'hiliteNodes' : hilites,
         'nodeMouseOver' : nodeMouseOver,
         'nodeMouseOut' : nodeMouseOut,
@@ -391,7 +399,7 @@
       });
       d3.phylogram.buildRadial('#phylotree-radial-graph', treeData, {
         'width' : width, // square graph 
-        'fill' : organismColor,
+        'fill' : getColor,
 	'hiliteNodes' : hilites,	
         'nodeMouseOver' : nodeMouseOver,
         'nodeMouseOut' : nodeMouseOut,
@@ -400,7 +408,7 @@
       organismBubblePlot('#phylotree-organisms', treeData, {
         'height' : width, // square graph
         'width' : width, 
-        'fill' : organismColor,
+        'fill' : getColor,
         'nodeMouseOver' : nodeMouseOver,
         'nodeMouseOut' : nodeMouseOut,
         'nodeMouseDown' : nodeMouseDown
