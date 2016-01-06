@@ -101,8 +101,7 @@ drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.0.4/js.cookie.min.js
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/chroma-js/1.1.1/chroma.min.js',
               'external');
 
-drupal_add_js('/lis_gis/static/grin_app/js/taxon-chroma.js');
-
+drupal_add_js('/'. $my_path . '/theme/js/taxon-chroma.js');
 drupal_add_js('/'. $my_path . '/theme/js/d3.phylogram.js');
 drupal_add_js('/'. $my_path . '/theme/js/organism-bubble-plot.js');
 drupal_add_js('/'. $my_path . '/theme/js/phylotree.js');
