@@ -491,8 +491,7 @@
 	// interior node link outs (if any)
 	var leaves = leafNodes(node);
 	var legumes = _.filter(leaves, function(d) {
-	  return _.get(legumeColors[d.common_name], 'color', false) ?
-	    true : false;
+	  return d.genus.toLowerCase() in taxonChroma.legumeGenera;
 	});
 	if(legumes.length) {
 	  /* context viewer */
