@@ -358,9 +358,10 @@
       var el = $(this);
       var dialog = $('#phylonode_popup_dialog');
       dialog.empty();
+      dialog.append("<div id='linkouts'></div>");
       addTripalOrganismLink(dialog, d);
       addTripalFeatureLink(dialog, d);
-      addExternalLinks(dialog, d);
+      addExternalLinks(dialog.find('#linkouts'), d);
       dialog.dialog({
         title : (! d.children ) ? d.name : 'interior node',
         position : { my : 'center center', at : 'center center', of : el },
@@ -524,15 +525,16 @@
 	}
       }
       else {
+	dialogElem.append("<img src='/sites/all/modules/tripal/tripal_phylogeny/image/ajax-loader.gif'/>");
 	// leaf node link outs
 	var transcript = node.feature_name.replace(/^.....\./, "");
 	var gene = transcript.replace(/\.\d+$/, "");
-	var url = "/phylotree_links/"+node.genus+"/"+node.species+"/"+
-	    gene+"/"+transcript+"/json";
+	var url = "/phylotree_links/"+node.feature_name+"/json";
 	$.ajax({
           type: "GET",
           url: url,
           success: function(data) {
+	    dialogElem.find("img").remove();
             _.each(data, function(value, index) {
 	      var linkAttr = {
 		id : 'feature_link_out_' + index,
