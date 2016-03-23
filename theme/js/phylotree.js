@@ -525,6 +525,7 @@
 	}
       }
       else {
+        //FIXME: I'm sure there's a more correct way of getting the path to this resource in this context
 	dialogElem.append("<img src='/sites/all/modules/tripal/tripal_phylogeny/image/ajax-loader.gif'/>");
 	// leaf node link outs
 	var transcript = node.feature_name.replace(/^.....\./, "");
