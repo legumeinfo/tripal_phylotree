@@ -89,23 +89,61 @@ if( ! empty($phylotree->comment) ) {
  * in the script getting loaded *on every drupal request* which is wasteful 
  */
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.5.9/d3.min.js',
-          'external');
+              array(
+                  'type' => 'external',
+                  'group' => JS_LIBRARY,
+              ));
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/URI.js/1.17.0/URI.min.js',
-              'external');
+              array(
+                  'type' => 'external',
+                  'group' => JS_LIBRARY,
+              ));
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js',
-              'external');
+              array(
+                  'type' => 'external',
+                  'group' => JS_LIBRARY,
+              ));
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/hopscotch/0.2.5/js/hopscotch.min.js',
-              'external');
+              array(
+                  'type' => 'external',
+                  'group' => JS_LIBRARY,
+              ));
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.0.4/js.cookie.min.js',
-              'external');
+              array(
+                  'type' => 'external',
+                  'group' => JS_LIBRARY,
+              ));
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/chroma-js/1.1.1/chroma.min.js',
-              'external');
+              array(
+                  'type' => 'external',
+                  'group' => JS_LIBRARY,
+              ));
 
-drupal_add_js('/'. $my_path . '/theme/js/taxon-chroma.js');
-drupal_add_js('/'. $my_path . '/theme/js/d3.phylogram.js');
-drupal_add_js('/'. $my_path . '/theme/js/organism-bubble-plot.js');
-drupal_add_js('/'. $my_path . '/theme/js/phylotree.js');
-drupal_add_js('/'. $my_path . '/theme/js/tour.js');
+drupal_add_js('/'. $my_path . '/theme/js/taxon-chroma.js',
+              array(
+                  'type' => 'file',
+                  'group' => JS_DEFAULT,
+              ));
+drupal_add_js('/'. $my_path . '/theme/js/d3.phylogram.js',
+              array(
+                  'type' => 'file',
+                  'group' => JS_DEFAULT,
+              ));
+drupal_add_js('/'. $my_path . '/theme/js/organism-bubble-plot.js',
+              array(
+                  'type' => 'file',
+                  'group' => JS_DEFAULT,
+              ));
+drupal_add_js('/'. $my_path . '/theme/js/phylotree.js',
+              array(
+                  'type' => 'file',
+                  'group' => JS_DEFAULT,
+              ));
+drupal_add_js('/'. $my_path . '/theme/js/tour.js',
+              array(
+                  'type' => 'file',
+                  'group' => JS_DEFAULT,
+              ));
 
 drupal_add_library('system', 'ui.dialog');
 

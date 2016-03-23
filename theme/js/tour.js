@@ -3,6 +3,18 @@
 var tourId = 'lis-phylogeny-tour';
 (function($) {
 
+  "use strict";
+  
+  if(! 'hopscotch' in window) {
+    console.log('hopscotch is required');
+    return;
+  }
+  
+  // cleanup existing tours first
+  if(hopscotch.getCurrTour()) {
+    hopscotch.endTour(false);
+  }
+  
   if(Cookies.get(tourId)) {
     // user seems to have already seen tour, so don't open automatically.
     return;
@@ -42,7 +54,7 @@ function showHopscotchTour() {
   // start tour on the id=base element, or a hilite node, if there is one
   var baseEl = document.querySelector('.hilite-node') || 'base';
   
-  var tour = {
+  var phylogenyTour = {
     id: tourId,
     steps: [
       {
@@ -157,6 +169,6 @@ function showHopscotchTour() {
     ],
     showPrevButton: true,
   };
-  hopscotch.startTour(tour, 0);
+  hopscotch.startTour(phylogenyTour, 0);
   Cookies.set(tourId, true, { expires: 365 });
 }
