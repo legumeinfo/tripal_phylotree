@@ -357,11 +357,17 @@
     var nodeMouseDown = function(d) {
       var el = $(this);
       var dialog = $('#phylonode_popup_dialog');
+      // clear previous content, if any
       dialog.empty();
-      dialog.append("<div id='linkouts'></div>");
-      addTripalOrganismLink(dialog, d);
-      addTripalFeatureLink(dialog, d);
-      addExternalLinks(dialog.find('#linkouts'), d);
+      // make a container div, hidden until the ajax request is finished.
+      var container = $('<div id="linkouts-container"></div>');
+      dialog.append(container);
+      container.hide();
+      var linkouts = $('<div id="ajax-linkouts"></div>');
+      container.append(linkouts);
+      addTripalOrganismLink(container, d);
+      addTripalFeatureLink(container, d);
+      addExternalLinks(dialog, container, d);
       dialog.dialog({
         title : (! d.children ) ? d.name : 'interior node',
         position : { my : 'center center', at : 'center center', of : el },
@@ -485,7 +491,7 @@
       dialogElem.append($('<br/>'));
     }
 
-    function addExternalLinks(dialogElem, node) {
+    function addExternalLinks(dialogElem, containerElem, node) {
       /* contact LIS link-out service for json list of href,text linkouts
        */
       if(node.children) {
@@ -504,8 +510,8 @@
 	    tabindex: '-1', /* prevent link being hilited by default */
 	  };
 	  var a = $('<a/>', linkAttr);
-	  dialogElem.append(a);
-	  dialogElem.append($('<br/>'));
+	  containerElem.append(a);
+	  containerElem.append($('<br/>'));
 	  /* cmtv */
 	  var url = 'http://velarde.ncgr.org:7070/isys/launch?svc=org.ncgr.cmtv.isys.CompMapViewerService%40--style%40http://velarde.ncgr.org:7070/isys/bin/Components/cmtv/conf/cmtv_combined_map_style.xml%40--combined_display%40' + window.location.origin + '/lis_gene_families/chado/phylo/node/gff_download/' + node.phylonode_id;
 	  var linkAttr = {
@@ -515,18 +521,19 @@
 	    tabindex: '-1', /* prevent link being hilited by default */
 	  };
 	  var a = $('<a/>', linkAttr);
-	  dialogElem.append(a);
-	  dialogElem.append($('<br/>'));
+	  containerElem.append(a);
+	  containerElem.append($('<br/>'));
 	}
 	else {
-	  var p  = dialogElem.append($('<p>'));
+	  var p  = containerElem.append($('<p>'));
 	  p.html('Sorry, no resources are available for this sub-tree. ' +
 		 'Please try another node.');
 	}
+	containerElem.show();
       }
       else {
-        //FIXME: I'm sure there's a more correct way of getting the path to this resource in this context
-	dialogElem.append("<img src='/sites/all/modules/tripal/tripal_phylogeny/image/ajax-loader.gif'/>");
+	var spinnerEl=$("<img src='"+pathToTheme+ "/image/ajax-loader.gif'/>");
+	dialogElem.append(spinnerEl);
 	// leaf node link outs
 	var transcript = node.feature_name.replace(/^.....\./, "");
 	var gene = transcript.replace(/\.\d+$/, "");
@@ -535,7 +542,7 @@
           type: "GET",
           url: url,
           success: function(data) {
-	    dialogElem.find("img").remove();
+	    data.reverse();
             _.each(data, function(value, index) {
 	      var linkAttr = {
 		id : 'feature_link_out_' + index,
@@ -544,9 +551,11 @@
 		tabindex: '-1', /* prevent link being hilited by default */
 	      };
 	      var a = $('<a/>', linkAttr);
-	      dialogElem.append(a);
-	      dialogElem.append($('<br/>'));
+	      containerElem.prepend($('<br/>'));
+	      containerElem.prepend(a);
             });
+	    spinnerEl.remove();
+	    containerElem.show();
           },
 	});
       }
