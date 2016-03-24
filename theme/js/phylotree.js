@@ -463,7 +463,7 @@
 	href: '/node/' + node.organism_node_id,
 	text: 'view organism: ' + node.genus + ' '+
 	  node.species + ( node.common_name ?
-			   '(' + node.common_name + ')' : '' ),
+			   ' (' + node.common_name + ')' : '' ),
 	tabindex: '-1', /* prevent link from being hilited by default */
       };
       var a = $('<a/>', linkAttr);
@@ -535,9 +535,7 @@
 	var spinnerEl=$("<img src='"+pathToTheme+ "/image/ajax-loader.gif'/>");
 	dialogElem.append(spinnerEl);
 	// leaf node link outs
-	var transcript = node.feature_name.replace(/^.....\./, "");
-	var gene = transcript.replace(/\.\d+$/, "");
-	var url = "/phylotree_links/"+node.feature_name+"/json";
+	var url = "/phylotree_links/"+node.genus+"/"+node.species+"/"+node.feature_name+"/json";
 	$.ajax({
           type: "GET",
           url: url,
