@@ -88,17 +88,18 @@ if( ! empty($phylotree->comment) ) {
  * putting it into tripal_phylotree.info scripts[] because that results
  * in the script getting loaded *on every drupal request* which is wasteful 
  */
-drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.5.9/d3.min.js',
+
+drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js',
               array(
                   'type' => 'external',
                   'group' => JS_LIBRARY,
               ));
-drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/URI.js/1.17.0/URI.min.js',
+drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/URI.js/1.17.1/URI.min.js',
               array(
                   'type' => 'external',
                   'group' => JS_LIBRARY,
               ));
-drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js',
+drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.6.1/lodash.js',
               array(
                   'type' => 'external',
                   'group' => JS_LIBRARY,
@@ -108,7 +109,7 @@ drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/hopscotch/0.2.5/js/hopscotch.min
                   'type' => 'external',
                   'group' => JS_LIBRARY,
               ));
-drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.0.4/js.cookie.min.js',
+drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.0/js.cookie.min.js',
               array(
                   'type' => 'external',
                   'group' => JS_LIBRARY,
