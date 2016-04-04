@@ -88,7 +88,6 @@ if( ! empty($phylotree->comment) ) {
  * putting it into tripal_phylotree.info scripts[] because that results
  * in the script getting loaded *on every drupal request* which is wasteful 
  */
-
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js',
               array(
                   'type' => 'external',
@@ -99,7 +98,7 @@ drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/URI.js/1.17.1/URI.min.js',
                   'type' => 'external',
                   'group' => JS_LIBRARY,
               ));
-drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.6.1/lodash.js',
+drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js',
               array(
                   'type' => 'external',
                   'group' => JS_LIBRARY,
