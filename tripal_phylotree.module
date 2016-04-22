@@ -225,6 +225,30 @@ function tripal_phylotree_theme($existing, $type, $theme, $path) {
 
 
 /**
+  * hook_form_alter
+  *
+  * Add a validator to the search form.
+* */
+
+function tripal_phylotree_form_alter(&$form, &$form_state, $form_id) {
+//drupal_set_message("Form ID is: $form_id"); ?~@~S uncomment to verify form name
+if ($form_id == 'views_exposed_form') { $form['#validate'][] = 'tripal_phylotree_form_validate';
+//drupal_set_message("Validation is set to " . var_export($form['#validate'], true)); -- uncomment to verify validator was added 
+ }
+}
+/**
+  * Form validator for search form.
+  * Use this to trim whitespace from text fields.
+  */
+function tripal_phylotree_form_validate($form, &$form_state) {
+//drupal_set_message("Form values are " . var_export($form_state['values'], true)); -- uncomment to see form field names 
+$form_state['values']['phylotree_name'] = trim($form_state['values']['phylotree_name']);
+$form_state['values']['phylotree_comment'] = trim($form_state['values']['phylotree_comment']);
+$form_state['values']['domains_con'] = trim($form_state['values']['domains_con']);
+}
+
+
+/**
  * Implements hook_help().
  * Adds a help page to the module list
  *
