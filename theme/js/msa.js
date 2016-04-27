@@ -5,8 +5,8 @@ var msaWrapper = require('msa');
 (function() {
   'use strict';
   var that = this;
-  var fastaAPI = 'http://legumeinfo.org/lis_gene_families/chado/msa/{f}-consensus/download/';
-  var gffAPI = 'https://cors-anywhere.herokuapp.com/legumeinfo.org/gff_export/{f}-consensus';
+  var fastaAPI = '/lis_gene_families/chado/msa/{f}-consensus/download/';
+  var gffAPI = '/legumeinfo.org/gff_export/{f}-consensus';
   
   if (!String.prototype.supplant) {
     String.prototype.supplant = function (o) {
@@ -22,9 +22,20 @@ var msaWrapper = require('msa');
   }
 
   this.load = function() {
+
+    var wrapper = jQuery('#msa-viewer-wrapper');
+    var spinner = jQuery('#msa-spinner');
     var container = jQuery('#msa-viewer');
-    container.empty();
+    wrapper.show();
     container.show();
+    spinner.show();
+    
+    if(that.viewer) {
+      // TODO dispose of previous msa viewer somehow? cannot find in API
+      container.empty();
+      jQuery('.smenubar').remove();
+    }
+    
     var params = {f: familyName};
     var url = fastaAPI.supplant(params);
     var div = container[0];
@@ -34,13 +45,19 @@ var msaWrapper = require('msa');
       el: div,
       bootstrapMenu: true, 
       importURL: url,
+      vis : { overviewbox: true},
     };
     that.viewer = new msa(opts);
     url = gffAPI.supplant(params);
     xhr(url, function(err, request, body) {
+      if(err || ! body) {
+	console.log(err);
+	spinner.hide();
+	return;
+      }
       var features = gffParser.parseSeqs(body);
       that.viewer.seqs.addFeatures(features);
-      //jQuery('#msa-spinner').hide();
+      spinner.hide();
     });
   };
       

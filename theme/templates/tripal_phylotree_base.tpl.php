@@ -52,7 +52,13 @@ if( ! empty($phylotree->comment) ) {
   </a>
 </div>
 
-<div id="msa-viewer" style="display: none">
+<div id="msa-viewer-wrapper" style="display: none; padding: 10px;">
+    <div id="msa-spinner">
+      <img src="/<?php print $my_path ?>/image/ajax-loader.gif"/>
+    </div>
+    <div id="msa-viewer">
+        <!-- biojs msa viewer will load div -->
+    </div>
 </div>
 
 <div id="phylogram">
