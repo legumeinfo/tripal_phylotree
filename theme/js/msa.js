@@ -22,7 +22,8 @@ var msaWrapper = require('msa');
   }
 
   this.load = function() {
-
+    jQuery('#organism-legend-dialog').dialog('close');
+    
     var wrapper = jQuery('#msa-viewer-wrapper');
     var spinner = jQuery('#msa-spinner');
     var container = jQuery('#msa-viewer');
