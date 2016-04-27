@@ -6,7 +6,7 @@ var msaWrapper = require('msa');
   'use strict';
   var that = this;
   var fastaAPI = '/lis_gene_families/chado/msa/{f}-consensus/download/';
-  var gffAPI = '/legumeinfo.org/gff_export/{f}-consensus';
+  var gffAPI = '/gff_export/{f}-consensus';
   
   if (!String.prototype.supplant) {
     String.prototype.supplant = function (o) {
