@@ -22,7 +22,10 @@ printf('var phylotreeDataURL = "/chado_phylotree/%d/json";',
 // write js var with path to our theme, for use below by javascript functions.
 // prefix path to theme with / because drupal returns it as a relative URL.
 printf('var pathToTheme = "/%s";', $my_path);
+
+printf('var familyName = "%s";', $phylotree->name);
 ?>
+
 </script>
 
 
@@ -44,10 +47,12 @@ if( ! empty($phylotree->comment) ) {
   <a href="#" class="button organism-legend-show" style="display: none">
     Show Legend
   </a>
-  <a id="msa-link"
-    href="/lis_gene_families/chado/msa/<?php print $phylotree->name ?>-consensus/">
+  <a id="msa-link" onclick="msaWrapper.load()">
     View Multiple Sequence Alignment for this gene family
   </a>
+</div>
+
+<div id="msa-viewer" style="display: none">
 </div>
 
 <div id="phylogram">
@@ -82,6 +87,7 @@ if( ! empty($phylotree->comment) ) {
 <div id="phylonode_popup_dialog" style="display: none;">
 </div>
 
+    
 <?php
 /* 
  * this template depends on a few javascript libraries, but i am not
@@ -89,6 +95,11 @@ if( ! empty($phylotree->comment) ) {
  * in the script getting loaded *on every drupal request* which is wasteful 
  */
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js',
+              array(
+                  'type' => 'external',
+                  'group' => JS_LIBRARY,
+              ));
+drupal_add_js('//cdn.biojs.net/msa/0.4/msa.min.gz.js',
               array(
                   'type' => 'external',
                   'group' => JS_LIBRARY,
@@ -118,7 +129,6 @@ drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/chroma-js/1.1.1/chroma.min.js',
                   'type' => 'external',
                   'group' => JS_LIBRARY,
               ));
-
 drupal_add_js('/'. $my_path . '/theme/js/taxon-chroma.js',
               array(
                   'type' => 'file',
@@ -140,6 +150,11 @@ drupal_add_js('/'. $my_path . '/theme/js/phylotree.js',
                   'group' => JS_DEFAULT,
               ));
 drupal_add_js('/'. $my_path . '/theme/js/tour.js',
+              array(
+                  'type' => 'file',
+                  'group' => JS_DEFAULT,
+              ));
+drupal_add_js('/'. $my_path . '/theme/js/msa.js',
               array(
                   'type' => 'file',
                   'group' => JS_DEFAULT,
