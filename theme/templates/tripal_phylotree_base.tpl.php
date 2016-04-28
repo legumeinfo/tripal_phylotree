@@ -105,7 +105,7 @@ drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js',
                   'type' => 'external',
                   'group' => JS_LIBRARY,
               ));
-drupal_add_js('//cdn.biojs.net/msa/0.4/msa.min.gz.js',
+drupal_add_js('//cdn.bio.sh/msa/latest/msa.min.gz.js',
               array(
                   'type' => 'external',
                   'group' => JS_LIBRARY,
