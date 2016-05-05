@@ -8,9 +8,10 @@ if(empty($my_path)) {
   // it will be installed
   $my_path = 'sites/all/modules/tripal/tripal_phylogeny';
 }
-drupal_add_css( $my_path . '/theme/css/phylogram.css');
-drupal_add_css('//cdnjs.cloudflare.com/ajax/libs/hopscotch/0.2.5/css/hopscotch.min.css',
-               'external');
+drupal_add_css($my_path . '/theme/css/phylogram.css');
+drupal_add_css(
+    '//cdnjs.cloudflare.com/ajax/libs/hopscotch/0.2.5/css/hopscotch.min.css',
+    'external');
 
 $phylotree = $variables['node']->phylotree;
 ?>
@@ -47,14 +48,14 @@ if( ! empty($phylotree->comment) ) {
   <a href="#" class="button organism-legend-show" style="display: none">
     Show Legend
   </a>
-  <a id="msa-link" onclick="phylogenymsa.load()">
+  <a id="msa-link" onclick="phylogeny_msa.load()">
     View Multiple Sequence Alignment for this gene family
   </a>
 </div>
 
 <div id="msa-viewer-wrapper" style="display: none; padding: 10px;">
     <div id="msa-spinner">
-      <img src="/<?php print $my_path ?>/image/ajax-loader.gif"/>
+    <img src="/<?php print $my_path ?>/image/ajax-loader.gif"/>
     </div>
     <div id="msa-viewer">
         <!-- biojs msa viewer will load div -->
@@ -100,6 +101,11 @@ if( ! empty($phylotree->comment) ) {
  * putting it into tripal_phylotree.info scripts[] because that results
  * in the script getting loaded *on every drupal request* which is wasteful 
  */
+drupal_add_js('//cdn.biojs.net/msa/latest/msa.min.gz.js',
+              array(
+                  'type' => 'external',
+                  'group' => JS_LIBRARY,
+              ));
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js',
               array(
                   'type' => 'external',
@@ -155,7 +161,7 @@ drupal_add_js('/'. $my_path . '/theme/js/tour.js',
                   'type' => 'file',
                   'group' => JS_DEFAULT,
               ));
-drupal_add_js('/'. $my_path . '/theme/js/msa-bundle.js',
+drupal_add_js('/'. $my_path . '/theme/js/phylogeny-msa.js',
               array(
                   'type' => 'file',
                   'group' => JS_DEFAULT,
