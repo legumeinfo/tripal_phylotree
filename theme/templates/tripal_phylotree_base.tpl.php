@@ -47,7 +47,7 @@ if( ! empty($phylotree->comment) ) {
   <a href="#" class="button organism-legend-show" style="display: none">
     Show Legend
   </a>
-  <a id="msa-link" onclick="msaWrapper.load()">
+  <a id="msa-link" onclick="phylogenymsa.load()">
     View Multiple Sequence Alignment for this gene family
   </a>
 </div>
@@ -105,11 +105,6 @@ drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js',
                   'type' => 'external',
                   'group' => JS_LIBRARY,
               ));
-drupal_add_js('//cdn.bio.sh/msa/latest/msa.min.gz.js',
-              array(
-                  'type' => 'external',
-                  'group' => JS_LIBRARY,
-              ));
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/URI.js/1.17.1/URI.min.js',
               array(
                   'type' => 'external',
@@ -160,7 +155,7 @@ drupal_add_js('/'. $my_path . '/theme/js/tour.js',
                   'type' => 'file',
                   'group' => JS_DEFAULT,
               ));
-drupal_add_js('/'. $my_path . '/theme/js/msa.js',
+drupal_add_js('/'. $my_path . '/theme/js/msa-bundle.js',
               array(
                   'type' => 'file',
                   'group' => JS_DEFAULT,

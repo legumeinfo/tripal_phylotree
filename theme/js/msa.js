@@ -1,6 +1,7 @@
 /* implement http://msa.biojs.net for lis gene families */
 
-var msaWrapper = require('msa');
+var msacomponent = require('msa');
+var phylogenymsa = {};
 
 (function() {
   'use strict';
@@ -62,4 +63,4 @@ var msaWrapper = require('msa');
     });
   };
       
-}.call(msaWrapper));
+}.call(phylogenymsa));
