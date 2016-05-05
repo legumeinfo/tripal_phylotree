@@ -77,8 +77,9 @@ var taxonChroma = {};
     var parts = taxon.split(' ');
     var genus = parts[0];
     var species = parts[1];
-    var genusColor = _.get(this.legumeGenera, genus, null);
-    if(genusColor) {
+
+    if(genus in this.legumeGenera ) {
+      var genusColor = this.legumeGenera[genus];
       var hue = chroma(genusColor).hsl()[0];
       var lightness = MIN_LIGHTNESS +
 	             (fnv32a(species, 1000) / 1000) * (1 - 2 *MIN_LIGHTNESS);
