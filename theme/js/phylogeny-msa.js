@@ -36,7 +36,7 @@ var phylogeny_msa = {};
     }
     visible = ! visible;
     var btn = jQuery('#msa-toggle');
-    var label = visible ? 'Hide' : 'Hide';
+    var label = visible ? 'Hide' : 'View';
     btn.html(label + ' Multiple Sequence Alignment (MSA)');
   };
   
