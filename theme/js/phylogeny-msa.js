@@ -58,11 +58,11 @@ var phylogeny_msa = {};
       importURL: url,
       vis: {
 	overviewbox: false,
+	labelId: false,
       },
       zoomer: {
-	labelNameLength: 120,
+	labelNameLength: 150,
 	labelFontsize: 9,
-	labelIdLength: 24,
       }
     };
     that.viewer = new msa(opts);
