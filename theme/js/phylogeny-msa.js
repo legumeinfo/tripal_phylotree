@@ -43,11 +43,8 @@ var phylogeny_msa = {};
     var params = {f: familyName};
     var url = fastaAPI.supplant(params);
     var div = container[0];
-
-    /* gff viewing disabled for now */
-    
-    //var gffParser = require('biojs-io-gff');
-    //var xhr = require('xhr');
+    var gffParser = require('biojs-io-gff');
+    var xhr = require('xhr');
     var opts = {
       el: div,
       bootstrapMenu: true, 
@@ -62,40 +59,37 @@ var phylogeny_msa = {};
       }
     };
     that.viewer = new msa(opts);
-
-    /* gff viewing disabled for now */
     
-    //url = gffAPI.supplant(params);
-    // xhr(url, function(err, request, body) {
-    //   if(err || ! body) {
-    // 	console.log(err);
-    // 	spinner.hide();
-    // 	return;
-    //   }
-    //   var features = gffParser.parseSeqs(body);
-    //   that.viewer.seqs.addFeatures(features);
-    //   spinner.hide();
-    // });
+    url = gffAPI.supplant(params);
+    xhr(url, function(err, request, body) {
+      if(err || ! body) {
+    	console.log(err);
+    	spinner.hide();
+    	return;
+      }
+      var features = gffParser.parseSeqs(body);
+      that.viewer.seqs.addFeatures(features);
+      spinner.hide();
+    });
 
-    // workaround for biojs-msa menu divs apparently being misplaced
-    // (at least in the LIS css context)
+    // workaround for biojs-msa menu divs possibly being effected by
+    // leaking CSS rules in this context
     jQuery('.smenubar_alink').live('click', function(evt) {
       setTimeout( function() {
 	jQuery('.smenu-dropdown').css('top', '');
       });
     });
 
-    function waitForImportURL() {
-      // biojs-msa hides the callback fn to the importURL util. So
-      // we dont know when it finishes loading
-      if(jQuery('.biojs_msa_labelrow').length) {
-	spinner.hide();
-	return;
-      }
-      setTimeout(waitForImportURL, 100);
-    }
-
-    waitForImportURL();
+    // function waitForImportURL() {
+    //   // biojs-msa hides the callback fn to the importURL util. So
+    //   // we dont know when it finishes loading
+    //   if(jQuery('.biojs_msa_labelrow').length) {
+    // 	spinner.hide();
+    // 	return;
+    //   }
+    //   setTimeout(waitForImportURL, 100);
+    // }
+    // waitForImportURL();
     
   };
 }.call(phylogeny_msa));

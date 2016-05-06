@@ -9,6 +9,7 @@ if(empty($my_path)) {
   $my_path = 'sites/all/modules/tripal/tripal_phylogeny';
 }
 drupal_add_css($my_path . '/theme/css/phylogram.css');
+drupal_add_css('//cdn.biojs.net/msa/latest/msa.min.gz.css', 'external');
 drupal_add_css(
     '//cdnjs.cloudflare.com/ajax/libs/hopscotch/0.2.5/css/hopscotch.min.css',
     'external');
