@@ -46,11 +46,11 @@ if( ! empty($phylotree->comment) ) {
     <img src="/sites/all/modules/tripal/tripal_phylogeny/image/help.png"/>
     Gene Family Help
   </a>
+  <a id="msa-toggle" href="#" class="button" onclick="phylogeny_msa.toggle()">
+    View Multiple Sequence Alignment (MSA)
+  </a>
   <a href="#" class="button organism-legend-show" style="display: none">
     Show Legend
-  </a>
-  <a id="msa-link" onclick="phylogeny_msa.load()">
-    View Multiple Sequence Alignment for this gene family
   </a>
 </div>
 

@@ -114,8 +114,8 @@ function showHopscotchTour() {
       {
         title: 'MSA',
         content: 'The multiple sequence aligment for the family \
-         is available via this link.',
-        target: 'msa-link',
+         is available via this button.',
+        target: 'msa-toggle',
         placement: 'top',
       },
       {

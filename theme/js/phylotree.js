@@ -211,7 +211,7 @@
       offset : '1000 -20',
     };
     dialog.dialog({
-      title : 'Legend',
+      title : 'Phylogram Legend',
       closeOnEscape : true,
       modal : false,
       width : '300px',
