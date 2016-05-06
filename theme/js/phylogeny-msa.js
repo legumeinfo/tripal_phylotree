@@ -7,8 +7,6 @@ var phylogeny_msa = {};
 
   var that = this;
   var fastaAPI = '/lis_gene_families/chado/msa/{f}-consensus/download/';
-  // gff loading disabled until it can be debugged
-  //var gffAPI = '/gff_export/{f}-consensus';
   
   if (!String.prototype.supplant) {
     String.prototype.supplant = function (o) {
@@ -22,9 +20,9 @@ var phylogeny_msa = {};
     };
   }
 
-  /* toggle visibility of msa viewer, saving state, lazily load fasta */
   var visible = false;
-  
+
+  /* toggle() visibility of msa viewer, saving state, lazily load fasta */
   this.toggle = function() {
     var wrapper = jQuery('#msa-viewer-wrapper');
     if(! visible) {
@@ -44,7 +42,6 @@ var phylogeny_msa = {};
   
   this.load = function() {
     jQuery('#organism-legend-dialog').dialog('close');
-    var msa = require('msa');
     var spinner = jQuery('#msa-spinner');
     var container = jQuery('#msa-viewer');
     spinner.show();
@@ -66,20 +63,6 @@ var phylogeny_msa = {};
       }
     };
     that.viewer = new msa(opts);
-
-    // var gffParser = require('biojs-io-gff');
-    // var xhr = require('xhr');
-    // url = gffAPI.supplant(params);
-    // xhr(url, function(err, request, body) {
-    //   if(err || ! body) {
-    // 	console.log(err);
-    // 	spinner.hide();
-    // 	return;
-    //   }
-    //   var features = gffParser.parseSeqs(body);
-    //   that.viewer.seqs.addFeatures(features);
-    //   spinner.hide();
-    // });
 
     // workaround for biojs-msa menu divs possibly being effected by
     // leaking CSS rules in this context

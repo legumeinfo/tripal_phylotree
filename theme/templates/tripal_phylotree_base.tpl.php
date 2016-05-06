@@ -9,7 +9,6 @@ if(empty($my_path)) {
   $my_path = 'sites/all/modules/tripal/tripal_phylogeny';
 }
 drupal_add_css($my_path . '/theme/css/phylogram.css');
-drupal_add_css('//cdn.biojs.net/msa/latest/msa.min.gz.css', 'external');
 drupal_add_css(
     '//cdnjs.cloudflare.com/ajax/libs/hopscotch/0.2.5/css/hopscotch.min.css',
     'external');
@@ -102,7 +101,10 @@ if( ! empty($phylotree->comment) ) {
  * putting it into tripal_phylotree.info scripts[] because that results
  * in the script getting loaded *on every drupal request* which is wasteful 
  */
-drupal_add_js('//cdn.biojs.net/msa/latest/msa.min.gz.js',
+
+    // re: cdn.biojs.net: this cdn ist outdated (long story) and I
+    // lost control over it. Try cdn.bio.sh (same path) --Sebastian
+drupal_add_js('//cdn.bio.sh/msa/latest/msa.min.gz.js',
               array(
                   'type' => 'external',
                   'group' => JS_LIBRARY,
