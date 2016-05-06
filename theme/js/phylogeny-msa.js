@@ -17,36 +17,36 @@ var phylogeny_msa = {};
 	function (a, b) {
 	  var r = o[b];
 	  return typeof r === 'string' || typeof r === 'number' ? r : a;
-	  
 	}
       );
     };
-    
   }
+
+  /* toggle visibility of msa viewer, saving state, lazily load fasta */
+  var visible = false;
   
   this.toggle = function() {
-    var btn = jQuery('#msa-toggle');
-    if(! that.viewer) {
-      that.load();
-      btn.html('Hide Multiple Sequence Alignment (MSA)');
-      return;
+    var wrapper = jQuery('#msa-viewer-wrapper');
+    if(! visible) {
+      if(! that.viewer) {
+	that.load();
+      }
+      wrapper.show();
     }
-    jQuery('#msa-viewer').empty();
-    jQuery('.smenubar').remove();
-    that.viewer = null;
-    btn.html('View Multiple Sequence Alignment (MSA)');
+    else {
+      wrapper.hide();
+    }
+    visible = ! visible;
+    var btn = jQuery('#msa-toggle');
+    var label = visible ? 'Hide' : 'Hide';
+    btn.html(label + ' Multiple Sequence Alignment (MSA)');
   };
   
   this.load = function() {
-    var msa = require('msa');
-    
     jQuery('#organism-legend-dialog').dialog('close');
-    
-    var wrapper = jQuery('#msa-viewer-wrapper');
+    var msa = require('msa');
     var spinner = jQuery('#msa-spinner');
     var container = jQuery('#msa-viewer');
-    wrapper.show();
-    container.show();
     spinner.show();
     
     var params = {f: familyName};
