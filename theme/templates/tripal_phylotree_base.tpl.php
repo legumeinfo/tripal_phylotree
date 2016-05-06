@@ -8,9 +8,10 @@ if(empty($my_path)) {
   // it will be installed
   $my_path = 'sites/all/modules/tripal/tripal_phylogeny';
 }
-drupal_add_css( $my_path . '/theme/css/phylogram.css');
-drupal_add_css('//cdnjs.cloudflare.com/ajax/libs/hopscotch/0.2.5/css/hopscotch.min.css',
-               'external');
+drupal_add_css($my_path . '/theme/css/phylogram.css');
+drupal_add_css(
+    '//cdnjs.cloudflare.com/ajax/libs/hopscotch/0.2.5/css/hopscotch.min.css',
+    'external');
 
 $phylotree = $variables['node']->phylotree;
 ?>
@@ -22,7 +23,10 @@ printf('var phylotreeDataURL = "/chado_phylotree/%d/json";',
 // write js var with path to our theme, for use below by javascript functions.
 // prefix path to theme with / because drupal returns it as a relative URL.
 printf('var pathToTheme = "/%s";', $my_path);
+
+printf('var familyName = "%s";', $phylotree->name);
 ?>
+
 </script>
 
 
@@ -41,13 +45,21 @@ if( ! empty($phylotree->comment) ) {
     <img src="/sites/all/modules/tripal/tripal_phylogeny/image/help.png"/>
     Gene Family Help
   </a>
+  <a id="msa-toggle" href="#" class="button" onclick="phylogeny_msa.toggle()">
+    View Multiple Sequence Alignment (MSA)
+  </a>
   <a href="#" class="button organism-legend-show" style="display: none">
     Show Legend
   </a>
-  <a id="msa-link"
-    href="/lis_gene_families/chado/msa/<?php print $phylotree->name ?>-consensus/">
-    View Multiple Sequence Alignment for this gene family
-  </a>
+</div>
+
+<div id="msa-viewer-wrapper" style="display: none; padding: 10px;">
+    <div id="msa-spinner">
+    <img src="/<?php print $my_path ?>/image/ajax-loader.gif"/>
+    </div>
+    <div id="msa-viewer">
+        <!-- biojs msa viewer will load div -->
+    </div>
 </div>
 
 <div id="phylogram">
@@ -82,12 +94,21 @@ if( ! empty($phylotree->comment) ) {
 <div id="phylonode_popup_dialog" style="display: none;">
 </div>
 
+    
 <?php
 /* 
  * this template depends on a few javascript libraries, but i am not
  * putting it into tripal_phylotree.info scripts[] because that results
  * in the script getting loaded *on every drupal request* which is wasteful 
  */
+
+    // re: cdn.biojs.net: this cdn ist outdated (long story) and I
+    // lost control over it. Try cdn.bio.sh (same path) --Sebastian
+drupal_add_js('//cdn.bio.sh/msa/latest/msa.min.gz.js',
+              array(
+                  'type' => 'external',
+                  'group' => JS_LIBRARY,
+              ));
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js',
               array(
                   'type' => 'external',
@@ -118,7 +139,6 @@ drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/chroma-js/1.1.1/chroma.min.js',
                   'type' => 'external',
                   'group' => JS_LIBRARY,
               ));
-
 drupal_add_js('/'. $my_path . '/theme/js/taxon-chroma.js',
               array(
                   'type' => 'file',
@@ -140,6 +160,11 @@ drupal_add_js('/'. $my_path . '/theme/js/phylotree.js',
                   'group' => JS_DEFAULT,
               ));
 drupal_add_js('/'. $my_path . '/theme/js/tour.js',
+              array(
+                  'type' => 'file',
+                  'group' => JS_DEFAULT,
+              ));
+drupal_add_js('/'. $my_path . '/theme/js/phylogeny-msa.js',
               array(
                   'type' => 'file',
                   'group' => JS_DEFAULT,
