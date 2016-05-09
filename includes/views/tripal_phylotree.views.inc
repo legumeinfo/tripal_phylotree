@@ -229,7 +229,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['cicar_count']['table'] = 'phylotree_count';
     $handler->display->display_options['fields']['cicar_count']['field'] = 'cicar_count';
     $handler->display->display_options['fields']['cicar_count']['alter']['make_link'] = TRUE;
-    $handler->display->display_options['fields']['cicar_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=cicar';
+    $handler->display->display_options['fields']['cicar_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=cicar.CDCFrontier';
     $handler->display->display_options['fields']['cicar_count']['alter']['absolute'] = TRUE;
     /* Field: phylotree_count: Glyma count */
     $handler->display->display_options['fields']['glyma_count']['id'] = 'glyma_count';
@@ -406,7 +406,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['filters']['cicar_count']['group'] = 1;
     $handler->display->display_options['filters']['cicar_count']['exposed'] = TRUE;
     $handler->display->display_options['filters']['cicar_count']['expose']['operator_id'] = 'cicar_count_op';
-    $handler->display->display_options['filters']['cicar_count']['expose']['label'] = 'Cicar count';
+    $handler->display->display_options['filters']['cicar_count']['expose']['label'] = 'Cicar (CDCFrontier) count';
     $handler->display->display_options['filters']['cicar_count']['expose']['use_operator'] = TRUE;
     $handler->display->display_options['filters']['cicar_count']['expose']['operator'] = 'cicar_count_op';
     $handler->display->display_options['filters']['cicar_count']['expose']['identifier'] = 'cicar_count';

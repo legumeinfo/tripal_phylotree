@@ -730,8 +730,8 @@ function tripal_phylotree_integrate_view(){
 
       'cicar_count' => array (
           'name' => 'cicar_count',
-          'title' => 'Cicar count',
-          'description' => 'Cicar count',
+          'title' => 'Cicar (CDCFrontier) count',
+          'description' => 'Cicar (CDCFrontier) count',
           'type' => 'int',
           'handlers' => array (
               'filter' => array (
