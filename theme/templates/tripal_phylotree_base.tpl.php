@@ -101,12 +101,10 @@ if( ! empty($phylotree->comment) ) {
  * putting it into tripal_phylotree.info scripts[] because that results
  * in the script getting loaded *on every drupal request* which is wasteful 
  */
-
-    // re: cdn.biojs.net: this cdn ist outdated (long story) and I
-    // lost control over it. Try cdn.bio.sh (same path) --Sebastian
-drupal_add_js('//cdn.bio.sh/msa/latest/msa.min.gz.js',
+    
+drupal_add_js($my_path . '/theme/js/msa/dist/msa.js',
               array(
-                  'type' => 'external',
+                  'type' => 'file',
                   'group' => JS_LIBRARY,
               ));
 drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js',
