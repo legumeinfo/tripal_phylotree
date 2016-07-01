@@ -3,6 +3,8 @@ tripal_phylotree
 A tripal module for Chado phylogeny tables, developed for
 http://legumeinfo.org/ 
 
+The Tripal Phylogeny module, http://tripal.info/extensions/modules/phylogeny ,  was initially based on this code. Tripal Phylogeny is more generic, and supports taxonomy trees as well. This LIS phylotree module is more oriented towards client side javascript features, for example using the BioJS MSA viewer.
+
 Requirements
 ------------
 * Tripal 2 http://tripal.info/
