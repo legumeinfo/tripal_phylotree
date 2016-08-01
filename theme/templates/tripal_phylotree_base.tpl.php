@@ -102,7 +102,7 @@ if( ! empty($phylotree->comment) ) {
  * in the script getting loaded *on every drupal request* which is wasteful 
  */
     
-drupal_add_js($my_path . '/theme/js/msa/dist/msa.js',
+drupal_add_js($my_path . '/theme/js/msa/dist/msa-1_0.min.js',
               array(
                   'type' => 'file',
                   'group' => JS_LIBRARY,
