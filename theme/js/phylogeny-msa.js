@@ -71,16 +71,37 @@ var phylogeny_msa = {};
 	jQuery('.smenu-dropdown').css('top', '');
       });
     });
+
+    function postprocess() {
+      spinner.hide();
+      that.consensusSeq = that.viewer.seqs.at(0);
+      that.viewer.seqs.comparator = sortFeatures;
+      that.viewer.seqs.sort();
+    }
+    
+    function sortFeatures(a,b) {
+      if(a === that.consensusSeq) {
+	return -1;
+      }
+      if(b === that.consensusSeq) {
+	return 1;
+      }
+      var a = a.get('name');
+      var b = b.get('name');
+      return a.localeCompare(b);
+    }
     
     function waitForImportURL() {
       // biojs-msa hides the callback fn to the importURL util. So
       // we dont know when it finishes loading
-      if(jQuery('.biojs_msa_labelrow').length) {
-    	spinner.hide();
+      //if(jQuery('.biojs_msa_labelrow').length) {
+      if(that.viewer.seqs.length) {
+	postprocess();
     	return;
       }
       setTimeout(waitForImportURL, 100);
     }
     waitForImportURL();
   };
+  
 }.call(phylogeny_msa));
