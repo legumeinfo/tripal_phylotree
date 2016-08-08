@@ -1,12 +1,12 @@
 /* phylotree d3js graphs */
 
 (function ($) {
-  
+
   var width = 550;
   var height = 0; // will be dynamically sized in displayData
   var pane = null;
   var organisms = {}; // lazily build hash of organisms, for displ. on legend
-      
+
   function currentPane() {
     // parse the url hash, or the href query string to see which
     // sub-pane the navigation is on (the pane can appear in either
@@ -26,7 +26,7 @@
     var uri = new URI(window.location.href);
     var query = uri.query(true);
     var keys, vals = [];
-    
+
     if(! query.hilite_node) {
       return {};
     }
@@ -34,7 +34,7 @@
     function lowercaser(s) {
 	return lowercase ? s.toLowerCase() : s;
     }
-    
+
     if(_.isArray(query.hilite_node)) {
       // there are multiple hilite_node query string parameters
       keys = _.map(query.hilite_node, lowercaser);
@@ -63,11 +63,11 @@
     _.each(organisms, function(val, key) {
       litems.push(val);
     });
-    
+
     litems.sort( function(a,b) {
       return 0;
     });
-    
+
     litems.sort( function(a,b) {
 
       if(a.isLegume && ! b.isLegume) {
@@ -76,12 +76,12 @@
       if(! a.isLegume && b.isLegume) {
 	return 1;
       }
-      return a.label.localeCompare(b.label);      
+      return a.label.localeCompare(b.label);
     });
-    
+
     var container = d3.selectAll('.organism-legend');
     container.selectAll('div').remove();
-    
+
     var rows = container.selectAll('div')
 	.data(litems)
 	.enter()
@@ -90,6 +90,7 @@
     rows.append('span')
       .attr('class', 'org-legend-color')
       .append('svg:svg')
+      .attr('xmlns', 'http://www.w3.org/2000/svg')
       .attr('width', 14)
       .attr('height', 18)
       .append('svg:circle')
@@ -110,6 +111,7 @@
 	.append('span')
 	.attr('class', 'org-legend-color')
 	.append('svg:svg')
+  .attr('xmlns', 'http://www.w3.org/2000/svg')
 	.attr('width', 14)
 	.attr('height', 18)
 	.append('svg:circle')
@@ -128,6 +130,7 @@
 	.append('span')
 	.attr('class', 'org-legend-color')
 	.append('svg:svg')
+  .attr('xmlns', 'http://www.w3.org/2000/svg')
 	.attr('width', 14)
 	.attr('height', 18)
 	.append('svg:circle')
@@ -153,6 +156,7 @@
 	div.append('span')
 	  .attr('class', 'org-legend-color')
 	  .append('svg:svg')
+    .attr('xmlns', 'http://www.w3.org/2000/svg')
   	  .attr('width', 14)
 	  .attr('height', 18)
 	  .append('svg:rect')
@@ -166,7 +170,7 @@
 	  .html('hilite: '+  hiliteNames.join(', ') + warning);
       }
     }
-    
+
     var dialog = $('#organism-legend-dialog');
     //allows re-open of dialog, basically a toggle between this
     //element and the dialog being visible
@@ -243,16 +247,16 @@
     var label = d.genus.substring(0, 3) + d.species.substring(0, 2);
     return label.toLowerCase();
   }
-  
+
   // function to generate color based on the organism genus and
   // species on graph node d, using taxonColor js library. lazily make
   // a hash of all organisms for display on legend.
   function getColor(d) {
     var color = null;
-    
+
     // check for odd 'default' value, haven't been able to track it down.
     if(! _.has(d, 'name')) { return; }
-    
+
     var taxon = d.genus + ' ' + d.species;
     var isLegume = false;
     // check if this is a legume, if so colorize with taxonChroma library.
@@ -270,7 +274,7 @@
       color = taxonChroma.defaultColor;
     }
     var abbrev = species5(d);
-    
+
     if(! organisms[abbrev]) {
       // lazily add to legend
       var litem  = {
@@ -284,7 +288,7 @@
     }
     return color;
   }
-  
+
   $(document).ready( function () {
 
     $('.phylogeny-help-btn').click(function() {
@@ -299,9 +303,9 @@
         show: { effect: 'blind', direction: 'down', duration: 200 }
       });
     });
-    
+
     pane = currentPane();
-    
+
     // when user navigates to a sub-panel without a graph, hide any popups
     // and redisplay the legend if applicable.
     $('.tripal_toc_list_item_link').click(function() {
@@ -338,7 +342,7 @@
         txt.attr('font-weight', 'bold');
       }
     };
-    
+
     // callback for mouseout event on graph node d
     var nodeMouseOut = function(d) {
       var el = $(this);
@@ -355,7 +359,7 @@
         circle.attr('fill', 'white');
       }
     };
-    
+
     // callback for mousedown/click event on graph node d
     var nodeMouseDown = function(d) {
       var el = $(this);
@@ -408,16 +412,16 @@
         'nodeMouseDown' : nodeMouseDown
       });
       d3.phylogram.buildRadial('#phylotree-radial-graph', treeData, {
-        'width' : width, // square graph 
+        'width' : width, // square graph
         'fill' : getColor,
-	'hiliteNodes' : hilites,	
+	'hiliteNodes' : hilites,
         'nodeMouseOver' : nodeMouseOver,
         'nodeMouseOut' : nodeMouseOut,
         'nodeMouseDown' : nodeMouseDown
       });
       organismBubblePlot('#phylotree-organisms', treeData, {
         'height' : width, // square graph
-        'width' : width, 
+        'width' : width,
         'fill' : getColor,
         'nodeMouseOver' : nodeMouseOver,
         'nodeMouseOut' : nodeMouseOut,
@@ -426,7 +430,7 @@
     }
 
     function leafNodes(node) {
-      /* for a root or interior node, return an array of leaf nodes. a leaf 
+      /* for a root or interior node, return an array of leaf nodes. a leaf
        * node by definition has no children
        */
       function _trampoline(f) {
@@ -454,7 +458,7 @@
 
     function addTripalOrganismLink(dialogElem, node) {
       /* add a tripal organism link to the dialog element, if this is a
-       * leaf node and organism is known. 
+       * leaf node and organism is known.
        */
       if(node.children || ! node.organism_node_id) {
 	// either this is an interior node, or the organism is not known.
@@ -561,6 +565,6 @@
 	});
       }
     }
-    
+
   });
 })(jQuery);
