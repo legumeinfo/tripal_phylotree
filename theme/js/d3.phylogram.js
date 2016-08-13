@@ -291,7 +291,7 @@ if (!d3) { throw "d3 wasn't included!"};
       .attr('fill', fill)
       .attr('stroke-width', '2px')
       .attr('class', function(d) {
-	if(fill(d) != fill('default')) {
+	if(fill(d) != taxonChroma.defaultColor) {
 	  // this is a total hack
 	  return 'legume-leaf-node';
 	}
