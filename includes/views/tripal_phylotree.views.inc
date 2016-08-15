@@ -69,12 +69,14 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         'phylotree_comment' => 'phylotree_comment',
         'total_count' => 'total_count',
         'medtr_count' => 'medtr_count',
+        'tripr_count' => 'tripr_count',
         'lotja_count' => 'lotja_count',
         'cicar_count' => 'cicar_count',
         'glyma_count' => 'glyma_count',
         'phavu_count' => 'phavu_count',
         'cajca_count' => 'cajca_count',
         'vigra_count' => 'vigra_count',
+        'vigan_count' => 'vigan_count',
         'aradu_count' => 'aradu_count',
         'araip_count' => 'araip_count',
     );
@@ -102,6 +104,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
             'empty_column' => 0,
         ),
         'medtr_count' => array(
+            'sortable' => 1,
+            'default_sort_order' => 'asc',
+            'align' => '',
+            'separator' => '',
+            'empty_column' => 0,
+        ),
+        'tripr_count' => array(
             'sortable' => 1,
             'default_sort_order' => 'asc',
             'align' => '',
@@ -151,6 +160,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
             'empty_column' => 0,
         ),
         'vigra_count' => array(
+            'sortable' => 1,
+            'default_sort_order' => 'asc',
+            'align' => '',
+            'separator' => '',
+            'empty_column' => 0,
+        ),
+        'vigan_count' => array(
             'sortable' => 1,
             'default_sort_order' => 'asc',
             'align' => '',
@@ -217,6 +233,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['medtr_count']['alter']['make_link'] = TRUE;
     $handler->display->display_options['fields']['medtr_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=medtr';
     $handler->display->display_options['fields']['medtr_count']['alter']['absolute'] = TRUE;
+    /* Field: phylotree_count: Tripr count */
+    $handler->display->display_options['fields']['tripr_count']['id'] = 'tripr_count';
+    $handler->display->display_options['fields']['tripr_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['fields']['tripr_count']['field'] = 'tripr_count';
+    $handler->display->display_options['fields']['tripr_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['tripr_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=tripr';
+    $handler->display->display_options['fields']['tripr_count']['alter']['absolute'] = TRUE;
     /* Field: phylotree_count: Lotja count */
     $handler->display->display_options['fields']['lotja_count']['id'] = 'lotja_count';
     $handler->display->display_options['fields']['lotja_count']['table'] = 'phylotree_count';
@@ -256,6 +279,12 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['vigra_count']['field'] = 'vigra_count';
     $handler->display->display_options['fields']['vigra_count']['alter']['make_link'] = TRUE;
     $handler->display->display_options['fields']['vigra_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=vigra';
+    /* Field: phylotree_count: Vigan count */
+    $handler->display->display_options['fields']['vigan_count']['id'] = 'vigan_count';
+    $handler->display->display_options['fields']['vigan_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['fields']['vigan_count']['field'] = 'vigan_count';
+    $handler->display->display_options['fields']['vigan_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['vigan_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=vigan';
     /* Field: phylotree_count: Aradu count */
     $handler->display->display_options['fields']['aradu_count']['id'] = 'aradu_count';
     $handler->display->display_options['fields']['aradu_count']['table'] = 'phylotree_count';
@@ -383,6 +412,22 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         1 => 0,
         4 => 0,
     );
+    /* Filter criterion: phylotree_count: Tripr count */
+    $handler->display->display_options['filters']['tripr_count']['id'] = 'tripr_count';
+    $handler->display->display_options['filters']['tripr_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['filters']['tripr_count']['field'] = 'tripr_count';
+    $handler->display->display_options['filters']['tripr_count']['group'] = 1;
+    $handler->display->display_options['filters']['tripr_count']['exposed'] = TRUE;
+    $handler->display->display_options['filters']['tripr_count']['expose']['operator_id'] = 'tripr_count_op';
+    $handler->display->display_options['filters']['tripr_count']['expose']['label'] = 'Tripr count';
+    $handler->display->display_options['filters']['tripr_count']['expose']['use_operator'] = TRUE;
+    $handler->display->display_options['filters']['tripr_count']['expose']['operator'] = 'tripr_count_op';
+    $handler->display->display_options['filters']['tripr_count']['expose']['identifier'] = 'tripr_count';
+    $handler->display->display_options['filters']['tripr_count']['expose']['remember_roles'] = array(
+        2 => '2',
+        1 => 0,
+        4 => 0,
+    );
     /* Filter criterion: phylotree_count: Lotja count */
     $handler->display->display_options['filters']['lotja_count']['id'] = 'lotja_count';
     $handler->display->display_options['filters']['lotja_count']['table'] = 'phylotree_count';
@@ -475,6 +520,22 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['filters']['vigra_count']['expose']['operator'] = 'vigra_count_op';
     $handler->display->display_options['filters']['vigra_count']['expose']['identifier'] = 'vigra_count';
     $handler->display->display_options['filters']['vigra_count']['expose']['remember_roles'] = array(
+        2 => '2',
+        1 => 0,
+        4 => 0,
+    );
+    /* Filter criterion: phylotree_count: Vigan count */
+    $handler->display->display_options['filters']['vigan_count']['id'] = 'vigan_count';
+    $handler->display->display_options['filters']['vigan_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['filters']['vigan_count']['field'] = 'vigan_count';
+    $handler->display->display_options['filters']['vigan_count']['group'] = 1;
+    $handler->display->display_options['filters']['vigan_count']['exposed'] = TRUE;
+    $handler->display->display_options['filters']['vigan_count']['expose']['operator_id'] = 'vigan_count_op';
+    $handler->display->display_options['filters']['vigan_count']['expose']['label'] = 'Vigan count';
+    $handler->display->display_options['filters']['vigan_count']['expose']['use_operator'] = TRUE;
+    $handler->display->display_options['filters']['vigan_count']['expose']['operator'] = 'vigan_count_op';
+    $handler->display->display_options['filters']['vigan_count']['expose']['identifier'] = 'vigan_count';
+    $handler->display->display_options['filters']['vigan_count']['expose']['remember_roles'] = array(
         2 => '2',
         1 => 0,
         4 => 0,
