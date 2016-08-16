@@ -5,7 +5,9 @@
 (function() {
   var j = localStorage.getItem('lisTourVisited');
   if(!j || ! JSON.parse(j).phylotree) {
-    lisTours.go('phylotree');
+    // user has not seen phylotree tour; check for conflict with multi-page tours.
+    if(! lisTours.active()) {
+      lisTours.go('phylotree');
+    }
   }
-  
 })();

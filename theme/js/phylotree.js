@@ -508,31 +508,31 @@
 	  return d.genus.toLowerCase() in taxonChroma.legumeGenera;
 	});
 	if(legumes.length) {
-      var spinnerEl=$("<img src='"+pathToTheme+ "/image/ajax-loader.gif'/>");
-      dialogElem.append(spinnerEl);
-      // leaf node link outs
-      var url = "/famreps_links?famreps="+legumes.map(function(n) {
-                                 return n.feature_name;}).join(',');
-      $.ajax({
-        type: "GET",
-        url: url,
-        success: function(data) {
-          data.reverse();
-          _.each(data, function(value, index) {
-            var linkAttr = {
-          id : 'feature_link_out_' + index,
-          href : value.href,
-          text : value.text,
-          tabindex: '-1', /* prevent link being hilited by default */
-            };
-            var a = $('<a/>', linkAttr);
-            containerElem.prepend($('<br/>'));
-            containerElem.prepend(a);
-          });
-          spinnerEl.remove();
-          containerElem.show();
-        },
-      });
+            var spinnerEl=$("<img src='"+pathToTheme+ "/image/ajax-loader.gif'/>");
+            dialogElem.append(spinnerEl);
+            // leaf node link outs
+            var url = "/famreps_links?famreps="+legumes.map(function(n) {
+                                       return n.feature_name;}).join(','); 
+            $.ajax({
+              type: "GET",
+              url: url,
+              success: function(data) {
+                data.reverse();
+                _.each(data, function(value, index) {
+                  var linkAttr = {
+                id : 'feature_link_out_' + index,
+                href : value.href,
+                text : value.text,
+                tabindex: '-1', /* prevent link being hilited by default */
+                  };
+                  var a = $('<a/>', linkAttr);
+                  containerElem.prepend($('<br/>'));
+                  containerElem.prepend(a);
+                });
+                spinnerEl.remove();
+                containerElem.show();
+              },
+            });
 	  /* cmtv */
 	  var url = 'http://velarde.ncgr.org:7070/isys/launch?svc=org.ncgr.cmtv.isys.CompMapViewerService%40--style%40http://velarde.ncgr.org:7070/isys/bin/Components/cmtv/conf/cmtv_combined_map_style.xml%40--combined_display%40' + window.location.origin + '/lis_gene_families/chado/phylo/node/gff_download/' + node.phylonode_id;
 	  var linkAttr = {
