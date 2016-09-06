@@ -376,6 +376,7 @@ SQL;
  */
 function phylotree_redirect_by_gene() {
     $q = drupal_get_query_parameters();
+    $family = $q['family'];
     $gene_name = $q['gene_name'];
     if(empty($gene_name)) {
         // handle the case where the URL ends with /geneName instead
@@ -391,23 +392,29 @@ function phylotree_redirect_by_gene() {
         // a single gene name was requested
         $gene_names = array($gene_name);
     }
-    // query for the gene family name by gene name (taking only the
-    // first gene name from the list)
-    $sql = <<<SQL
-      SELECT fp.value
-      FROM chado.featureprop fp, chado.feature f
-      WHERE fp.type_id = (SELECT cvterm_id FROM chado.cvterm
-                          WHERE NAME = 'gene family')
-      AND (f.uniquename = :gene OR f.name = :gene)
-      AND fp.feature_id = f.feature_id
+    //in some contexts, it's easy to make the target family explicit; doing
+    //so makes it easier to get the right tree when the gene is not explcitly
+    //part of the tree building or we don't store the gene info explicitly
+    //(non-legumes).
+    if (!$family) {
+        // query for the gene family name by gene name (taking only the
+        // first gene name from the list)
+        $sql = <<<SQL
+          SELECT fp.value
+          FROM chado.featureprop fp, chado.feature f
+          WHERE fp.type_id = (SELECT cvterm_id FROM chado.cvterm
+                  WHERE NAME = 'gene family')
+          AND (f.uniquename = :gene OR f.name = :gene)
+          AND fp.feature_id = f.feature_id
 SQL;
-    $args = array(':gene' => $gene_names[0]);
-    $result = chado_query($sql, $args);
-    $family = $result->fetchField();
-    if(! $family) {
+        $args = array(':gene' => $gene_names[0]);
+        $result = chado_query($sql, $args);
+        $family = $result->fetchField();
+        if(! $family) {
         drupal_add_http_header('Status', '404 Not Found');
         print("Error: gene family not found\n");
         drupal_exit();
+        }
     }
     $pp_names = array();
     foreach ($gene_names as $n) {
@@ -423,7 +430,13 @@ SQL;
         $args = array(':gene' => $n);
         $result = chado_query($sql, $args);
         $name = $result->fetchField();
+        if ($name) {
         $pp_names[] = $name;
+        }
+        else{
+        //probably won't be listed in tree, but at least we'll get the message
+        $pp_names[] = $n;
+        }
     }
     // multiple family representatives appear to resolve to same
     // polypeptide, so uniquify the array
