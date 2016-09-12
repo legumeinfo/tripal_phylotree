@@ -35,7 +35,8 @@
   },
   "unitTestRunner": {
     "id": "none",
-    "displayName": "None"
+    "displayName": "none",
+    "source": "test/unit/**/*.js"
   },
   "paths": {
     "root": "src",
@@ -44,6 +45,10 @@
     "attributes": "src/resources/attributes",
     "valueConverters": "src/resources/value-converters",
     "bindingBehaviors": "src/resources/binding-behaviors"
+  },
+  "testFramework": {
+    "id": "none",
+    "displayName": "none"
   },
   "build": {
     "targets": [
@@ -78,12 +83,12 @@
         "source": [
           "[**/*.js]",
           "**/*.{css,html}"
-        ]
+        ]        
       },
       {
         "name": "vendor-bundle.js",
         "prepend": [
-          "node_modules/bluebird/js/browser/bluebird.core.js",
+	  "node_modules/bluebird/js/browser/bluebird.core.js",
           "scripts/require.js"
         ],
         "dependencies": [
@@ -91,9 +96,8 @@
           "aurelia-bootstrapper",
           "aurelia-dependency-injection",
           "aurelia-event-aggregator",
+          "aurelia-fetch-client",
           "aurelia-framework",
-          "aurelia-history",
-          "aurelia-history-browser",
           "aurelia-loader",
           "aurelia-loader-default",
           "aurelia-logging",
@@ -103,8 +107,6 @@
           "aurelia-pal-browser",
           "aurelia-path",
           "aurelia-polyfills",
-          "aurelia-route-recognizer",
-          "aurelia-router",
           "aurelia-task-queue",
           "aurelia-templating",
           "aurelia-templating-binding",
@@ -118,15 +120,12 @@
             "main": "aurelia-templating-resources"
           },
           {
-            "name": "aurelia-templating-router",
-            "path": "../node_modules/aurelia-templating-router/dist/amd",
-            "main": "aurelia-templating-router"
+            "name": "crossfilter2",
+            "path": "../node_modules/crossfilter2/crossfilter"            
           },
           {
-            "name": "aurelia-testing",
-            "path": "../node_modules/aurelia-testing/dist/amd",
-            "main": "aurelia-testing",
-            "env": "dev"
+            "name" : "tnt.tree",
+            "path" : "../node_modules/tnt.tree/build/tnt.tree.min"
           }
         ]
       }
