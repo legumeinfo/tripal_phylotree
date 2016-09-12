@@ -1,0 +1,14 @@
+.svg-container {
+ position: relative; 
+ width:100%; 
+ height:250px; 
+ overflow-y: scroll;
+ border-style: 1px;
+ border-style: dotted;
+ border-color: lightgrey;
+}
+
+label, legend {
+    font-weight: normal;
+    display: inline;
+}

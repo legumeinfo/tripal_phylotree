@@ -1,0 +1,23 @@
+<template>
+  <require from="./loader-anim"></require>
+
+  <h5>Multiple Sequence Alignment</h5>
+
+  <loader-anim if.bind="loading"></loader-anim>
+  <div class="smenubar">
+  </div>
+  <div id="msa" ref="msaElement">
+  </div>
+
+  <button class="button" click.delegate="onToggleMenu()">
+    <span if.bind="! menu">Show</span>
+    <span if.bind="menu">Hide</span>
+    MSA Menu
+  </button>
+
+  <button class="button"  if.bind="selectedFeatureNum"
+          click.delegate="onClearSelection()">
+    Reset MSA Selection
+  </button>
+
+</template>
