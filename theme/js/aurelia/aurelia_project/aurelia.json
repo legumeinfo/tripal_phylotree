@@ -35,8 +35,7 @@
   },
   "unitTestRunner": {
     "id": "none",
-    "displayName": "none",
-    "source": "test/unit/**/*.js"
+    "displayName": "None"
   },
   "paths": {
     "root": "src",
@@ -45,10 +44,6 @@
     "attributes": "src/resources/attributes",
     "valueConverters": "src/resources/value-converters",
     "bindingBehaviors": "src/resources/binding-behaviors"
-  },
-  "testFramework": {
-    "id": "none",
-    "displayName": "none"
   },
   "build": {
     "targets": [

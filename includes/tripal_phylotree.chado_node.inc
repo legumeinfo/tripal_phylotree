@@ -607,3 +607,19 @@ function phylotree_feature_summary($phylotree_id) {
   }
   return $summary;
 }
+
+/**
+ * phylotree_static_scripts
+ * workaround for drupal having terrible support for serving up static content.
+ * js/aurelia/scripts is the build folder for `au build` script.
+ *
+ * @param string filename
+ * @ingroup tripal_phylotree
+ */
+function phylotree_static_scripts($file) {
+    $my_path = drupal_get_path('module', 'tripal_phylotree');
+    $file = "$my_path/theme/js/aurelia/scripts/$file";
+    drupal_add_http_header('Content-Type', 'application/javascript');
+    readfile($file);
+    drupal_exit();
+}
