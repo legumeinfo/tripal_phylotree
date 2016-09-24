@@ -55,7 +55,7 @@ drupal_add_css('//cdnjs.cloudflare.com/ajax/libs/loaders.css/0.1.2/loaders.min.c
 
     
 /*
- * this template depends on a few javascript libraries, but i am not
+ * this template depends on a few javascript libraries, but we are not
  * putting it into tripal_phylotree.info scripts[] because that
  * results in the script getting loaded *on every drupal request*
  * across the site, which is waste of resources.
@@ -72,9 +72,16 @@ drupal_add_js(
 );
 
 // TODO: is the old drupal jquery sufficient version?
-
+drupal_add_js(
+    '//cdn.bio.sh/msa/1.0/msa.min.gz.js',
+    array('type' => 'external', 'group' => JS_LIBRARY)
+);
 drupal_add_js(
     '//cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js',
+    array('type' => 'external', 'group' => JS_LIBRARY)
+);
+drupal_add_js(
+    '//cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.4/nv.d3.min.js',
     array('type' => 'external', 'group' => JS_LIBRARY)
 );
 drupal_add_js(
@@ -102,14 +109,9 @@ drupal_add_js(
     array('type' => 'file', 'group' => JS_DEFAULT)
 );
 
-// drupal_add_js(
-//     $js_dir . '/aurelia/scripts/vendor-bundle.js',
-//     array('type' => 'file', 'group' => JS_DEFAULT)
-// );
-
 // finally, use a regular script tag to inject the aurelia boostrapper
-// it will fill in the aurelia-app div, above.
-printf('<script src="%s/aurelia/scripts/vendor-bundle.js" data-main="aurelia-bootstrapper"></script>',
+// it will populate the aurelia-app div, above.
+printf('<script src="%s/aurelia/scripts/vendor-bundle-ccd6bc07c0.js" data-main="aurelia-bootstrapper"></script>',
        $js_dir)
 
 ?>

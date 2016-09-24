@@ -1,10 +1,11 @@
 {
-  "name": "aurelia-prj",
+  "name": "aurelia",
   "type": "project:application",
   "platform": {
     "id": "web",
     "displayName": "Web",
-    "output": "scripts"
+    "output": "scripts",
+    "index": "../../templates/tripal_phylotree_base.tpl.php"
   },
   "transpiler": {
     "id": "babel",
@@ -50,7 +51,8 @@
       {
         "id": "web",
         "displayName": "Web",
-        "output": "scripts"
+        "output": "scripts",
+        "index": "../../templates/tripal_phylotree_base.tpl.php"
       }
     ],
     "loader": {
@@ -70,7 +72,8 @@
     },
     "options": {
       "minify": "stage & prod",
-      "sourcemaps": "dev & stage"
+      "sourcemaps": "dev & stage",
+      "rev": true
     },
     "bundles": [
       {
@@ -78,12 +81,12 @@
         "source": [
           "[**/*.js]",
           "**/*.{css,html}"
-        ]        
+        ]
       },
       {
         "name": "vendor-bundle.js",
         "prepend": [
-	  "node_modules/bluebird/js/browser/bluebird.core.js",
+          "node_modules/bluebird/js/browser/bluebird.core.js",
           "scripts/require.js"
         ],
         "dependencies": [
@@ -91,8 +94,10 @@
           "aurelia-bootstrapper",
           "aurelia-dependency-injection",
           "aurelia-event-aggregator",
-          "aurelia-fetch-client",
+	  "aurelia-fetch-client",
           "aurelia-framework",
+          "aurelia-history",
+          "aurelia-history-browser",
           "aurelia-loader",
           "aurelia-loader-default",
           "aurelia-logging",
@@ -102,6 +107,8 @@
           "aurelia-pal-browser",
           "aurelia-path",
           "aurelia-polyfills",
+          "aurelia-route-recognizer",
+          "aurelia-router",
           "aurelia-task-queue",
           "aurelia-templating",
           "aurelia-templating-binding",
@@ -115,13 +122,26 @@
             "main": "aurelia-templating-resources"
           },
           {
-            "name": "crossfilter2",
-            "path": "../node_modules/crossfilter2/crossfilter"            
+            "name": "aurelia-templating-router",
+            "path": "../node_modules/aurelia-templating-router/dist/amd",
+            "main": "aurelia-templating-router"
           },
           {
-            "name" : "tnt.tree",
-            "path" : "../node_modules/tnt.tree/build/tnt.tree.min"
-          }
+            "name": "aurelia-testing",
+            "path": "../node_modules/aurelia-testing/dist/amd",
+            "main": "aurelia-testing",
+            "env": "dev"
+          },
+	  {
+	    "name": "crossfilter2",
+	    "path": "../node_modules/crossfilter2/crossfilter"
+	              
+	  },
+	  {
+	    "name" : "tnt.tree",
+	    "path" : "../node_modules/tnt.tree/build/tnt.tree.min"
+	              
+	  }	  
         ]
       }
     ]
