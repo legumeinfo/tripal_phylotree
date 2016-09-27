@@ -70,15 +70,6 @@ drupal_add_css(
  * across the site, which is waste of resources.
  */
 
-// aurelia needs bluebird and fetch polyfill shims to be loaded first
-drupal_add_js(
-    '//cdnjs.cloudflare.com/ajax/libs/bluebird/3.4.1/bluebird.core.min.js',
-    array('type' => 'external', 'group' => JS_LIBRARY)
-);
-drupal_add_js(
-    '//cdnjs.cloudflare.com/ajax/libs/fetch/1.0.0/fetch.min.js',
-    array('type' => 'external', 'group' => JS_LIBRARY)
-);
 
 // TODO: is the old drupal jquery sufficient version?
 drupal_add_js(
