@@ -13,8 +13,8 @@ let fasta = msa.io.fasta; /* msa lib is loaded in <script> tag */
 @inject(HttpClient, EventAggregator)
 export class Api {
 
-    TREE_URL = '../data/example-tree.json';
-    MSA_URL = '../data/example-msa.fasta';
+    TREE_URL = API.tree; // global var was defined in drupal template
+    MSA_URL =  API.msa;  // global var was defined in drupal template
 
     _cf = null;
     _dims = {};

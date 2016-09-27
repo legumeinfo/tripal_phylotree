@@ -16,16 +16,22 @@ $phylotree = $variables['node']->phylotree;
 
 <script>
 <?php
-// write js var having URL of json data source for charting
-printf('var phylotreeDataURL = "/chado_phylotree/%d/json";',
-  $phylotree->phylotree_id );
+// write js var with gene family name
+printf("var FAMILY_NAME = '%s';\n", $phylotree->name);
+
 // write js var with path to our theme, for use below by javascript functions.
 // prefix path to theme with / because drupal returns it as a relative URL.
-printf('var pathToTheme = "/%s";', $my_path);
+printf("var THEME_PATH = '/%s';\n", $my_path);
 
-printf('var familyName = "%s";', $phylotree->name);
+// write js var having URL of json and gff data sources
+printf("var API = {
+  tree: \"/chado_phylotree/%s/json\",
+  msa: \"/lis_gene_families/chado/msa/%s-consensus/download/\"
+};\n",
+       $phylotree->phylotree_id,
+       $phylotree->name
+);
 ?>
-
 </script>
 
 <div class="tripal_phylotree-data-block-desc tripal-data-block-desc">
@@ -111,7 +117,7 @@ drupal_add_js(
 
 // finally, use a regular script tag to inject the aurelia boostrapper
 // it will populate the aurelia-app div, above.
-printf('<script src="%s/aurelia/scripts/vendor-bundle-ccd6bc07c0.js" data-main="aurelia-bootstrapper"></script>',
+printf('<script src="%s/aurelia/scripts/vendor-bundle-7291916a92.js" data-main="aurelia-bootstrapper"></script>',
        $js_dir)
 
 ?>
