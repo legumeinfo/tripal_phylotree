@@ -57,7 +57,10 @@ if( ! empty($phylotree->comment) ) {
 
 <?php
 
-drupal_add_css('//cdnjs.cloudflare.com/ajax/libs/loaders.css/0.1.2/loaders.min.css');
+drupal_add_css(
+    '//cdnjs.cloudflare.com/ajax/libs/loaders.css/0.1.2/loaders.min.css',
+    array('type' => 'external', 'group' => CSS_THEME)
+);
 
     
 /*
