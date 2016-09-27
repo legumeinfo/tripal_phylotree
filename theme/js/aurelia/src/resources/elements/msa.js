@@ -4,6 +4,7 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 import {Api} from 'api';
 import {CrossfilterCreated, FilterUpdated} from 'topics';
 
+let $ = jQuery;
 
 @inject(Api, EventAggregator)
 export class Msa {
