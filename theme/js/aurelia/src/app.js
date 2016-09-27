@@ -1,24 +1,21 @@
-import {inject} from 'aurelia-framework';
-import {EventAggregator} from 'aurelia-event-aggregator';
-
-
+import {inject, TaskQueue} from 'aurelia-framework';
 import {Api} from 'api';
 import {FilterUpdated} from 'topics';
 
 
-@inject(Api, EventAggregator)
+@inject(Api, TaskQueue)
 export class App {
 
   treeData = null;
   msaData = null;
 
-  constructor(api, ea) {
-    this.api = api;
-    this.ea = ea;
+  constructor(api, tq) {
+    this.api = api; // Api
+    this.tq = tq;   // TaskQueue
   }
 
   attached() {
-    setTimeout(() => this.api.init());
+    this.tq.queueMicroTask( () => this.api.init() );
   }
 
 }
