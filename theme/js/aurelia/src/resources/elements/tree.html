@@ -1,43 +1,33 @@
 <template>
   <require from="./loader-anim"></require>
   <require from="./tree.css"></require>
-
-  <h5>Phylogram</h5>
-
     <loader-anim if.bind="loading"></loader-anim>
-
-    <div id="tree-chart" class="svg-container" ref="chartElement">
-    </div>
-
     <form action="">
       <fieldset>
-
         <span if.bind="hiddenLeavesNum">
-          <button if.bind="hiddenLeavesNum" class="button" click.delegate="onReset()">
+          <button if.bind="hiddenLeavesNum" class="button"
+						click.delegate="onReset()">
             Reset Phylogram Chart
           </button>
-          ${hiddenLeavesNum} hidden terminal (leaf) nodes
-          |
+          ${hiddenLeavesNum} hidden terminal (leaf) nodes |
         </span>
-
         <label for="verticalLayout">
-        <input  id="verticalLayout" type="radio" name="layout" value="vertical"
-        checked.bind="selectedLayout" change.delegate="onLayout()">
+        <input id="verticalLayout" type="radio" name="layout" value="vertical"
+					checked.bind="selectedLayout" change.delegate="onLayout()">
         <span class="label body">
-               vertical layout
-         </span>
+          vertical layout
+        </span>
         </label>
         <label for="radialLayout">
         <input id="radialLayout" type="radio" name="layout" value="radial"
-            checked.bind="selectedLayout" change.delegate="onLayout()">
+          checked.bind="selectedLayout" change.delegate="onLayout()">
         <span class="label body">
            radial layout
          </span>
         </label>
         </div>
-
-
       </fieldset>
     </form>
-
+    <div id="tree-chart" class="svg-container" ref="chartElement">
+    </div>
 </template>
