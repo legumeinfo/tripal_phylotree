@@ -70,38 +70,40 @@ drupal_add_css(
  * across the site, which is waste of resources.
  */
 
-
-// TODO: is the old drupal jquery sufficient version?
+//
+// library group/level of scripts
+//
+$js_config = array('type' => 'external', 'group' => JS_LIBRARY);
 drupal_add_js(
     '//cdn.bio.sh/msa/1.0/msa.min.gz.js',
-    array('type' => 'external', 'group' => JS_LIBRARY)
+    $js_config    
 );
 drupal_add_js(
     '//cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js',
-    array('type' => 'external', 'group' => JS_LIBRARY)
+    $js_config
 );
 drupal_add_js(
     '//cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.4/nv.d3.min.js',
-    array('type' => 'external', 'group' => JS_LIBRARY)
+    $js_config
 );
 drupal_add_js(
     '//cdnjs.cloudflare.com/ajax/libs/URI.js/1.18.1/URI.min.js',
-    array('type' => 'external', 'group' => JS_LIBRARY)
+    $js_config
 );
 drupal_add_js(
     '//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.14.2/lodash.min.js',
-    array('type' => 'external', 'group' => JS_LIBRARY)
+    $js_config
 );
 drupal_add_js(
     '//cdnjs.cloudflare.com/ajax/libs/chroma-js/1.2.1/chroma.min.js',
-    array('type' => 'external', 'group' => JS_LIBRARY)
+    $js_config
+    
 );
 
 drupal_add_library('system', 'ui.dialog');
 
-
 //
-// default level javascripts (loads after library level)
+// default group/level javascripts (loads after library group)
 //
 $js_dir = '/'. $my_path . '/theme/js';
 drupal_add_js(
