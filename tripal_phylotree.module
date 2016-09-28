@@ -198,18 +198,6 @@ function tripal_phylotree_theme($existing, $type, $theme, $path) {
       'template' => 'tripal_phylotree_base',
       'path' => "$path/theme/templates",
     ),
-    // partial for organisms block
-    'tripal_phylotree_organisms' => array(
-      'variables' => array('node' => NULL),
-      'template' => 'tripal_phylotree_organisms',
-      'path' => "$path/theme/templates",
-    ),
-    // partial for phylotree radial block
-    'tripal_phylotree_radial' => array(
-      'variables' => array('node' => NULL),
-      'template' => 'tripal_phylotree_radial',
-      'path' => "$path/theme/templates",
-    ),
     // partial for cross references block
     'tripal_phylotree_references' => array(
       'variables' => array('node' => NULL),
