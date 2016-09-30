@@ -87,15 +87,22 @@
         "name": "vendor-bundle.js",
         "prepend": [
           "node_modules/bluebird/js/browser/bluebird.core.js",
-	  "node_modules/whatwg-fetch/fetch.js",	  
           "scripts/require.js"
         ],
         "dependencies": [
+					{
+						"name": "fetch",
+						"path": "../node_modules/whatwg-fetch",
+						"main": "fetch"
+						          
+					},
+					"raf",
+					"performance-now",
           "aurelia-binding",
           "aurelia-bootstrapper",
           "aurelia-dependency-injection",
           "aurelia-event-aggregator",
-	  "aurelia-fetch-client",
+					"aurelia-fetch-client",
           "aurelia-framework",
           "aurelia-loader",
           "aurelia-loader-default",
