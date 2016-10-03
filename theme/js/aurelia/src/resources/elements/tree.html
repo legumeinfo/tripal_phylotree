@@ -1,7 +1,6 @@
 <template>
   <require from="./loader-anim"></require>
   <require from="./tree.css"></require>
-    <loader-anim if.bind="loading"></loader-anim>
     <form action="">
       <fieldset>
         <span if.bind="hiddenLeavesNum">
@@ -28,6 +27,7 @@
         </div>
       </fieldset>
     </form>
+    <loader-anim if.bind="loading"></loader-anim>
     <div id="tree-chart" class="svg-container" ref="chartElement">
     </div>
 </template>

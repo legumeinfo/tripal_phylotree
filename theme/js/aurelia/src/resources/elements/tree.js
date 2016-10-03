@@ -3,9 +3,10 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 
 import {Api} from 'api';
 import {CrossfilterCreated, FilterUpdated} from 'topics';
+import {Symbology} from 'symbology';
 
 
-@inject(Api, EventAggregator)
+@inject(Api, EventAggregator, Symbology)
 export class Tree {
 
   WIDTH = window.innerWidth - 100;
@@ -19,9 +20,10 @@ export class Tree {
   _dims = {};
   _grps = {};
 
-  constructor(api, ea) {
-    this.api = api;
-    this.ea = ea;
+  constructor(api, ea, sym) {
+    this.api = api;        // web api
+    this.ea = ea;          // event aggregator
+		this.symbology = sym;  // symbology
   }
 
   attached() {
@@ -48,14 +50,34 @@ export class Tree {
       .data(this._rootNode)
       .duration(this.DURATION_MS)
       .layout(tnt.tree.layout.vertical()
-        .width(this.WIDTH)
-        .scale(true)
-      );
-    this._tree.on('click', (node) => this.onToggleTreeNode(node) );
+							.width(this.WIDTH)
+							.scale(true));
+
+		// override the default colors with our taxon color scheme
+		let nodeDisplay= this._tree.node_display();
+		nodeDisplay.fill( node => this.onNodeColor(node));
+		this._tree.node_display(nodeDisplay);
+		
+		// add event handler for node clicks
+		this._tree.on('click', (node) => this.onToggleTreeNode(node) );
+
+		// display the tree
     this._tree(this.chartElement);
     this.loading = false;
   }
-
+	
+	onNodeColor(node) {
+		let d = node.data();
+		switch(d.cvterm_name) {
+		case 'phylo_leaf':
+			return this.symbology.color(d.genus + ' ' + d.species);
+		case 'phylo_root':
+			return 'black;'
+		case 'phylo_interior':
+			return 'darkgrey';
+		}
+	}
+	
   onToggleTreeNode(node) {
       // toggle node state, and refresh display of tree
       node.toggle();

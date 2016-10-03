@@ -3,9 +3,10 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 
 import {Api} from 'api';
 import {CrossfilterCreated, FilterUpdated, DimensionAdded} from 'topics';
+import {Symbology} from 'symbology';
 
 
-@inject(Api, EventAggregator)
+@inject(Api, EventAggregator, Symbology)
 export class Taxon {
 
   loading = true;
@@ -20,9 +21,10 @@ export class Taxon {
 
   disabledTaxaNum = 0;
 
-  constructor(api, ea) {
-    this.api = api;
-    this.ea = ea;
+  constructor(api, ea, sym) {
+    this.api = api;   // web api
+    this.ea = ea;     // event aggregator
+		this.symbology = sym; // symbology
   }
 
   created() {
@@ -32,26 +34,27 @@ export class Taxon {
   attached() {
     let that = this;
     nv.addGraph(function () {
-      let chart =   that._chart = nv.models.pieChart()
-      .x(function (d) { return d.label })
-      .y(function (d) { return d.value })
-      .showLabels(true)
-      .labelThreshold(.05)
-      .labelType('percent')
-      .donut(true)
-      .donutRatio(0.35);
+      let chart = that._chart = nv.models.pieChart()
+					.x(function (d) { return d.label })
+					.y(function (d) { return d.value })
+					.showLabels(true)
+					.labelThreshold(.05)
+					.labelType('percent')
+					.donut(true)
+					.donutRatio(0.35)
+					.color( d => that.symbology.color(d.label) );
       chart.options({ legendPosition : 'right' });
       chart.margin({ left: 5, right: 5, top: 5, bottom: 5 });
       chart.dispatch.on('stateChange', evt => {
         setTimeout(() => that.onTaxonStateChange(evt), this.DURATION_MS);
-      });
+      })
       return chart;
     });
   }
 
   onTaxonStateChange(event) {
     // the event.disabled property is a list of boolean values for
-    // which taxe are active vs inactive.
+    // which taxa are active vs inactive.
     let data = this._grp.all();
     let disabled = event.disabled; // array of true/false
     let disabledTaxa = {};
