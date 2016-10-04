@@ -198,6 +198,7 @@ count_vigan_genes as (select count(fp.value) count, t.phylotree_id from phylotre
 count_phavu_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'phavu.%' group by t.phylotree_id),
 count_aradu_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'aradu.%' group by t.phylotree_id),
 count_araip_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'araip.%' group by t.phylotree_id),
+count_lupan_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'lupan.%' group by t.phylotree_id),
 count_glyma_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'glyma.%' group by t.phylotree_id)
 SELECT
 phylotree.phylotree_id AS phylotree_phylotree_id,
@@ -214,7 +215,8 @@ count_cajca_genes.count as cajca_count,
 count_vigra_genes.count as vigra_count,
 coalesce(count_vigan_genes.count,0) as vigan_count,
 count_aradu_genes.count as aradu_count,
-count_araip_genes.count as araip_count
+count_araip_genes.count as araip_count,
+coalesce(count_lupan_genes.count,0) as lupan_count
 FROM chado.phylotree phylotree
 LEFT JOIN chado_phylotree chado_phylotree ON phylotree.phylotree_id = chado_phylotree.phylotree_id
 LEFT JOIN count_genes count_genes ON phylotree.phylotree_id = count_genes.phylotree_id
@@ -229,6 +231,7 @@ LEFT JOIN count_vigra_genes ON phylotree.phylotree_id = count_vigra_genes.phylot
 LEFT JOIN count_vigan_genes ON phylotree.phylotree_id = count_vigan_genes.phylotree_id
 LEFT JOIN count_aradu_genes ON phylotree.phylotree_id = count_aradu_genes.phylotree_id
 LEFT JOIN count_araip_genes ON phylotree.phylotree_id = count_araip_genes.phylotree_id
+LEFT JOIN count_lupan_genes ON phylotree.phylotree_id = count_lupan_genes.phylotree_id
 JOIN analysis a ON phylotree.analysis_id=a.analysis_id JOIN analysisprop ap ON ap.analysis_id=a.analysis_id JOIN cvterm ct ON ap.type_id=ct.cvterm_id
 WHERE ct.name='is_current'
 ";
@@ -295,6 +298,10 @@ WHERE ct.name='is_current'
                     'not null' => TRUE,
                 ),
                 'araip_count' => array(
+                    'type' => 'int',
+                    'not null' => TRUE,
+                ),
+                'lupan_count' => array(
                     'type' => 'int',
                     'not null' => TRUE,
                 ),
@@ -384,6 +391,7 @@ count_vigan_genes as (select count(fp.value) count, t.phylotree_id from phylotre
 count_phavu_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'phavu.%' group by t.phylotree_id),
 count_aradu_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'aradu.%' group by t.phylotree_id),
 count_araip_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'araip.%' group by t.phylotree_id),
+count_lupan_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'lupan.%' group by t.phylotree_id),
 count_glyma_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'glyma.%' group by t.phylotree_id),
 consensus2domain as (select string_agg(DISTINCT(f.name),E' ') domains_con ,string_agg(DISTINCT(d.iprterm),E' ') AS ipr2, phylotree_id from feature f JOIN cvterm cvt1 ON cvt1.cvterm_id=f.type_id JOIN featureloc floc ON f.feature_id=floc.feature_id JOIN feature f2 ON floc.srcfeature_id=f2.feature_id JOIN cvterm cvt2 ON cvt2.cvterm_id=f2.type_id JOIN phylotree ON f2.name = phylotree.name || '-consensus' JOIN domain d ON d.feature_name=f.name WHERE cvt2.name='consensus_region' and (cvt1.name='protein_match' OR cvt1.name='protein_hmm_match') group by phylotree.phylotree_id)
 SELECT 
@@ -402,6 +410,7 @@ count_vigra_genes.count as vigra_count,
 coalesce(count_vigan_genes.count,0) as vigan_count,
 count_aradu_genes.count as aradu_count, 
 count_araip_genes.count as araip_count,
+coalesce(count_lupan_genes.count,0) as lupan_count,
 c2d.domains_con || ' ' || coalesce(c2d.ipr2, '') as domains_con
 FROM chado.phylotree phylotree
 LEFT JOIN consensus2domain c2d ON phylotree.phylotree_id = c2d.phylotree_id
@@ -418,6 +427,7 @@ LEFT JOIN count_vigra_genes ON phylotree.phylotree_id = count_vigra_genes.phylot
 LEFT JOIN count_vigan_genes ON phylotree.phylotree_id = count_vigan_genes.phylotree_id
 LEFT JOIN count_aradu_genes ON phylotree.phylotree_id = count_aradu_genes.phylotree_id
 LEFT JOIN count_araip_genes ON phylotree.phylotree_id = count_araip_genes.phylotree_id
+LEFT JOIN count_lupan_genes ON phylotree.phylotree_id = count_lupan_genes.phylotree_id
 JOIN analysis a ON phylotree.analysis_id=a.analysis_id JOIN analysisprop ap ON ap.analysis_id=a.analysis_id JOIN cvterm ct ON ap.type_id=ct.cvterm_id
 WHERE ct.name='is_current'";
 
@@ -483,6 +493,10 @@ WHERE ct.name='is_current'";
           'not null' => TRUE,
       ),
       'araip_count' => array(
+          'type' => 'int',
+          'not null' => TRUE,
+      ),
+      'lupan_count' => array(
           'type' => 'int',
           'not null' => TRUE,
       ),
@@ -968,6 +982,33 @@ function tripal_phylotree_integrate_view(){
           'name' => 'araip_count',
           'title' => 'Araip count',
           'description' => 'Araip count',
+          'type' => 'int',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'views_handler_filter_numeric',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_numeric',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+      
+
+      'lupan_count' => array (
+          'name' => 'lupan_count',
+          'title' => 'Lupan count',
+          'description' => 'Lupan count',
           'type' => 'int',
           'handlers' => array (
               'filter' => array (
