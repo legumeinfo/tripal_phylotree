@@ -69,7 +69,6 @@ export class Api {
             .then(data => {
               this.treeData = data;
               this.parseTree(data);
-              console.log('# tree leaves: ' + this.flatData.length);
               return this.treeData;
             })
             .catch(err => {
@@ -95,7 +94,6 @@ export class Api {
     // postProcess() : add the corresponding MSA sequence to each record in the
     // flatData set.
     postProcess() {
-        console.log('# msa seqs: ' + this.msaSeqs.length);
         _.forEach(this.msaSeqs, d => {
             if (!d.seq || !d.name) {
                 return;
