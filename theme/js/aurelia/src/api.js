@@ -3,8 +3,6 @@
    data files */
 import {inject, observable} from 'aurelia-framework';
 import {HttpClient} from 'aurelia-fetch-client';
-
-import {CrossfilterCreated, FilterUpdated, DimensionAdded} from 'topics';
 import * as crossfilter2 from 'crossfilter2';
 let crossfilter = crossfilter2.crossfilter;
 let fasta = msa.io.fasta; /* msa lib is loaded in <script> tag */

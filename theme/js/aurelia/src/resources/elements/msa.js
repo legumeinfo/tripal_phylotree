@@ -1,8 +1,11 @@
 import {inject, bindable, BindingEngine} from 'aurelia-framework';
 import {Api} from 'api';
-import {CrossfilterCreated, FilterUpdated} from 'topics';
 
 let $ = jQuery;
+
+
+// TODO: dont filter on msa selection, instead hilight the feature in
+// the tnt.tree.
 
 @inject(Api, BindingEngine)
 export class Msa {
@@ -144,7 +147,7 @@ export class Msa {
       this.selectedFeatureNum = 0;
       this.selectedFeatureNames = {};
       this._dim.filter(null); // filters are additive per dimension, so clear previous.
-      this.ea.publish( new FilterUpdated(this) );
+      // this.ea.publish( new FilterUpdated(this) );
   }
 
   // updateFilter() :  update crossfilter with the selected features.
@@ -153,9 +156,10 @@ export class Msa {
     if(_.size(this.selectedFeatureNames)) {
       this._dim.filter(d => this.selectedFeatureNames[d]);
     }
+		
     // trigger an initial update to display all data
-    let msg = new FilterUpdated(this);
-    this.ea.publish(msg);
+    // let msg = new FilterUpdated(this);
+    //this.ea.publish(msg);
   }
 
 }

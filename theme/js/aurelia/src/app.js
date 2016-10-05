@@ -1,6 +1,5 @@
 import {inject, TaskQueue} from 'aurelia-framework';
 import {Api} from 'api';
-import {FilterUpdated} from 'topics';
 
 
 @inject(Api, TaskQueue)

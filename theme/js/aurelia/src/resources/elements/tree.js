@@ -1,6 +1,5 @@
 import {inject, bindable, BindingEngine} from 'aurelia-framework';
 import {Api} from 'api';
-import {CrossfilterCreated, FilterUpdated} from 'topics';
 import {Symbology} from 'symbology';
 
 
