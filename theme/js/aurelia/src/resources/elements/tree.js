@@ -9,7 +9,6 @@ export class Tree {
   WIDTH = window.innerWidth - 100;
   DURATION_MS = 300;
 
-  loading = true;
   selectedLayout = 'vertical';
 	@bindable familyName;
 	
@@ -74,7 +73,6 @@ export class Tree {
 
 		// display the tree
     this._tree(this.chartElement);
-    this.loading = false;
   }
 
 	// get the fill color of each node

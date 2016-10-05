@@ -1,7 +1,7 @@
 <template>
-  <require from="./loader-anim"></require>
   <require from="./taxon.css"></require>
 
+	<span if.bind="!api.loading">
   <h5>Taxon</h5>
   <p>
     <span if.bind="hiddenTaxaCount">
@@ -10,7 +10,6 @@
         Reset
       </button>
     </span>
-    <loader-anim if.bind="loading"></loader-anim>
     <svg class="taxon-chart" ref="taxonSvgEl"></svg>
 
     <button class="button"  if.bind="disabledTaxaNum"
@@ -18,4 +17,5 @@
       Reset Taxa Selection
     </button>
   </p>
+	</span>
 </template>

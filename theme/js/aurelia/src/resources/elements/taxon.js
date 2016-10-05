@@ -8,7 +8,6 @@ export class Taxon {
 	
   DURATION_MS = 500
 
-  loading = true;
   hiddenTaxaCount = 0;
 	
 	@bindable() familyName = null;
@@ -101,8 +100,6 @@ export class Taxon {
   }
 
   update() {
-    this.loading = false;
-
     // get the current results from our group
     let data = this._grp.all();
     // filter out taxa having 0 value (count)

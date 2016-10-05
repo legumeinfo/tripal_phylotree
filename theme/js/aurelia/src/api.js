@@ -19,7 +19,8 @@ export class Api {
 	@observable cfUpdated; // a crossfilter updated message
 	
     treeData = null;
-    msaSeqs = null;
+  msaSeqs = null;
+	loading = true;
     flatData = []; // same as tree leaves
     index = {};
 	
@@ -33,8 +34,9 @@ export class Api {
         let p2 = this.getMsaData();
         // after both resources to load, then do more setup.
         Promise.all([p1, p2]).then(() => {
-            this.postProcess();
-            this.setupCrossFilter();
+					this.loading = false;
+          this.postProcess();
+          this.setupCrossFilter();
         });
     }
 

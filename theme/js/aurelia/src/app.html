@@ -3,9 +3,11 @@
   <require from="resources/elements/tree"></require>
   <require from="resources/elements/msa"></require>
   <require from="resources/elements/taxon"></require>
+  <require from="resources/elements/loader-anim"></require>
+	
+  <loader-anim if.bind="api.loading"></loader-anim>
 
-  <tree family-name.one-time="familyName"></tree>
-  <taxon family-name.one-time="familyName"></taxon>
-  <msa family-name.one-time="familyName"></msa>
-
+	<tree family-name.one-time="familyName"></tree>
+	<taxon family-name.one-time="familyName"></taxon>
+	<msa family-name.one-time="familyName"></msa>
 </template>

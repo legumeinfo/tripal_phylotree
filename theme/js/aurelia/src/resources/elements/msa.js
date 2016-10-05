@@ -13,7 +13,6 @@ export class Msa {
   MAX_HEIGHT = 175;
 	
 	@bindable familyName;
-  loading = true;
   selectedFeatureNames = {};
   selectedFeatureNum = 0;
 
@@ -79,10 +78,8 @@ export class Msa {
 			this.update();
 		}
 	}
-
 	
   update() {
-    this.loading = false;
     let data = this._dim.top(Infinity);
     let seqs = _.map(data, d => d.msa);
     seqs = _.sortBy(seqs, d => d.name);
