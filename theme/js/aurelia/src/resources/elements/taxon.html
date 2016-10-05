@@ -1,21 +1,21 @@
 <template>
   <require from="./taxon.css"></require>
 
-	<span if.bind="!api.loading">
-  <h5>Taxon</h5>
-  <p>
-    <span if.bind="hiddenTaxaCount">
-      ${hiddenTaxaCount} taxa are hidden.
-      <button click.delegate="onReset()">
-        Reset
-      </button>
-    </span>
-    <svg class="taxon-chart" ref="taxonSvgEl"></svg>
-
-    <button class="button"  if.bind="disabledTaxaNum"
-            click.delegate="onClearSelection()">
-      Reset Taxa Selection
-    </button>
-  </p>
-	</span>
+	<div id="taxon-dialog" ref="taxonEl">
+		<span if.bind="! api.loading">
+			<p>
+				<span if.bind="hiddenTaxaCount">
+					${hiddenTaxaCount} taxa are hidden.
+					<button click.delegate="onReset()">
+						Reset
+					</button>
+				</span>
+				<svg class="taxon-chart" ref="taxonSvgEl"></svg>
+				<button class="button btn-sm"  if.bind="disabledTaxaNum"
+          click.delegate="onClearSelection()">
+					Reset Taxa Selection
+				</button>
+			</p>
+		</span>
+	</div>
 </template>

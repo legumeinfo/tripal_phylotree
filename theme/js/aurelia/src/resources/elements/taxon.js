@@ -1,9 +1,10 @@
-import {inject, bindable, BindingEngine} from 'aurelia-framework';
+import {inject, bindable, BindingEngine, TaskQueue} from 'aurelia-framework';
 import {Api} from 'api';
 import {Symbology} from 'symbology';
 
+let $ = jQuery;
 
-@inject(Api, BindingEngine, Symbology)
+@inject(Api, Symbology, TaskQueue, BindingEngine)
 export class Taxon {
 	
   DURATION_MS = 500
@@ -19,10 +20,11 @@ export class Taxon {
 
   disabledTaxaNum = 0;
 
-  constructor(api, be, sym) {
+  constructor(api, sym, tq, be) {
     this.api = api;       // web api
-    this.be = be;         // binding engine
 		this.symbology = sym; // symbology
+		this.tq = tq;         // task queue
+    this.be = be;         // binding engine
   }
 
   created() {
@@ -30,6 +32,10 @@ export class Taxon {
   }
 
   attached() {
+		this.initNvD3Graph();
+  }
+
+	initNvD3Graph() {
     let that = this;
     nv.addGraph(function () {
       let chart = that._chart = nv.models.pieChart()
@@ -42,14 +48,26 @@ export class Taxon {
 					.donutRatio(0.35)
 					.color( d => that.symbology.color(d.label) );
       chart.options({ legendPosition : 'right' });
-      chart.margin({ left: 5, right: 5, top: 5, bottom: 5 });
+      chart.margin({ left: 0, right: 0, top: 0, bottom: 0 });
       chart.dispatch.on('stateChange', evt => {
         setTimeout(() => that.onTaxonStateChange(evt), this.DURATION_MS);
       })
       return chart;
     });
-  }
+	}
 
+	initJqueryDialog() {
+		this.dialog = $(this.taxonEl);
+    this.dialog.dialog({
+      title: 'Taxon',
+      closeOnEscape: true,
+      modal: false,
+      width: '450px'
+    });
+		// TODO position, close properties
+    //this.dialog.dialog('open');
+	}
+	
   onTaxonStateChange(event) {
     // the event.disabled property is a list of boolean values for
     // which taxa are active vs inactive.
@@ -80,9 +98,9 @@ export class Taxon {
   }
 
 	onCfCreated(cf) {
-      this._cf = cf;
-      this.setupCrossfilter();
-      this.update();
+    this._cf = cf;
+    this.setupCrossfilter();
+    this.update();
 	}
 
 	onCfUpdated(msg) {
@@ -109,6 +127,10 @@ export class Taxon {
       return { label: d.key, value: d.value };
     });
     this.display(data);
+
+		if(! this.dialog) {
+			this.initJqueryDialog();
+		}
   }
 
   display(data) {
