@@ -1,12 +1,10 @@
-import {inject, bindable} from 'aurelia-framework';
-import {EventAggregator} from 'aurelia-event-aggregator';
-
+import {inject, bindable, BindingEngine} from 'aurelia-framework';
 import {Api} from 'api';
 import {CrossfilterCreated, FilterUpdated} from 'topics';
 import {Symbology} from 'symbology';
 
 
-@inject(Api, EventAggregator, Symbology)
+@inject(Api, BindingEngine, Symbology)
 export class Tree {
 
   WIDTH = window.innerWidth - 100;
@@ -14,16 +12,18 @@ export class Tree {
 
   loading = true;
   selectedLayout = 'vertical';
+	@bindable familyName;
+	
   _rootNode = null;
   _tree = null;
   _cf = null;
   _dims = {};
   _grps = {};
 
-  constructor(api, ea, sym) {
-    this.api = api;        // web api
-    this.ea = ea;          // event aggregator
-		this.symbology = sym;  // symbology
+  constructor(api, be, sym) {
+    this.api = api;       // web api
+		this.be = be;         // binding engine
+		this.symbology = sym; // symbology
   }
 
   attached() {
@@ -31,18 +31,25 @@ export class Tree {
   }
 
   subscribe() {
-    this.ea.subscribe(CrossfilterCreated, msg => {
-      let cf = this._cf = msg.crossfilter;
-      this._dim = cf.dimension(d => d.name);
-      this.init();
-    });
-    this.ea.subscribe(FilterUpdated, msg => {
-      if(msg.sender != this) {
-        this.update();
-      }
-    });
+		this.be.propertyObserver(this.api, 'cf')
+		 	.subscribe( o => this.onCfCreated(o));
+		this.be.propertyObserver(this.api, 'cfUpdated')
+		 	.subscribe( o => this.onCfUpdated(o));
   }
 
+	onCfCreated(cf) {
+    this._cf = cf;
+		// create a dimension by name (keep our own instance of this dimension)
+    this._dim = cf.dimension(d => d.name);
+    this.init();
+	}
+	
+	onCfUpdated(msg) {
+		if(msg.sender != this) {
+			this.update();
+		}
+	}
+	
   // init() : create the tnt.tree chart
   init() {
     this._rootNode = this.api.treeData;
@@ -104,7 +111,8 @@ export class Tree {
     });
     this._dim.filterAll(); // filters are additive per dimension, so clear out previous
     this._dim.filterFunction((d) => visibleNodes[d]);
-    this.ea.publish(new FilterUpdated(this));
+		
+		this.api.cfUpdated = { sender: this };
   }
 
   /* update the view-model with current crossfilter results */

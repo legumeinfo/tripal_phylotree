@@ -1,15 +1,15 @@
-import {inject} from 'aurelia-framework';
-import {EventAggregator} from 'aurelia-event-aggregator';
-
+import {inject, bindable, BindingEngine} from 'aurelia-framework';
 import {Api} from 'api';
 import {CrossfilterCreated, FilterUpdated} from 'topics';
 
 let $ = jQuery;
 
-@inject(Api, EventAggregator)
+@inject(Api, BindingEngine)
 export class Msa {
 
   MAX_HEIGHT = 175;
+	
+	@bindable familyName;
   loading = true;
   selectedFeatureNames = {};
   selectedFeatureNum = 0;
@@ -21,15 +21,15 @@ export class Msa {
   index = {}
   _dim = null; // crossfilter dimension
 
-  constructor(api, ea) {
-    this.api = api;
-    this.ea = ea;
+  constructor(api, be) {
+    this.api = api; // web api
+    this.be = be;   // binding engine
   }
 
-  created() {
+  attached() {
     this.subscribe();
   }
-
+	
   init() {
     this.seqs = this.api.msaSeqs;
 
@@ -57,19 +57,27 @@ export class Msa {
   }
 
   subscribe() {
-    this.ea.subscribe(CrossfilterCreated, msg => {
-      let cf = this._cf = msg.crossfilter;
-      this._dim = cf.dimension(d => d.name);
-      this.init();
-      this.update();
-    });
-    this.ea.subscribe(FilterUpdated, msg => {
-      if(msg.sender != this) {
-        this.update();
-      }
-    });
+		this.be.propertyObserver(this.api, 'cf')
+		 	.subscribe( o => this.onCfCreated(o));
+		this.be.propertyObserver(this.api, 'cfUpdated')
+		 	.subscribe( o => this.onCfUpdated(o));
   }
 
+	onCfCreated(cf) {
+    this._cf = cf;
+		// create a dimension by name (keep our own instance of this dimension)		
+    this._dim = cf.dimension(d => d.name);
+    this.init();
+		this.update();
+	}
+	
+	onCfUpdated(msg) {
+		if(msg.sender != this) {
+			this.update();
+		}
+	}
+
+	
   update() {
     this.loading = false;
     let data = this._dim.top(Infinity);

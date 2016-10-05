@@ -1,19 +1,20 @@
-import {inject} from 'aurelia-framework';
-import {EventAggregator} from 'aurelia-event-aggregator';
+import {inject, bindable, BindingEngine} from 'aurelia-framework';
 
 import {Api} from 'api';
 import {CrossfilterCreated, FilterUpdated, DimensionAdded} from 'topics';
 import {Symbology} from 'symbology';
 
 
-@inject(Api, EventAggregator, Symbology)
+@inject(Api, BindingEngine, Symbology)
 export class Taxon {
+	
+  DURATION_MS = 500
 
   loading = true;
   hiddenTaxaCount = 0;
-
-  DURATION_MS = 500
-
+	
+	@bindable() familyName = null;
+	
   _chart = null;
   _cf = null;
   _dim = null; // crossfilter dimension
@@ -21,9 +22,9 @@ export class Taxon {
 
   disabledTaxaNum = 0;
 
-  constructor(api, ea, sym) {
-    this.api = api;   // web api
-    this.ea = ea;     // event aggregator
+  constructor(api, be, sym) {
+    this.api = api;       // web api
+    this.be = be;         // binding engine
 		this.symbology = sym; // symbology
   }
 
@@ -69,21 +70,29 @@ export class Taxon {
     }
     this._dim.filter(null); // filters are additive per dimension.
     this._dim.filter( d => ! disabledTaxa[d] );
-    this.ea.publish(new FilterUpdated(this));
+		
+		this.api.cfUpdated = { sender: this };
   }
 
+	
   subscribe() {
-    this.ea.subscribe(CrossfilterCreated, msg => {
-      this._cf = msg.crossfilter;
+		this.be.propertyObserver(this.api, 'cf')
+		 	.subscribe( o => this.onCfCreated(o));
+		this.be.propertyObserver(this.api, 'cfUpdated')
+		 	.subscribe( o => this.onCfUpdated(o));
+  }
+
+	onCfCreated(cf) {
+      this._cf = cf;
       this.setupCrossfilter();
       this.update();
-    });
-    this.ea.subscribe(FilterUpdated, msg => {
-      if(msg.sender != this) {
-        this.update();
-      }
-    });
-  }
+	}
+
+	onCfUpdated(msg) {
+    if(msg.sender != this) {
+      this.update();
+    }
+	}
 
   setupCrossfilter() {
     // create a dimension for the taxon
@@ -118,8 +127,8 @@ export class Taxon {
   onClearSelection() {
     this.disabledTaxaNum = 0;
     this._dim.filter(null);
-    this.ea.publish(new FilterUpdated(this));
     this.update();
+		this.api.cfUpdated = { sender: this };		
   }
 
 };

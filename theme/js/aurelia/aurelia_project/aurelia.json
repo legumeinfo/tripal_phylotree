@@ -101,7 +101,6 @@
           "aurelia-binding",
           "aurelia-bootstrapper",
           "aurelia-dependency-injection",
-          "aurelia-event-aggregator",
 					"aurelia-fetch-client",
           "aurelia-framework",
           "aurelia-loader",
@@ -131,16 +130,14 @@
             "main": "aurelia-testing",
             "env": "dev"
           },
-	  {
-	    "name": "crossfilter2",
-	    "path": "../node_modules/crossfilter2/crossfilter"
-	              
-	  },
-	  {
-	    "name" : "tnt.tree",
-	    "path" : "../node_modules/tnt.tree/build/tnt.tree.min"
-	              
-	  }	  
+					{
+						"name": "crossfilter2",
+						"path": "../node_modules/crossfilter2/crossfilter"	          
+					},
+					{
+						"name" : "tnt.tree",
+						"path" : "../node_modules/tnt.tree/build/tnt.tree.min"
+					}	  
         ]
       }
     ]

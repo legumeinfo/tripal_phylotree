@@ -1,32 +1,32 @@
 /* a singleton/service for loading source data files and managing crossfilter
    objects. In a real app, this would talk to a rest API and not load static
    data files */
-import {inject} from 'aurelia-framework';
+import {inject, observable} from 'aurelia-framework';
 import {HttpClient} from 'aurelia-fetch-client';
-import {EventAggregator} from 'aurelia-event-aggregator';
 
 import {CrossfilterCreated, FilterUpdated, DimensionAdded} from 'topics';
 import * as crossfilter2 from 'crossfilter2';
 let crossfilter = crossfilter2.crossfilter;
 let fasta = msa.io.fasta; /* msa lib is loaded in <script> tag */
 
-@inject(HttpClient, EventAggregator)
+@inject(HttpClient)
 export class Api {
 
     TREE_URL = API.tree; // global var was defined in drupal template
     MSA_URL =  API.msa;  // global var was defined in drupal template
 
-    _cf = null;
-    _dims = {};
 
+	// declare some observable properties for use by other vis. elements:
+	@observable cf; // crossfilter object
+	@observable cfUpdated; // a crossfilter updated message
+	
     treeData = null;
     msaSeqs = null;
     flatData = []; // same as tree leaves
     index = {};
-
-    constructor(http, ea) {
+	
+    constructor(http) {
         this.http = http;
-        this.ea = ea;
     }
 
     init() {
@@ -48,19 +48,7 @@ export class Api {
     setupCrossFilter() {
         // create crossfilter from flat data, not from tree data.
         let msg = null;
-        let cf = crossfilter(this.flatData);
-        this.cf = cf;
-        //
-        // // create a dimension by feature name. share with all consumers of this
-        // // crossfilter.
-        // let dim = cf.dimension(d => d.name);
-        // this._dims.featureName = dim;
-
-        msg = new CrossfilterCreated('demoGeneFamily', cf);
-        this.ea.publish(msg);
-        //
-        // msg = new DimensionAdded('featureName', dim);
-        // this.ea.publish(msg);
+				this.cf = crossfilter(this.flatData);
     }
 
     getTreeData() {

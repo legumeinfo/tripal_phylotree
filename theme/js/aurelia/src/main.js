@@ -13,7 +13,6 @@ export function configure(aurelia) {
   aurelia.use
     .defaultBindingLanguage()
     .defaultResources()
-    .eventAggregator()
     .feature('resources');
 
   if (environment.debug) {
