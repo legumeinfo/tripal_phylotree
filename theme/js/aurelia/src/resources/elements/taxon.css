@@ -1,4 +1,9 @@
 svg.taxon-chart {
     width: 600px;
-    height: 175px;
+    height: 200px;
 }
+
+.nv-legend-text {
+		font-size: 11px !important;
+}
+

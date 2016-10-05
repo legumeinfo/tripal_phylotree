@@ -62,6 +62,10 @@ drupal_add_css(
     array('type' => 'external', 'group' => CSS_THEME)
 );
 
+drupal_add_css(
+    '//cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.4/nv.d3.min.css',
+    array('type' => 'external', 'group' => CSS_THEME)
+);
     
 /*
  * this template depends on a few javascript libraries, but we are not
