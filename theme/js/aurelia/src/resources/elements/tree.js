@@ -52,11 +52,16 @@ export class Tree {
       .layout(tnt.tree.layout.vertical()
 							.width(this.WIDTH)
 							.scale(true));
+		// override the default node display props
+		let nd = this._tree.node_display();
+		nd.size(6);
+		nd.fill( node => this.getNodeColor(node) );
+		this._tree.node_display(nd);
 
-		// override the default colors with our taxon color scheme
-		let nodeDisplay= this._tree.node_display();
-		nodeDisplay.fill( node => this.onNodeColor(node));
-		this._tree.node_display(nodeDisplay);
+		// override the default labelling in increase verticalspacing
+		let labeler = this._tree.label();
+		labeler.height(18);
+		this._tree.label(labeler);
 		
 		// add event handler for node clicks
 		this._tree.on('click', (node) => this.onToggleTreeNode(node) );
@@ -65,17 +70,14 @@ export class Tree {
     this._tree(this.chartElement);
     this.loading = false;
   }
-	
-	onNodeColor(node) {
-		let d = node.data();
-		switch(d.cvterm_name) {
-		case 'phylo_leaf':
+
+	// get the fill color of each node
+	getNodeColor(node) {
+		if(node.is_leaf()) {
+			let d = node.data();
 			return this.symbology.color(d.genus + ' ' + d.species);
-		case 'phylo_root':
-			return 'black;'
-		case 'phylo_interior':
-			return 'darkgrey';
 		}
+		// else the color will be defined by tree.css, not by a fill attribute.
 	}
 	
   onToggleTreeNode(node) {
