@@ -72,16 +72,35 @@ export class Tree {
 		labeler.height(18);
 		this._tree.label(labeler);
 		
-		// add event handler for node clicks
+		// add event handlers for node interaction
 		this._tree.on('click', node => this.onTreeNodeClick(node) );
-
+		this._tree.on('mouseover', node => this.onNodeMouseover(node));
+		this._tree.on('mouseout', node => this.onNodeMouseout(node));
+		
 		// display the tree
     this._tree(this.phylogramElement);
   }
 
+	// lookup the node with jquery
+	node2jQuery(node) {
+		let nodeSelector = '#tnt_tree_node_tree-chart_'+ node.id();
+		let nodeEl = $(nodeSelector);
+		return nodeEl;
+	}
+	
+	onNodeMouseover(node) {
+		let el = this.node2jQuery(node);
+    el.attr('cursor', 'pointer');
+	}
+
+	onNodeMouseout(node) {
+		let el = this.node2jQuery(node);
+    el.attr('cursor', 'default');		
+	}
+	
 	// get the fill color of each node
 	getNodeColor(node) {
-		if(node.is_leaf()) {
+		if(node.is_leaf() && ! node.is_collapsed()) {
 			let d = node.data();
 			return this.symbology.color(d.genus + ' ' + d.species);
 		}
@@ -90,15 +109,13 @@ export class Tree {
 	
   onTreeNodeClick(node) {
 		this.node = node;
-		let nodeSelector = '#tnt_tree_node_tree-chart_'+ node.id();
-		let nodeEl = $(nodeSelector);
 		let dialog = $(this.nodeDialogEl);
 		let opts = {
 			title: null,
       closeOnEscape: true,
       modal: false,
 			position: {
-				my: 'center', at: 'center', of: nodeEl
+				my: 'center', at: 'center', of: this.node2jQuery(node)
 			},
 			//close: (event, ui) => {}
 		};
