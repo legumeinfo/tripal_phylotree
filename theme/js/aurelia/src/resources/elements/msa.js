@@ -77,7 +77,7 @@ export class Msa {
 			modal: false,
 			width: this.DIALOG_WIDTH + 'px',
 			position: {
-				my: 'top', at: 'bottom', of: $('#tree-chart')
+				my: 'left', at: 'bottom'
 			}
 		});
 	}

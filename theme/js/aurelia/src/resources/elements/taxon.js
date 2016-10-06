@@ -63,7 +63,7 @@ export class Taxon {
       modal: false,
       width: this.DIALOG_WIDTH,
 			position: {
-				my: 'left', at: 'right', of: $('#tree-chart')
+				my: 'right', at: 'bottom'
 			}
     });
 	}
