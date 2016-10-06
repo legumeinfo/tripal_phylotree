@@ -7,7 +7,8 @@ let $ = jQuery;
 @inject(Api, Symbology, TaskQueue, BindingEngine)
 export class Taxon {
 	
-  DURATION_MS = 500
+  DURATION_MS = 500;
+	DIALOG_WIDTH = '520px';
 	
 	@bindable() familyName = null;
 	
@@ -60,7 +61,7 @@ export class Taxon {
       title: 'Taxa - ' + this.familyName,
       closeOnEscape: true,
       modal: false,
-      width: '450px',
+      width: this.DIALOG_WIDTH,
 			position: {
 				my: 'left', at: 'right', of: $('#tree-chart')
 			}
