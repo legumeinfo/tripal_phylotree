@@ -1,21 +1,23 @@
 <template>
-	<span if.bind="!api.loading">
-		<h5>Multiple Sequence Alignment</h5>
-		<div class="smenubar">
-		</div>
-		
-		<button class="button" click.delegate="onToggleMenu()">
-			<span if.bind="! menu">Show</span>
-			<span if.bind="menu">Hide</span>
-			MSA Menu
-		</button>
-		
-		<button class="button"  if.bind="selectedFeatureNum"
-      click.delegate="onClearSelection()">
-			Reset MSA Selection
-		</button>
+	<div id="msa-dialog" ref="msaEl">
 
-		<div id="msa" ref="msaElement">
-		</div>
-	</span>
+		<span if.bind="!api.loading">
+			<div class="smenubar">
+			</div>
+			
+			<button class="ui-button ui-corner-all" click.delegate="onToggleMenu()">
+				<span if.bind="! menu">Show</span>
+				<span if.bind="menu">Hide</span>
+				MSA Menu
+			</button>
+			
+			<button class="ui-button ui-corner-all" if.bind="selectedFeatureNum"
+				click.delegate="onClearSelection()">
+				Reset MSA Selection
+			</button>
+		</span>
+		
+			<div ref="msaElement">
+			</div>
+	</div>
 </template>

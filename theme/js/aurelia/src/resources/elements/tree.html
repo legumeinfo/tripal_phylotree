@@ -3,7 +3,7 @@
     <form action=""  if.bind="!api.loading">
       <fieldset>
         <span if.bind="hiddenLeavesNum">
-          <button if.bind="hiddenLeavesNum" class="button"
+          <button if.bind="hiddenLeavesNum" class="ui-button ui-corner-all"
 						click.delegate="onReset()">
             Reset Phylogram Chart
           </button>
@@ -26,6 +26,6 @@
         </div>
       </fieldset>
     </form>
-    <div id="tree-chart" class="svg-container" ref="chartElement">
+    <div id="tree-chart" class="svg-container" ref="phylogramElement">
     </div>
 </template>

@@ -8,8 +8,6 @@ let $ = jQuery;
 export class Taxon {
 	
   DURATION_MS = 500
-
-  hiddenTaxaCount = 0;
 	
 	@bindable() familyName = null;
 	
@@ -59,13 +57,14 @@ export class Taxon {
 	initJqueryDialog() {
 		this.dialog = $(this.taxonEl);
     this.dialog.dialog({
-      title: 'Taxon',
+      title: 'Taxa - ' + this.familyName,
       closeOnEscape: true,
       modal: false,
-      width: '450px'
+      width: '450px',
+			position: {
+				my: 'left', at: 'right', of: $('#tree-chart')
+			}
     });
-		// TODO position, close properties
-    //this.dialog.dialog('open');
 	}
 	
   onTaxonStateChange(event) {

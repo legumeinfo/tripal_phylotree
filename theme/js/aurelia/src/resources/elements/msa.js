@@ -11,6 +11,8 @@ let $ = jQuery;
 export class Msa {
 
   MAX_HEIGHT = 175;
+	MSA_ZOOMER_WIDTH = 475;
+	DIALOG_WIDTH = 650;
 	
 	@bindable familyName;
   selectedFeatureNames = {};
@@ -45,19 +47,31 @@ export class Msa {
       zoomer: {
         labelNameLength: 150,
         labelFontsize: 9,
+				alignmentWidth: this.MSA_ZOOMER_WIDTH
       }
     };
     this.msa = msa(opts);
     let callbacks = {
       reset: this.onMsaSelectionReset,
       add: this.onMsaSelectionAdd,
-      all: function (a, b, c) {
-        console.log(a);
-      }
+			//  all: function (a, b, c) {}
     };
     this.msa.g.selcol.on(callbacks, this);
   }
 
+	initJqueryDialog() {
+		this.dialog = $(this.msaEl);
+		this.dialog.dialog({
+			title: 'Multiple Sequence Alignment - ' + this.familyName,
+			closeOnEscape: true,
+			modal: false,
+			width: this.DIALOG_WIDTH + 'px',
+			position: {
+				my: 'top', at: 'bottom', of: $('#tree-chart')
+			}
+		});
+	}
+	
   subscribe() {
 		this.be.propertyObserver(this.api, 'cf')
 		 	.subscribe( o => this.onCfCreated(o));
@@ -85,6 +99,9 @@ export class Msa {
     seqs = _.sortBy(seqs, d => d.name);
     seqs.unshift(this.api.getConsensusSeq());
     this.display(seqs);
+		if(! this.dialog) {
+			this.initJqueryDialog();
+		}
   }
 
   display(seqs) {
@@ -136,27 +153,23 @@ export class Msa {
       }
     }
     this.selectedFeatureNum  = _.size(this.selectedFeatureNames);
-    this.updateFilter();
+    //this.updateFilter();
   }
 
   onClearSelection() {
-      this.msa.g.selcol.reset([]);    
-      this.selectedFeatureNum = 0;
-      this.selectedFeatureNames = {};
-      this._dim.filter(null); // filters are additive per dimension, so clear previous.
-      // this.ea.publish( new FilterUpdated(this) );
+      // this.msa.g.selcol.reset([]);    
+      // this.selectedFeatureNum = 0;
+      // this.selectedFeatureNames = {};
+      // this._dim.filter(null);
   }
 
   // updateFilter() :  update crossfilter with the selected features.
   updateFilter() {
-    this._dim.filterAll(); // filters are additive per dimension, so clear previous.
+		// filters are additive per dimension, so clear previous.
+    this._dim.filterAll();
     if(_.size(this.selectedFeatureNames)) {
       this._dim.filter(d => this.selectedFeatureNames[d]);
     }
-		
-    // trigger an initial update to display all data
-    // let msg = new FilterUpdated(this);
-    //this.ea.publish(msg);
   }
 
 }

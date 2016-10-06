@@ -44,14 +44,6 @@ if( ! empty($phylotree->comment) ) {
   </p>
 </div>
 
-<div id="organism-legend-dialog" style="display: none">
-  <div class="organism-legend">
-  </div>
-</div>
-
-<div id="phylonode_popup_dialog" style="display: none;">
-</div>
-
 <div id="au-content" aurelia-app="main">
 </div>
 

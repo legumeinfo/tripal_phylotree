@@ -72,7 +72,7 @@ export class Tree {
 		this._tree.on('click', (node) => this.onToggleTreeNode(node) );
 
 		// display the tree
-    this._tree(this.chartElement);
+    this._tree(this.phylogramElement);
   }
 
 	// get the fill color of each node
