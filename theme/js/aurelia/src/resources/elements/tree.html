@@ -28,4 +28,18 @@
     </form>
     <div id="tree-chart" class="svg-container" ref="phylogramElement">
     </div>
+		
+		<div id="node-dialog" ref="nodeDialogEl" style="display: none">
+			<div if.bind="! node.is_leaf() || node.is_collapsed()">
+				<a href="#" click.delegate="onNodeToggle()">
+					<span if.bind="node.is_collapsed()">
+						Expand
+					</span>
+					<span if.bind="! node.is_collapsed()">
+						Collapse
+					</span>
+					subtree at this node
+				</a>
+			</div>
+		</div>
 </template>

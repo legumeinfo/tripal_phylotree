@@ -2,6 +2,7 @@ import {inject, bindable, BindingEngine} from 'aurelia-framework';
 import {Api} from 'api';
 import {Symbology} from 'symbology';
 
+let $ = jQuery;
 
 @inject(Api, BindingEngine, Symbology)
 export class Tree {
@@ -11,6 +12,9 @@ export class Tree {
 
   selectedLayout = 'vertical';
 	@bindable familyName;
+
+	hilitedNodes = [];
+	node = null; // clicked node for expand/collapse/other dialog options
 	
   _rootNode = null;
   _tree = null;
@@ -69,7 +73,7 @@ export class Tree {
 		this._tree.label(labeler);
 		
 		// add event handler for node clicks
-		this._tree.on('click', (node) => this.onToggleTreeNode(node) );
+		this._tree.on('click', node => this.onTreeNodeClick(node) );
 
 		// display the tree
     this._tree(this.phylogramElement);
@@ -84,13 +88,40 @@ export class Tree {
 		// else the color will be defined by tree.css, not by a fill attribute.
 	}
 	
-  onToggleTreeNode(node) {
-      // toggle node state, and refresh display of tree
-      node.toggle();
-      //this.update();
-      this._tree.update();
-      setTimeout(() => this.updateFilter(), this.DURATION_MS);
-  }
+  onTreeNodeClick(node) {
+		this.node = node;
+		let nodeSelector = '#tnt_tree_node_tree-chart_'+ node.id();
+		let nodeEl = $(nodeSelector);
+		let dialog = $(this.nodeDialogEl);
+		let opts = {
+			title: null,
+      closeOnEscape: true,
+      modal: false,
+			position: {
+				my: 'center', at: 'center', of: nodeEl
+			},
+			//close: (event, ui) => {}
+		};
+		if(node.is_collapsed()) {
+			opts.title = 'collapsed subtree';
+		}
+		else if(node.is_leaf()) {
+			opts.title = node.node_name();
+		}
+		else {
+			opts.title = 'interior node';
+		}
+		dialog.dialog(opts);
+	}
+
+	// toggle node state, and refresh display of tree
+	onNodeToggle() {
+		let dialog = $(this.nodeDialogEl);
+		dialog.dialog('close');
+		this.node.toggle();
+		this._tree.update();
+		setTimeout(() => this.updateFilter(), this.DURATION_MS);
+	}
 
   updateFilter() {
     // update crossfilter with currently visible nodes
