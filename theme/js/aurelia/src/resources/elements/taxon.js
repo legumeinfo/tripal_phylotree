@@ -1,10 +1,11 @@
 import {inject, bindable, BindingEngine, TaskQueue} from 'aurelia-framework';
 import {Api} from 'api';
 import {Symbology} from 'symbology';
+import {App} from 'app';
 
 let $ = jQuery;
 
-@inject(Api, Symbology, TaskQueue, BindingEngine)
+@inject(App, Api, Symbology, TaskQueue, BindingEngine)
 export class Taxon {
 	
   DURATION_MS = 500;
@@ -19,7 +20,8 @@ export class Taxon {
 
   disabledTaxaNum = 0;
 
-  constructor(api, sym, tq, be) {
+  constructor(app, api, sym, tq, be) {
+		this.app = app;       // app.js
     this.api = api;       // web api
 		this.symbology = sym; // symbology
 		this.tq = tq;         // task queue
@@ -56,6 +58,7 @@ export class Taxon {
 	}
 
 	initJqueryDialog() {
+		let that = this;
 		this.dialog = $(this.taxonEl);
     this.dialog.dialog({
       title: 'Taxa - ' + this.familyName,
@@ -64,8 +67,12 @@ export class Taxon {
       width: this.DIALOG_WIDTH,
 			position: {
 				my: 'right', at: 'bottom'
+			},
+			close: (event, ui) => {
+				that.app.tools.taxon = false;
 			}
     });
+		this.app.tools.taxon = true;
 	}
 	
   onTaxonStateChange(event) {

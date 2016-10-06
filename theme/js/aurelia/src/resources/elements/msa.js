@@ -1,5 +1,6 @@
 import {inject, bindable, BindingEngine} from 'aurelia-framework';
 import {Api} from 'api';
+import {App} from 'app';
 
 let $ = jQuery;
 
@@ -7,7 +8,7 @@ let $ = jQuery;
 // TODO: dont filter on msa selection, instead hilight the feature in
 // the tnt.tree.
 
-@inject(Api, BindingEngine)
+@inject(App, Api, BindingEngine)
 export class Msa {
 
   MAX_HEIGHT = 175;
@@ -25,7 +26,8 @@ export class Msa {
   index = {}
   _dim = null; // crossfilter dimension
 
-  constructor(api, be) {
+  constructor(app,api, be) {
+		this.app = app; // app.js
     this.api = api; // web api
     this.be = be;   // binding engine
   }
@@ -70,6 +72,7 @@ export class Msa {
 	}
 
 	initJqueryDialog() {
+		let that = this;
 		this.dialog = $(this.msaEl);
 		this.dialog.dialog({
 			title: 'Multiple Sequence Alignment - ' + this.familyName,
@@ -78,8 +81,12 @@ export class Msa {
 			width: this.DIALOG_WIDTH + 'px',
 			position: {
 				my: 'left', at: 'bottom'
+			},
+			close: (event, ui) => {
+				that.app.tools.msa = false;
 			}
 		});
+		this.app.tools.msa = true;
 	}
 	
   subscribe() {
