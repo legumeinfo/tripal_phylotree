@@ -57,7 +57,17 @@ export class Msa {
 			//  all: function (a, b, c) {}
     };
     this.msa.g.selcol.on(callbacks, this);
-  }
+
+    // workaround for biojs-msa menu divs possibly being effected by
+    // leaking CSS rules in this context
+    $('.smenubar_alink').live('click', evt => {
+      setTimeout( () => {
+				let el = $('.smenu-dropdown');
+				el.css('top', '');
+				el.css('left', '');
+			});
+		});
+	}
 
 	initJqueryDialog() {
 		this.dialog = $(this.msaEl);
