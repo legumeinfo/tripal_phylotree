@@ -135,7 +135,7 @@ export class Api {
 			return promise;
 		}
 		else if(node.legumes.length > 0) {
-			let query = node.legumes.map(d => d.feature_name).join(',');
+			let query = node.legumes.map(n => n.data().feature_name).join(',');
 			let url = this.FAMREPS_LINKS_URL + query;
 			let promise = this.http.fetch(url)
 					.then(res => res.json())
@@ -143,7 +143,6 @@ export class Api {
 			return promise;
 		}
 		else {
-			// no linkouts for you!
 			return Promise.resolve([]);
 		}
 	}
