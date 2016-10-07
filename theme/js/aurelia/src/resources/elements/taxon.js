@@ -37,24 +37,23 @@ export class Taxon {
   }
 
 	initNvD3Graph() {
-    let that = this;
-    nv.addGraph(function () {
-      let chart = that._chart = nv.models.pieChart()
-					.x(function (d) { return d.label })
-					.y(function (d) { return d.value })
+    nv.addGraph( () => {
+      let chart = this._chart = nv.models.pieChart()
+					.x( d => d.label )
+					.y( d => d.value )
 					.showLabels(true)
 					.labelThreshold(.05)
 					.labelType('percent')
 					.donut(true)
 					.donutRatio(0.35)
-					.color( d => that.symbology.color(d.label) );
+					.color( d => this.symbology.color(d.label) );
       chart.options({ legendPosition : 'right' });
       chart.margin({ left: 0, right: 0, top: 0, bottom: 0 });
       chart.dispatch.on('stateChange', evt => {
-        setTimeout(() => that.onTaxonStateChange(evt), this.DURATION_MS);
-      })
+        setTimeout(() => this.onTaxonStateChange(evt), this.DURATION_MS);
+      });
       return chart;
-    });
+		});
 	}
 
 	initJqueryDialog() {
