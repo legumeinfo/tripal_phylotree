@@ -25,6 +25,8 @@ export class App {
 
   attached() {
     this.tq.queueMicroTask( () => this.api.init() );
+		// remove the ajax spinner that was hardcoded in the php template
+		$('#ajax-spinner').remove();
   }
 
 	toggleHelp() {

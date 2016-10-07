@@ -44,6 +44,16 @@ if( ! empty($phylotree->comment) ) {
   </p>
 </div>
 
+<style>
+.ball-pulse > div {
+    background: lightslategrey;
+    
+ }
+</style>
+<div id="ajax-spinner" class="loader-inner ball-pulse">
+    <div></div><div></div><div></div>
+</div>
+
 <div id="au-content" aurelia-app="main">
 </div>
 

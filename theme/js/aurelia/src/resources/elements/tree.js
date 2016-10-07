@@ -15,6 +15,7 @@ export class Tree {
 
 	hilitedNodes = [];
 	node = null; // clicked node for expand/collapse/other dialog options
+	loading = false;
 	
   _rootNode = null;
   _tree = null;
@@ -108,7 +109,24 @@ export class Tree {
 	}
 	
   onTreeNodeClick(node) {
+		this.loading = true;
+		let that = this;
 		this.node = node;
+		let legumeGenera = this.symbology.legumes;
+		 this.node.legumes = _.filter(node.get_all_leaves(true), n => {
+			 let d = n.data();
+			 if(! d.genus) { return false; }
+			 return d.genus.toLowerCase() in legumeGenera;
+		 });
+		this.api.getLinkouts(node)
+			.then(data => {
+				that.node.linkouts = data;
+				that.loading = false;
+			})
+			.catch(err => {
+				that.loading = false;
+				console.error(err);
+			});
 		let dialog = $(this.nodeDialogEl);
 		let opts = {
 			title: null,
@@ -117,6 +135,7 @@ export class Tree {
 			position: {
 				my: 'center', at: 'center', of: this.node2jQuery(node)
 			},
+			show : { effect: 'blind', direction: 'down', duration: 100 },
 			//close: (event, ui) => {}
 		};
 		if(node.is_collapsed()) {
@@ -128,7 +147,9 @@ export class Tree {
 		else {
 			opts.title = 'interior node';
 		}
-		dialog.dialog(opts);
+		// aurelia updates the dom asynchronously, so delay before showing
+		// the jquery.ui dialog
+		setTimeout( () => dialog.dialog(opts) );
 	}
 
 	// toggle node state, and refresh display of tree

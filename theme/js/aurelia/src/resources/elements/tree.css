@@ -30,3 +30,7 @@
 		font-family: sans-serif;
 		font-size: 0.75rem;
 }
+
+.ui-dialog a {
+		text-decoration: underline;
+}

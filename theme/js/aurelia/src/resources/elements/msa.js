@@ -74,7 +74,7 @@ export class Msa {
 	initJqueryDialog() {
 		let that = this;
 		this.dialog = $(this.msaEl);
-		this.dialog.dialog({
+		let opts = {
 			title: 'Multiple Sequence Alignment - ' + this.familyName,
 			closeOnEscape: true,
 			modal: false,
@@ -85,7 +85,8 @@ export class Msa {
 			close: (event, ui) => {
 				that.app.tools.msa = false;
 			}
-		});
+		};
+		this.dialog.dialog(opts);	
 		this.app.tools.msa = true;
 	}
 	

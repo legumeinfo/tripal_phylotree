@@ -60,7 +60,8 @@ export class Taxon {
 	initJqueryDialog() {
 		let that = this;
 		this.dialog = $(this.taxonEl);
-    this.dialog.dialog({
+
+		let opts = {
       title: 'Taxa - ' + this.familyName,
       closeOnEscape: true,
       modal: false,
@@ -71,7 +72,8 @@ export class Taxon {
 			close: (event, ui) => {
 				that.app.tools.taxon = false;
 			}
-    });
+    };
+		this.dialog.dialog(opts);
 		this.app.tools.taxon = true;
 	}
 	

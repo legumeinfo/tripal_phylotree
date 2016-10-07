@@ -2,6 +2,8 @@ import {taxonChroma} from 'taxon-chroma';
 
 
 export class Symbology {
+	
+	legumes = taxonChroma.legumeGenera;
 
 	// we have 2 species of arachis which are not distinguishable in the
 	// phylotree context, so force one to be a different shade, but same
@@ -15,5 +17,5 @@ export class Symbology {
 	color(taxon) {
 		return taxonChroma.get(taxon, this.OPTS);
 	}
-	
+
 }
