@@ -12,6 +12,26 @@ if(empty($my_path)) {
   // path_to_theme(), even though this is effectively an absolute url.
 }
 $phylotree = $variables['node']->phylotree;
+
+drupal_add_css(
+    '//cdnjs.cloudflare.com/ajax/libs/loaders.css/0.1.2/loaders.min.css',
+    array('type' => 'external', 'group' => CSS_THEME)
+);
+
+drupal_add_css(
+    '//cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.4/nv.d3.min.css',
+    array('type' => 'external', 'group' => CSS_THEME)
+);
+
+drupal_add_css(
+    $my_path . '/theme/css/ajax-spinner.css',
+    array('type' => 'file', 'group' => CSS_THEME)
+);
+drupal_add_css(
+    $my_path . '/theme/css/teaser-fix.css',
+    array('type' => 'file', 'group' => CSS_THEME)
+);
+
 ?>
 
 <script>
@@ -44,12 +64,6 @@ if( ! empty($phylotree->comment) ) {
   </p>
 </div>
 
-<style>
-.ball-pulse > div {
-    background: lightslategrey;
-    
- }
-</style>
 <div id="ajax-spinner" class="loader-inner ball-pulse">
     <div></div><div></div><div></div>
 </div>
@@ -58,17 +72,6 @@ if( ! empty($phylotree->comment) ) {
 </div>
 
 <?php
-
-drupal_add_css(
-    '//cdnjs.cloudflare.com/ajax/libs/loaders.css/0.1.2/loaders.min.css',
-    array('type' => 'external', 'group' => CSS_THEME)
-);
-
-drupal_add_css(
-    '//cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.4/nv.d3.min.css',
-    array('type' => 'external', 'group' => CSS_THEME)
-);
-    
 /*
  * this template depends on a few javascript libraries, but we are not
  * putting it into tripal_phylotree.info scripts[] because that
