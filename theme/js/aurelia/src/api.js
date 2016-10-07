@@ -16,7 +16,7 @@ export class Api {
 	// the endpoint for the "family representative" links from the
 	// tripal_linkout module.
 	FAMREPS_LINKS_URL = '/famreps_links?famreps='; // +comma separated list
-	LEAF_LINKS_URL = '/phylotree_links/'; //+node.genus+"/"+node.species+"/"+node.feature_name+"/json"
+	LEAF_LINKS_URL = '/phylotree_links/'; // genus//speciesnode.feature_name/json
 
 	// declare some observable properties for use by other vis. elements:
 	@observable cf; // crossfilter object

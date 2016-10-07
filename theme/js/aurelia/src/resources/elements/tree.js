@@ -10,12 +10,14 @@ export class Tree {
   WIDTH = window.innerWidth - 100;
   DURATION_MS = 300;
 
-  selectedLayout = 'vertical';
-	@bindable familyName;
-
-	hilitedNodes = [];
-	node = null; // clicked node for expand/collapse/other dialog options
-	loading = false;
+	@bindable familyName; // family-name attribute of <tree> element
+	@bindable msa;      // <msa> element
+	msa = null;           // msa view-model
+	
+	selectedLayout = 'vertical';
+	hilitedFeatures = {};
+	node = null; // clicked node for expand/collapse/other dialog options.
+	loading = false; // loading flag for use by tree node dialog.
 	
   _rootNode = null;
   _tree = null;
@@ -30,16 +32,27 @@ export class Tree {
   }
 
   attached() {
+		// aurelia bound the <msa> element to a variable, but we need the
+		// msa's view-model (msa.js)
+		this.msa = this.msa.au.controller.viewModel;
     this.subscribe();
   }
 
   subscribe() {
 		this.be.propertyObserver(this.api, 'cf')
-		 	.subscribe( o => this.onCfCreated(o));
+		 	.subscribe(o => this.onCfCreated(o));
 		this.be.propertyObserver(this.api, 'cfUpdated')
-		 	.subscribe( o => this.onCfUpdated(o));
+		 	.subscribe(o => this.onCfUpdated(o));
+		this.be.propertyObserver(this.msa, 'selectedFeatureNames')
+			.subscribe(o => this.onMsaSelectionChange(o));
   }
 
+	onMsaSelectionChange(newValue, oldValue) {
+		// val is like {arath.AT2G14835.1: true, glyma.Glyma.20G133500.1: true}		
+		this.hilitedFeatures = newValue;
+		this._tree.update();
+	}
+											 
 	onCfCreated(cf) {
     this._cf = cf;
 		// create a dimension by name (keep our own instance of this dimension)
@@ -65,7 +78,7 @@ export class Tree {
 		// override the default node display props
 		let nd = this._tree.node_display();
 		nd.size(6);
-		nd.fill( node => this.getNodeColor(node) );
+		nd.fill(node => this.getNodeColor(node));
 		this._tree.node_display(nd);
 
 		// override the default labelling in increase verticalspacing

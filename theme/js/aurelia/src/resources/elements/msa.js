@@ -1,12 +1,9 @@
-import {inject, bindable, BindingEngine} from 'aurelia-framework';
+import {inject, bindable, observable, BindingEngine} from 'aurelia-framework';
 import {Api} from 'api';
 import {App} from 'app';
 
 let $ = jQuery;
 
-
-// TODO: dont filter on msa selection, instead hilight the feature in
-// the tnt.tree.
 
 @inject(App, Api, BindingEngine)
 export class Msa {
@@ -16,8 +13,8 @@ export class Msa {
 	DIALOG_WIDTH = 650;
 	
 	@bindable familyName;
-  selectedFeatureNames = {};
-  selectedFeatureNum = 0;
+  @observable selectedFeatureNames = {};
+  @observable selectedFeatureNum = 0; // count of selected features
 
   menu = false;
   msa = null; // msa viewer component
@@ -156,7 +153,7 @@ export class Msa {
     this.selectedFeatureNames = {};
     _.each(names, n => this.selectedFeatureNames[n] = true);
     this.selectedFeatureNum  = _.size(this.selectedFeatureNames);
-    this.updateFilter();
+    //this.updateFilter();
   }
 
   // onMsaSelectionReset() : reset means there is a single feature selected
@@ -175,19 +172,19 @@ export class Msa {
   }
 
   onClearSelection() {
-      // this.msa.g.selcol.reset([]);    
-      // this.selectedFeatureNum = 0;
-      // this.selectedFeatureNames = {};
-      // this._dim.filter(null);
+    this.msa.g.selcol.reset([]);    
+    this.selectedFeatureNum = 0;
+    this.selectedFeatureNames = {};
+    // this._dim.filter(null);
   }
 
   // updateFilter() :  update crossfilter with the selected features.
-  updateFilter() {
-		// filters are additive per dimension, so clear previous.
-    this._dim.filterAll();
-    if(_.size(this.selectedFeatureNames)) {
-      this._dim.filter(d => this.selectedFeatureNames[d]);
-    }
-  }
+  // updateFilter() {
+	// 	// filters are additive per dimension, so clear previous.
+  //   this._dim.filterAll();
+  //   if(_.size(this.selectedFeatureNames)) {
+  //     this._dim.filter(d => this.selectedFeatureNames[d]);
+  //   }
+  // }
 
 }
