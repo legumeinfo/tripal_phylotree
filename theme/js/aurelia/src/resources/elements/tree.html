@@ -36,7 +36,7 @@
 
 			<div if.bind="node.is_leaf() && ! node.is_collapsed()">
 				<!-- leaf node linkouts -->
-				<loader-anim if.bind="loading"></loader-anim>
+
 				<div repeat.for="link of node.linkouts">
 					<a href.bind="link.href" tabindex="-1">
 						${link.text}
@@ -56,7 +56,6 @@
 				</a>
 				<div if.bind="node.legumes.length">
 					<!-- interior node linkouts -->
-					<loader-anim if.bind="loading"></loader-anim>
 					<div repeat.for="link of node.linkouts">
 						<a href.bind="link.href" tabindex="-1">
 							${link.text}
@@ -97,7 +96,7 @@
 					</a>
 				</div>
 			</div>
-			
+			<loader-anim if.bind="loading"></loader-anim>
 		</div>
 			
 </template>
