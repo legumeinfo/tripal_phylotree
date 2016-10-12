@@ -30,11 +30,10 @@ export class App {
   }
 
 	toggleHelp() {
-		
+		this.tools.help = ! this.tools.help;
 	}
-
+	
 	toggleTour() {
-		
 	}
 
 	toggleTaxon() {

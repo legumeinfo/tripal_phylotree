@@ -23,8 +23,8 @@ export class Msa {
   index = {}
   _dim = null; // crossfilter dimension
 
-  constructor(app,api, be) {
-		this.app = app; // app.js
+  constructor(app, api, be) {
+		this.app = app; // app.js singleton
     this.api = api; // web api
     this.be = be;   // binding engine
   }
