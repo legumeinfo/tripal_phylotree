@@ -1,11 +1,11 @@
-import {inject, bindable, observable, BindingEngine} from 'aurelia-framework';
+import {inject, bindable, observable, BindingEngine, TaskQueue} from 'aurelia-framework';
 import {Api} from 'api';
 import {App} from 'app';
 
 let $ = jQuery;
 
 
-@inject(App, Api, BindingEngine)
+@inject(App, Api, BindingEngine, TaskQueue)
 export class Msa {
 
   MAX_HEIGHT = 175;
@@ -15,27 +15,41 @@ export class Msa {
 	@bindable familyName;
   @observable selectedFeatureNames = {};
   @observable selectedFeatureNum = 0; // count of selected features
-
+	@bindable showDialog; // two-way databinding for toggling dialog in app.js
+	
   menu = false;
   msa = null; // msa viewer component
+	dialog = null;
 
   seqs = [];
   index = {}
   _dim = null; // crossfilter dimension
 
-  constructor(app, api, be) {
+  constructor(app, api, be, tq) {
 		this.app = app; // app.js singleton
     this.api = api; // web api
     this.be = be;   // binding engine
+		this.tq = tq;   // task queue
   }
 
   attached() {
+		// the dom is ready, so use jquery to get reference to dialog div.
+		this.dialog = $("#msa-dialog");
     this.subscribe();
   }
-	
+
+	showDialogChanged(newValue, oldValue) {
+		this.showDialog = newValue;
+		// ignore changed events if attached() has not run yet (based on
+		// existence of dialog jquery object)
+		if(this.dialog) {
+			this.updateDialog();
+		}
+	}
+
+	// initialize the msa component
   init() {
     this.seqs = this.api.msaSeqs;
-
     let opts = {
       el: this.msaElement,
       bootstrapMenu: true,
@@ -68,9 +82,12 @@ export class Msa {
 		});
 	}
 
-	initJqueryDialog() {
-		let that = this;
-		this.dialog = $(this.msaEl);
+	updateDialog() {
+		if(this.showDialog && this.msa.dirty) {
+			// lazy update the msa component
+			this.updateMsa();
+		}
+		
 		let opts = {
 			title: 'Multiple Sequence Alignment - ' + this.familyName,
 			closeOnEscape: true,
@@ -79,44 +96,54 @@ export class Msa {
 			position: {
 				my: 'left', at: 'bottom'
 			},
-			close: (event, ui) => {
-				that.app.tools.msa = false;
-			}
+			close: (event, ui) => this.closed()
 		};
-		this.dialog.dialog(opts);	
-		this.app.tools.msa = true;
+		this.dialog.dialog(opts);
+		let action = this.showDialog ? 'open' : 'close';
+		
+		this.dialog.dialog(action);
 	}
-	
+
+	// callback for close dialog event
+	closed() {
+		this.showDialog = false;
+	}
+
+	// setup observers for crossfilter data
   subscribe() {
 		this.be.propertyObserver(this.api, 'cf')
 		 	.subscribe( o => this.onCfCreated(o));
 		this.be.propertyObserver(this.api, 'cfUpdated')
 		 	.subscribe( o => this.onCfUpdated(o));
   }
-
+	
 	onCfCreated(cf) {
     this._cf = cf;
-		// create a dimension by name (keep our own instance of this dimension)		
+		// create a dimension by name (keep our own instance of this dimension)
     this._dim = cf.dimension(d => d.name);
     this.init();
-		this.update();
+		this.updateMsa();
+		this.updateDialog();
 	}
 	
 	onCfUpdated(msg) {
 		if(msg.sender != this) {
-			this.update();
+			if(this.showDialog) {
+				this.updateMsa();
+			}
+			else {
+				this.msa.dirty = true;
+			}
 		}
 	}
 	
-  update() {
+  updateMsa() {
     let data = this._dim.top(Infinity);
     let seqs = _.map(data, d => d.msa);
     seqs = _.sortBy(seqs, d => d.name);
     seqs.unshift(this.api.getConsensusSeq());
     this.display(seqs);
-		if(! this.dialog) {
-			this.initJqueryDialog();
-		}
+		this.msa.dirty = false;
   }
 
   display(seqs) {

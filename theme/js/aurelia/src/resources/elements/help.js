@@ -5,20 +5,20 @@ let $ = jQuery;
 export class Help {
 
 	@bindable showDialog;
-	
-	attached() {
-		this.dialog = $("#help-dialog");
-	}
+
 	
 	showDialogChanged(newValue, oldValue) {
+		this.showDialog = newValue;
 		// expect initial value is false (not shown)
 		if(newValue || oldValue !== null) {
-			this.toggle();
+			this.update();
 		}
 	}
 	
-	// toggle visibility of help dialog
-	toggle() {
+	update() {
+		if(! this.dialog) {
+			this.dialog = $("#help-dialog");			
+		}
 		let opts = {
 			title: 'Gene Family Help',
 			closeOnEscape: true,

@@ -11,9 +11,10 @@ export class Tree {
   DURATION_MS = 300;
 
 	@bindable familyName; // family-name attribute of <tree> element
-	@bindable msa;      // <msa> element
-	msa = null;           // msa view-model
+	@bindable msaEl;      // reference to <msa> element
+	@bindable showDialog; // two-way databinding for toggling dialog in app.js
 	
+	msa = null;           // msa view-model
 	selectedLayout = 'vertical';
 	hilitedFeatures = {};
 	node = null; // clicked node for expand/collapse/other dialog options.
@@ -34,7 +35,7 @@ export class Tree {
   attached() {
 		// aurelia bound the <msa> element to a variable, but we need the
 		// msa's view-model (msa.js)
-		this.msa = this.msa.au.controller.viewModel;
+		this.msa = this.msaEl.au.controller.viewModel;
     this.subscribe();
   }
 

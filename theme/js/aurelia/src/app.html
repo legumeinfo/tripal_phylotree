@@ -23,8 +23,21 @@
 	</div>
 	
   <loader-anim if.bind="api.loading"></loader-anim>
+	
 	<help show-dialog.two-way="tools.help"></help>
-	<tree family-name.one-time="familyName" msa.bind="msaEl"></tree>
-	<taxon family-name.one-time="familyName" ref="taxonEl"></taxon>
-	<msa family-name.one-time="familyName" ref="msaEl"></msa>
+	
+	<tree show-dialog.two-way="tools.tree"
+		    family-name.one-time="familyName"
+		    msa-el.bind="msaEl">
+	</tree>
+	
+	<taxon show-dialog.two-way="tools.taxon"
+		     family-name.one-time="familyName">
+	</taxon>
+	
+	<msa show-dialog.two-way="tools.msa"
+		   family-name.one-time="familyName"
+		   ref="msaEl">
+	</msa>
+	
 </template>
