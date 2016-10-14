@@ -8,11 +8,9 @@ export class Help {
 	
 	attached() {
 		this.dialog = $("#help-dialog");
-		this.showDialog = true;
 	}
 	
 	showDialogChanged(newValue, oldValue) {
-		console.log(newValue);
 		// expect initial value is false (not shown)
 		if(newValue || oldValue !== null) {
 			this.toggle();
@@ -37,8 +35,8 @@ export class Help {
 	}
 
 	onTour() {
-		// TODO
-		//onclick="lisTours.go('phylotree'); jQuery('#phylogeny-help-dlg').dialog('close');"			
+		this.showDialog = false;
+		lisTours.go('phylotree');
 	}
 }
 

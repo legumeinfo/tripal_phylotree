@@ -10,8 +10,7 @@ export class App {
 	tools = {
 		msa : true,
 		taxon : true,
-		help : false,
-		tour : false,
+		help : false
 	};
 	
   treeData = null;
@@ -31,9 +30,6 @@ export class App {
 
 	toggleHelp() {
 		this.tools.help = ! this.tools.help;
-	}
-	
-	toggleTour() {
 	}
 
 	toggleTaxon() {
