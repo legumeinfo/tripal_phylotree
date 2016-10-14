@@ -1,9 +1,9 @@
-import {inject, TaskQueue} from 'aurelia-framework';
+import {inject} from 'aurelia-framework';
 import {Api} from 'api';
 
 let $ = jQuery;
 
-@inject(Api, TaskQueue)
+@inject(Api)
 export class App {
 
 	// currently shown tools in the ui
@@ -17,15 +17,18 @@ export class App {
   msaData = null;
 	familyName = FAMILY_NAME; // is global var in php template
 
-  constructor(api, tq) {
+  constructor(api) {
     this.api = api; // Api
-    this.tq = tq;   // TaskQueue
   }
 
   attached() {
-    this.tq.queueMicroTask( () => this.api.init() );
-		// remove the ajax spinner that was hardcoded in the php template
+		// remove the static ajax spinner that was hardcoded in the php
+		// template the loader-anim element will display the same spinner
+		// while needed.
 		$('#ajax-spinner').remove();
+		
+		// fetch the resources for this gene family
+		this.api.init();
   }
 
 	toggleHelp() {
