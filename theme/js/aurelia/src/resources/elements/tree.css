@@ -34,3 +34,7 @@
 .ui-dialog a {
 		text-decoration: underline;
 }
+
+.hilite-node {
+		fill: yellow;
+}

@@ -9,7 +9,10 @@ export class Tree {
 
   WIDTH = window.innerWidth - 100;
   DURATION_MS = 300;
-
+	LABEL_HEIGHT = '10px';
+	LABEL_BASELINE_SHIFT = '30%';
+	HILITE_COLOR = 'goldenrod';
+	
 	@bindable familyName; // family-name attribute of <tree> element
 	@bindable msaEl;      // reference to <msa> element
 	@bindable showDialog; // two-way databinding for toggling dialog in app.js
@@ -51,9 +54,35 @@ export class Tree {
 	onMsaSelectionChange(newValue, oldValue) {
 		// val is like {arath.AT2G14835.1: true, glyma.Glyma.20G133500.1: true}		
 		this.hilitedFeatures = newValue;
-		this._tree.update();
+		this._tree.update_nodes(); // use tree api to refersh tree nodes & labels.
+		this.updateLeafNodeHilite(); 
 	}
-											 
+
+	// tnt.tree api does not support selections or hiliting that I can
+	// see, so use d3 to decorate the currently selected features with a 
+	// hilited css style.
+	updateLeafNodeHilite() {
+		let that = this;
+		let hilite = {
+			padding: 5, width: 200, height: 20,
+			color: 'yellow'
+		};
+		d3.selectAll('text.tnt_tree_label')
+			.filter((d) => d.name in that.hilitedFeatures)
+			.each( function(d) {
+				d.bbox = this.getBBox();
+				console.log(d.bbox);
+			});
+		d3.selectAll('g.tnt_tree_node')
+			.filter((d) => d.name in that.hilitedFeatures)		
+			.insert('svg:rect', ':first-child')
+			.attr('x', (d) => d.bbox.x+ 10)
+			.attr('y', (d) => d.bbox.y/2)
+			.attr('width', (d) => d.bbox.width + 2)
+			.attr('height', (d) => d.bbox.height + 1)
+			.attr('class', 'hilite-node');
+	}
+	
 	onCfCreated(cf) {
     this._cf = cf;
 		// create a dimension by name (keep our own instance of this dimension)
@@ -69,6 +98,7 @@ export class Tree {
 	
   // init() : create the tnt.tree chart
   init() {
+		let that = this;
     this._rootNode = this.api.treeData;
     this._tree = tnt.tree()
       .data(this._rootNode)
@@ -81,12 +111,30 @@ export class Tree {
 		nd.size(6);
 		nd.fill(node => this.getNodeColor(node));
 		this._tree.node_display(nd);
-
-		// override the default labelling in increase verticalspacing
-		let labeler = this._tree.label();
-		labeler.height(18);
+		// optimize the labeling, code adapted from
+		// https://github.com/tntvis/tnt.tree/blob/master/src/label.js
+		let labeler = tnt.tree.label.text();
+		labeler.display (  function (node, layout_type) {
+			let d = node.data();
+			let hilite = d.name in that.hilitedFeatures;
+			let l = d3.select(this) // note: this is the d3js "this"
+			    .append('text')
+			    .attr('text-anchor', (d) => {
+						if (layout_type === 'radial') {
+							return (d.x%360 < 180) ? 'start' : 'end';
+						}
+						return 'start';
+					})
+			    .text((d) => d.name)
+			    .style('font-size', that.LABEL_HEIGHT)
+					.style('font-weight', (d) => hilite ? 'bold' : 'normal')
+					.style('baseline-shift', that.LABEL_BASELINE_SHIFT)
+			    .style('fill', '#000')
+			    .attr('id', 'tree-label-'+ d.name);
+			return l;
+		});
 		this._tree.label(labeler);
-		
+
 		// add event handlers for node interaction
 		this._tree.on('click', node => this.onTreeNodeClick(node) );
 		this._tree.on('mouseover', node => this.onNodeMouseover(node));
@@ -95,7 +143,7 @@ export class Tree {
 		// display the tree
     this._tree(this.phylogramElement);
   }
-
+	
 	// lookup the node with jquery
 	node2jQuery(node) {
 		let nodeSelector = '#tnt_tree_node_tree-chart_'+ node.id();
