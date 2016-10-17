@@ -1,6 +1,9 @@
 /* a singleton/service for loading source data files and managing crossfilter
-   objects. In a real app, this would talk to a rest API and not load static
-   data files */
+ * objects.
+ * 
+ * note: all http error handling is in the app.js http interceptor.
+ */
+
 import {inject, observable} from 'aurelia-framework';
 import {HttpClient} from 'aurelia-fetch-client';
 import * as crossfilter2 from 'crossfilter2';
@@ -62,9 +65,6 @@ export class Api {
           this.treeData = data;
           this.parseTree(data);
           return this.treeData;
-        })
-        .catch(err => {
-          console.error(err);
         });
     return promise;
   }
@@ -76,9 +76,6 @@ export class Api {
           this.msaFasta = data;
           this.msaSeqs = fasta.parse(data);
           return this.msaSeqs;
-        })
-        .catch(err => {
-          console.error(err);
         });
     return promise;
   }
@@ -130,16 +127,14 @@ export class Api {
 		if(node.is_leaf() && !node.is_collapsed()) {
 			let url = `${this.LEAF_LINKS_URL}${d.genus}/${d.species}/${d.feature_name}/json`;
 			let promise = this.http.fetch(url)
-					.then(res => res.json())
-					.catch(err => console.error(err));
+					.then(res => res.json());
 			return promise;
 		}
 		else if(node.legumes.length > 0) {
 			let query = node.legumes.map(n => n.data().feature_name).join(',');
 			let url = this.FAMREPS_LINKS_URL + query;
 			let promise = this.http.fetch(url)
-					.then(res => res.json())
-					.catch(err => console.error(err));
+					.then(res => res.json());
 			return promise;
 		}
 		else {
