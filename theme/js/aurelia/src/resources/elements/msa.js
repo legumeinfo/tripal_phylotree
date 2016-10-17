@@ -1,11 +1,11 @@
-import {inject, bindable, observable, BindingEngine, TaskQueue} from 'aurelia-framework';
+import {inject, bindable, observable, BindingEngine} from 'aurelia-framework';
 import {Api} from 'api';
 import {App} from 'app';
 
 let $ = jQuery;
 
 
-@inject(App, Api, BindingEngine, TaskQueue)
+@inject(App, Api, BindingEngine)
 export class Msa {
 
   MAX_HEIGHT = 175;
@@ -13,9 +13,9 @@ export class Msa {
 	DIALOG_WIDTH = 650;
 	
 	@bindable familyName;
+	@bindable showDialog; // two-way databinding for toggling dialog in app.js
   @observable selectedFeatureNames = {};
   @observable selectedFeatureNum = 0; // count of selected features
-	@bindable showDialog; // two-way databinding for toggling dialog in app.js
 	
   menu = false;
   msa = null; // msa viewer component
@@ -29,7 +29,6 @@ export class Msa {
 		this.app = app; // app.js singleton
     this.api = api; // web api
     this.be = be;   // binding engine
-		this.tq = tq;   // task queue
   }
 
   attached() {
