@@ -11,7 +11,8 @@ export class Taxon {
   DURATION_MS = 500;
 	DIALOG_WIDTH = '520px';
 	
-	@bindable() familyName = null;
+	@bindable familyName = null;
+	@bindable showDialog; // two-way databinding for toggling dialog in app.js
 	
   _chart = null;
   _cf = null;
@@ -27,12 +28,10 @@ export class Taxon {
     this.be = be;         // binding engine
   }
 
-  created() {
-    this.subscribe();
-  }
-
   attached() {
+		this.dialog = $(this.taxonEl);
 		this.initNvD3Graph();
+    this.subscribe();
   }
 
 	initNvD3Graph() {
@@ -55,24 +54,13 @@ export class Taxon {
 		});
 	}
 
-	initJqueryDialog() {
-		let that = this;
-		this.dialog = $(this.taxonEl);
-
-		let opts = {
-      title: 'Taxa - ' + this.familyName,
-      closeOnEscape: true,
-      modal: false,
-      width: this.DIALOG_WIDTH,
-			position: {
-				my: 'right', at: 'bottom'
-			},
-			close: (event, ui) => {
-				that.app.tools.taxon = false;
-			}
-    };
-		this.dialog.dialog(opts);
-		this.app.tools.taxon = true;
+	showDialogChanged(newValue, oldValue) {
+		this.showDialog = newValue;
+		// ignore changed events if attached() has not run yet (based on
+		// existence of dialog jquery object)
+		if(this.dialog) {
+			this.updateDialog();
+		}
 	}
 	
   onTaxonStateChange(event) {
@@ -107,13 +95,19 @@ export class Taxon {
 	onCfCreated(cf) {
     this._cf = cf;
     this.setupCrossfilter();
-    this.update();
+    this.updateTaxaChart();
+		this.updateDialog();
 	}
 
 	onCfUpdated(msg) {
     if(msg.sender != this) {
-      this.update();
-    }
+			if(this.showDialog) {
+				this.updateTaxaChart();
+			}
+			else {
+				this._chart.dirty = true;
+			}
+		}
 	}
 
   setupCrossfilter() {
@@ -124,7 +118,32 @@ export class Taxon {
     this._grp = this._dim.group();
   }
 
-  update() {
+	updateDialog() {
+		if(this.showDialog && this._chart.dirty) {
+			// lazy update the taxa component
+			this.updateTaxaChart();
+		}
+		let that = this;
+		let opts = {
+      title: 'Taxa - ' + this.familyName,
+      closeOnEscape: true,
+      modal: false,
+      width: this.DIALOG_WIDTH,
+			position: {
+				my: 'right', at: 'bottom'
+			},
+			close: (event, ui) => this.closed() 
+    };
+		this.dialog.dialog(opts);
+		let action = this.showDialog ? 'open' : 'close';
+		this.dialog.dialog(action);
+	}
+
+	closed() {
+		this.showDialog = false;
+	}
+	
+  updateTaxaChart() {
     // get the current results from our group
     let data = this._grp.all();
     // filter out taxa having 0 value (count)
@@ -134,10 +153,6 @@ export class Taxon {
       return { label: d.key, value: d.value };
     });
     this.display(data);
-
-		if(! this.dialog) {
-			this.initJqueryDialog();
-		}
   }
 
   display(data) {
@@ -151,7 +166,7 @@ export class Taxon {
   onClearSelection() {
     this.disabledTaxaNum = 0;
     this._dim.filter(null);
-    this.update();
+    this.updateTaxaChart();
 		this.api.cfUpdated = { sender: this };		
   }
 
