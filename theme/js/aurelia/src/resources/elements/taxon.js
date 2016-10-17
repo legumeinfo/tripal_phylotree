@@ -1,11 +1,11 @@
-import {inject, bindable, BindingEngine, TaskQueue} from 'aurelia-framework';
+import {inject, bindable, BindingEngine} from 'aurelia-framework';
 import {Api} from 'api';
 import {Symbology} from 'symbology';
 import {App} from 'app';
 
 let $ = jQuery;
 
-@inject(App, Api, Symbology, TaskQueue, BindingEngine)
+@inject(App, Api, Symbology, BindingEngine)
 export class Taxon {
 	
   DURATION_MS = 500;
@@ -20,11 +20,10 @@ export class Taxon {
 
   disabledTaxaNum = 0;
 
-  constructor(app, api, sym, tq, be) {
+  constructor(app, api, sym, be) {
 		this.app = app;       // app.js
     this.api = api;       // web api
 		this.symbology = sym; // symbology
-		this.tq = tq;         // task queue
     this.be = be;         // binding engine
   }
 
