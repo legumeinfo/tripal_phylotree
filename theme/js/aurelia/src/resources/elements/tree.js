@@ -226,6 +226,7 @@ export class Tree {
 		dialog.dialog('close');
 		this.node.toggle();
 		this._tree.update();
+		this.updateLeafNodeHilite();
 		setTimeout(() => this.updateFilter(), this.DURATION_MS);
 	}
 
