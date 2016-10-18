@@ -8,7 +8,8 @@ let $ = jQuery;
 @inject(App, Api, Symbology, BindingEngine)
 export class Taxon {
 	
-  DURATION_MS = 500;
+  ANIM_MS = 50; // nvd3 defaults to 250ms
+	DOUBLECLICK_MS = 500;
 	DIALOG_WIDTH = '520px';
 	
 	@bindable familyName = null;
@@ -35,6 +36,7 @@ export class Taxon {
   }
 
 	initNvD3Graph() {
+		let that = this;
     nv.addGraph( () => {
       let chart = this._chart = nv.models.pieChart()
 					.x( d => d.label )
@@ -45,10 +47,22 @@ export class Taxon {
 					.donut(true)
 					.donutRatio(0.35)
 					.color( d => this.symbology.color(d.label) );
-      chart.options({ legendPosition : 'right' });
+      chart.options({
+				legendPosition : 'right',
+				duration: this.ANIM_MS
+			});
       chart.margin({ left: 0, right: 0, top: 0, bottom: 0 });
       chart.dispatch.on('stateChange', evt => {
-        setTimeout(() => this.onTaxonStateChange(evt), this.DURATION_MS);
+				// prevent double-click from stacking up state change events
+				if(that.timeoutId) {
+					clearTimeout(that.timeoutId);
+					that.timeoutId = null;
+				}
+				// dont publish state change until the pie chart's transition
+				// is finished.
+        that.timeoutId = setTimeout(
+					() => this.onTaxonStateChange(evt), this.ANIM_MS
+				);
       });
       return chart;
 		});
@@ -64,7 +78,6 @@ export class Taxon {
 	}
 	
   onTaxonStateChange(event) {
-    // the event.disabled property is a list of boolean values for
     // which taxa are active vs inactive.
     let data = this._grp.all();
     let disabled = event.disabled; // array of true/false
@@ -80,7 +93,6 @@ export class Taxon {
     }
     this._dim.filter(null); // filters are additive per dimension.
     this._dim.filter( d => ! disabledTaxa[d] );
-		
 		this.api.cfUpdated = { sender: this };
   }
 
@@ -159,7 +171,7 @@ export class Taxon {
   display(data) {
     d3.select(this.taxonSvgEl)
       .datum(data)
-      .transition().duration(this.DURATION_MS)
+			.transition().duration(this.ANIM_MS)
       .call(this._chart);
     this._chart.legend.updateState();
   }

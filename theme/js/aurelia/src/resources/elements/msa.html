@@ -1,23 +1,20 @@
 <template>
 	<div id="msa-dialog" ref="msaEl">
-
 		<span if.bind="!api.loading">
 			<div class="smenubar">
 			</div>
-			
 			<button class="ui-button ui-corner-all" click.delegate="onToggleMenu()">
 				<span if.bind="! menu">Show</span>
 				<span if.bind="menu">Hide</span>
 				MSA Menu
 			</button>
-			
-			<button class="ui-button ui-corner-all" if.bind="selectedFeatureNum"
+			<button class="ui-button ui-corner-all"
+				disabled.bind="! selectedFeatureNum"
 				click.delegate="onClearSelection()">
 				Reset MSA Selection
 			</button>
 		</span>
-		
-			<div ref="msaElement">
-			</div>
+		<div ref="msaElement">
+		</div>
 	</div>
 </template>

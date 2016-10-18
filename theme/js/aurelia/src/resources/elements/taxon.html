@@ -1,12 +1,12 @@
 <template>
   <require from="./taxon.css"></require>
 	<div id="taxon-dialog" ref="taxonEl">
+		<button disabled.bind="! disabledTaxaNum"
+			class="ui-button ui-corner-all"
+      click.delegate="onClearSelection()">
+			Reset Taxa Selection
+		</button>
 		<span if.bind="! api.loading">
-			<button if.bind="disabledTaxaNum"
-				class="ui-button ui-corner-all"
-        click.delegate="onClearSelection()">
-				Reset Taxa Selection
-			</button>
 			<svg class="taxon-chart" ref="taxonSvgEl"></svg>
 		</span>
 	</div>
