@@ -71,12 +71,19 @@ export class Tree {
 			.filter((d) => d.name in that.hilitedFeatures)
 			.each( function(d) {
 				d.bbox = this.getBBox();
-				console.log(d.bbox);
 			});
+		// the text labels bounding box was set in d.bbox, so use that to
+		// draw a rect with the hilite color.
 		d3.selectAll('g.tnt_tree_node')
-			.filter((d) => d.name in that.hilitedFeatures)		
+			.filter((d) => d.name in that.hilitedFeatures)
 			.insert('svg:rect', ':first-child')
-			.attr('x', (d) => d.bbox.x+ 10)
+			.attr('x', (d) => {
+				if(d.textAnchor === 'end') {
+					// textAnchor was set dynamically for the radial layout
+					return d.bbox.x + d.bbox.width + 10;
+				}
+				return d.bbox.x + 10;
+			})
 			.attr('y', (d) => d.bbox.y/2)
 			.attr('width', (d) => d.bbox.width + 2)
 			.attr('height', (d) => d.bbox.height + 1)
@@ -119,18 +126,21 @@ export class Tree {
 			let hilite = d.name in that.hilitedFeatures;
 			let l = d3.select(this) // note: this is the d3js "this"
 			    .append('text')
-			    .attr('text-anchor', (d) => {
-						if (layout_type === 'radial') {
-							return (d.x%360 < 180) ? 'start' : 'end';
-						}
-						return 'start';
-					})
 			    .text((d) => d.name)
 			    .style('font-size', that.LABEL_HEIGHT)
 					.style('font-weight', (d) => hilite ? 'bold' : 'normal')
 					.style('baseline-shift', that.LABEL_BASELINE_SHIFT)
 			    .style('fill', '#000')
-			    .attr('id', 'tree-label-'+ d.name);
+			    .attr('id', 'tree-label-'+ d.name)
+			    .attr('text-anchor', (d) => {
+						if (layout_type === 'radial') {
+							d.textAnchor = (d.x%360 < 180) ? 'start' : 'end';
+						}
+						else {
+							d.textAnchor = 'start';
+						}
+						return d.textAnchor; // d.textAnchor also used in label hiliting
+					});
 			return l;
 		});
 		this._tree.label(labeler);
@@ -184,10 +194,6 @@ export class Tree {
 			.then(data => {
 				that.node.linkouts = data;
 				that.loading = false;
-			})
-			.catch(err => {
-				that.loading = false;
-				console.error(err);
 			});
 		let dialog = $(this.nodeDialogEl);
 		let opts = {
@@ -272,6 +278,7 @@ export class Tree {
     layout.width(this.WIDTH).scale(true);
     this._tree.layout(layout);
     this._tree.update();
+		this.updateLeafNodeHilite();
   }
 
   onReset() {
