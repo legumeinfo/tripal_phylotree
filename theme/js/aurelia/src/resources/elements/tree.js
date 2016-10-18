@@ -265,6 +265,7 @@ export class Tree {
     let subtree = root.subtree(leaves);
     this._tree.data(subtree.data());
     this._tree.update();
+		this.updateLeafNodeHilite();
   }
 
   onLayout() {
@@ -292,6 +293,7 @@ export class Tree {
     });
     this.hiddenLeavesNum = 0;
     this._tree.update();
+		this.updateLeafNodeHilite();
     setTimeout(() => this.updateFilter(), this.DURATION_MS);
   }
 
