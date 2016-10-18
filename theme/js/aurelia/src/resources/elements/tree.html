@@ -27,10 +27,19 @@
         </label>
         </div>
       </fieldset>
-    </form>
+  </form>
+	
+	<div style="margin-top: 10px"
+		    if.bind="! api.loading && hilitedFeatures">
+		Jump to hilited feature:
+		<a repeat.for="name of hilitedFeatures | keys"
+			 click.delegate="onScrollToHilite(name)">
+			${name}
+		</a>
+	</div>
 		
-    <div id="tree-chart" class="svg-container" ref="phylogramElement">
-    </div>
+  <div id="tree-chart" class="svg-container" ref="phylogramElement">
+  </div>
 		
 		<div id="node-dialog" ref="nodeDialogEl" style="display: none">
 

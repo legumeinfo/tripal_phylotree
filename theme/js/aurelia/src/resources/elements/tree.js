@@ -1,4 +1,4 @@
-import {inject, bindable, BindingEngine} from 'aurelia-framework';
+import {inject, bindable, parseQueryString, BindingEngine} from 'aurelia-framework';
 import {Api} from 'api';
 import {Symbology} from 'symbology';
 
@@ -11,7 +11,6 @@ export class Tree {
   DURATION_MS = 300;
 	LABEL_HEIGHT = '10px';
 	LABEL_BASELINE_SHIFT = '30%';
-	HILITE_COLOR = 'goldenrod';
 	
 	@bindable familyName; // family-name attribute of <tree> element
 	@bindable msaEl;      // reference to <msa> element
@@ -39,9 +38,35 @@ export class Tree {
 		// aurelia bound the <msa> element to a variable, but we need the
 		// msa's view-model (msa.js)
 		this.msa = this.msaEl.au.controller.viewModel;
+		this.initHiliteFeatures();
     this.subscribe();
   }
 
+	// parse the url query string into an object keyed by feature name
+	// to hilite. aurelias parser will transform this into an array:
+	// ?hilite_node=xxx&hilite_node=yyy but wont parse this, so we have
+	// to check for this nonstandard encoding of parameters:
+	// ?hilite_node=x,y,z
+	initHiliteFeatures() {
+		let q = parseQueryString(window.location.search);
+		if(! 'hilite_node' in q) {
+			this.hiliteFeatures = {};
+			return;
+		}
+		// convert hilite_node into an array.
+		if(typeof q.hilite_node === 'string') {
+			if(q.hilite_node.indexOf(',') !== -1) {
+				q.hilite_node = t.split(',');
+			}
+			else {
+				q.hilite_node = [ q.hilite_node ];
+			}
+		}
+		let keys = _.map(q.hilite_node, n => n.toLowerCase());
+		let vals = _.map(keys, n => true);
+		this.hilitedFeatures = _.zipObject(keys, vals);
+	}
+	
   subscribe() {
 		this.be.propertyObserver(this.api, 'cf')
 		 	.subscribe(o => this.onCfCreated(o));
@@ -52,8 +77,8 @@ export class Tree {
   }
 
 	onMsaSelectionChange(newValue, oldValue) {
-		// val is like {arath.AT2G14835.1: true, glyma.Glyma.20G133500.1: true}		
-		this.hilitedFeatures = newValue;
+		// val is like {arath.AT2G14835.1: true, glyma.Glyma.20G133500.1: true}
+		this.hilitedFeatures = _.mapKeys(newValue, (v,k) => k.toLowerCase());
 		this._tree.update_nodes(); // use tree api to refersh tree nodes & labels.
 		this.updateLeafNodeHilite(); 
 	}
@@ -63,19 +88,16 @@ export class Tree {
 	// hilited css style.
 	updateLeafNodeHilite() {
 		let that = this;
-		let hilite = {
-			padding: 5, width: 200, height: 20,
-			color: 'yellow'
-		};
 		d3.selectAll('text.tnt_tree_label')
-			.filter((d) => d.name in that.hilitedFeatures)
+			.filter((d) => d.name.toLowerCase() in that.hilitedFeatures)
 			.each( function(d) {
 				d.bbox = this.getBBox();
 			});
+		let top = Infinity;
 		// the text labels bounding box was set in d.bbox, so use that to
 		// draw a rect with the hilite color.
 		d3.selectAll('g.tnt_tree_node')
-			.filter((d) => d.name in that.hilitedFeatures)
+			.filter((d) => d.name.toLowerCase() in that.hilitedFeatures)
 			.insert('svg:rect', ':first-child')
 			.attr('x', (d) => {
 				if(d.textAnchor === 'end') {
@@ -87,7 +109,26 @@ export class Tree {
 			.attr('y', (d) => d.bbox.y/2)
 			.attr('width', (d) => d.bbox.width + 2)
 			.attr('height', (d) => d.bbox.height + 1)
-			.attr('class', 'hilite-node');
+			.attr('class', 'hilite-node')
+		  .each(function() {
+				var offset = $(this).offset();
+				if(offset.top > 0 && offset.top < top) {
+					top = offset.top;
+				}
+			});
+		if(_.keys(this.hilitedFeatures).length) {
+			$('html,body').attr('scrollTop',  top - 100);
+		}
+	}
+	
+	onScrollToHilite(featureName) {
+		// TODO: maybe use tnt.tree find_by_name?
+		
+		// let jq = featureName.replace( /(:|\.|\[|\]|,|=)/g, "\\$1" );
+		// let selector = `#tree-chart text:contains('${jq}')`;
+		// console.log(selector);
+		let offset = $(selector).offset();
+		$('html,body').attr('scrollTop',  offset.top - 100);
 	}
 	
 	onCfCreated(cf) {
@@ -123,7 +164,7 @@ export class Tree {
 		let labeler = tnt.tree.label.text();
 		labeler.display (  function (node, layout_type) {
 			let d = node.data();
-			let hilite = d.name in that.hilitedFeatures;
+			let hilite = d.name.toLowerCase() in that.hilitedFeatures;
 			let l = d3.select(this) // note: this is the d3js "this"
 			    .append('text')
 			    .text((d) => d.name)
@@ -131,7 +172,6 @@ export class Tree {
 					.style('font-weight', (d) => hilite ? 'bold' : 'normal')
 					.style('baseline-shift', that.LABEL_BASELINE_SHIFT)
 			    .style('fill', '#000')
-			    .attr('id', 'tree-label-'+ d.name)
 			    .attr('text-anchor', (d) => {
 						if (layout_type === 'radial') {
 							d.textAnchor = (d.x%360 < 180) ? 'start' : 'end';
@@ -152,6 +192,9 @@ export class Tree {
 		
 		// display the tree
     this._tree(this.phylogramElement);
+		if(_.keys(this.hilitedFeatures).length) {
+			this.updateLeafNodeHilite();
+		}
   }
 	
 	// lookup the node with jquery
@@ -298,4 +341,10 @@ export class Tree {
     setTimeout(() => this.updateFilter(), this.DURATION_MS);
   }
 
+}
+
+export class KeysValueConverter {
+	toView(obj) {
+		return Reflect.ownKeys(obj);
+	}
 }
