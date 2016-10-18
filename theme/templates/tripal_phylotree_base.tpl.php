@@ -96,11 +96,7 @@ drupal_add_js(
     $js_config
 );
 drupal_add_js(
-    '//cdnjs.cloudflare.com/ajax/libs/URI.js/1.18.1/URI.min.js',
-    $js_config
-);
-drupal_add_js(
-    '//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.14.2/lodash.min.js',
+    '//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.4/lodash.min.js',
     $js_config
 );
 drupal_add_js(
