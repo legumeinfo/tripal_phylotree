@@ -140,6 +140,7 @@ export class Taxon {
 	}
 
 	closed() {
+		this.onClearSelection();
 		this.showDialog = false;
 	}
 	

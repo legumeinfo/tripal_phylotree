@@ -105,6 +105,7 @@ export class Msa {
 
 	// callback for close dialog event
 	closed() {
+		this.onClearSelection();
 		this.showDialog = false;
 	}
 
@@ -165,7 +166,7 @@ export class Msa {
       $('div.smenubar').show();// msa component does not clean up  menu bar
     }
     else {
-        $('div.smenubar').hide();
+      $('div.smenubar').hide();
     }
   }
 
@@ -179,7 +180,6 @@ export class Msa {
     this.selectedFeatureNames = {};
     _.each(names, n => this.selectedFeatureNames[n] = true);
     this.selectedFeatureNum  = _.size(this.selectedFeatureNames);
-    //this.updateFilter();
   }
 
   // onMsaSelectionReset() : reset means there is a single feature selected
@@ -194,23 +194,12 @@ export class Msa {
       }
     }
     this.selectedFeatureNum  = _.size(this.selectedFeatureNames);
-    //this.updateFilter();
   }
 
   onClearSelection() {
     this.msa.g.selcol.reset([]);    
     this.selectedFeatureNum = 0;
     this.selectedFeatureNames = {};
-    // this._dim.filter(null);
   }
-
-  // updateFilter() :  update crossfilter with the selected features.
-  // updateFilter() {
-	// 	// filters are additive per dimension, so clear previous.
-  //   this._dim.filterAll();
-  //   if(_.size(this.selectedFeatureNames)) {
-  //     this._dim.filter(d => this.selectedFeatureNames[d]);
-  //   }
-  // }
 
 }
