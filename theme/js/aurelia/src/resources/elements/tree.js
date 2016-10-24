@@ -18,9 +18,9 @@ export class Tree {
 	
 	msa = null;           // msa view-model
 	selectedLayout = 'vertical';
-	hilitedFeatures = {};
+	hiliteFeatures = {};
 	node = null; // clicked node for expand/collapse/other dialog options.
-	loading = false; // loading flag for use by tree node dialog.
+	loading = false; // loading flag for use by tree node popup dialog.
 	
   _rootNode = null;
   _tree = null;
@@ -51,12 +51,13 @@ export class Tree {
 		let q = parseQueryString(window.location.search);
 		if(! 'hilite_node' in q) {
 			this.hiliteFeatures = {};
+			this.hiliteFeaturesCount = 0;
 			return;
 		}
 		// convert hilite_node into an array.
 		if(typeof q.hilite_node === 'string') {
 			if(q.hilite_node.indexOf(',') !== -1) {
-				q.hilite_node = t.split(',');
+				q.hilite_node = q.hilite_node.split(',');
 			}
 			else {
 				q.hilite_node = [ q.hilite_node ];
@@ -64,7 +65,8 @@ export class Tree {
 		}
 		let keys = _.map(q.hilite_node, n => n.toLowerCase());
 		let vals = _.map(keys, n => true);
-		this.hilitedFeatures = _.zipObject(keys, vals);
+		this.hiliteFeatures = _.zipObject(keys, vals);
+		this.hiliteFeaturesCount = keys.length;
 	}
 	
   subscribe() {
@@ -78,18 +80,26 @@ export class Tree {
 
 	onMsaSelectionChange(newValue, oldValue) {
 		// val is like {arath.AT2G14835.1: true, glyma.Glyma.20G133500.1: true}
-		this.hilitedFeatures = _.mapKeys(newValue, (v,k) => k.toLowerCase());
+		let names = _.keys(newValue);
+		names = _.map(names, n => n.toLowerCase());
+		names = _.filter(names, n => {
+			// filter out the consensus sequence because it is not shown in tree view
+			return n.indexOf('consensus') === -1;
+		});
+		let vals = _.map(names, () => true);
+		this.hiliteFeatures = _.zipObject(names, vals);
+		this.hiliteFeaturesCount = names.length;
 		this._tree.update_nodes(); // use tree api to refersh tree nodes & labels.
-		this.updateLeafNodeHilite(); 
+		this.updateLeafNodeHilite(false); 
 	}
 
 	// tnt.tree api does not support selections or hiliting that I can
 	// see, so use d3 to decorate the currently selected features with a 
 	// hilited css style.
-	updateLeafNodeHilite() {
+	updateLeafNodeHilite(scroll) {
 		let that = this;
 		d3.selectAll('text.tnt_tree_label')
-			.filter((d) => d.name.toLowerCase() in that.hilitedFeatures)
+			.filter((d) => d.name.toLowerCase() in that.hiliteFeatures)
 			.each( function(d) {
 				d.bbox = this.getBBox();
 			});
@@ -97,7 +107,7 @@ export class Tree {
 		// the text labels bounding box was set in d.bbox, so use that to
 		// draw a rect with the hilite color.
 		d3.selectAll('g.tnt_tree_node')
-			.filter((d) => d.name.toLowerCase() in that.hilitedFeatures)
+			.filter((d) => d.name.toLowerCase() in that.hiliteFeatures)
 			.insert('svg:rect', ':first-child')
 			.attr('x', (d) => {
 				if(d.textAnchor === 'end') {
@@ -116,17 +126,22 @@ export class Tree {
 					top = offset.top;
 				}
 			});
-		if(_.keys(this.hilitedFeatures).length) {
+		if(scroll && _.keys(this.hiliteFeatures).length) {
 			$('html,body').attr('scrollTop',  top - 100);
 		}
 	}
 	
+	/*
+	 * onScrollToHilite() : use jquery to scroll to the tree element
+	 * with selector like #tnt_tree_node_tree-chart_{id} (id is the
+	 * tnt.tree generated it)
+	 */
 	onScrollToHilite(featureName) {
-		// TODO: maybe use tnt.tree find_by_name?
-		
-		// let jq = featureName.replace( /(:|\.|\[|\]|,|=)/g, "\\$1" );
-		// let selector = `#tree-chart text:contains('${jq}')`;
-		// console.log(selector);
+		let node = this._tree.root().find_node( node => {
+			return node.node_name().toLowerCase() === featureName;
+		});
+		let nodeId = node.property('_id');
+		let selector = '#tnt_tree_node_tree-chart_'+ nodeId;
 		let offset = $(selector).offset();
 		$('html,body').attr('scrollTop',  offset.top - 100);
 	}
@@ -164,7 +179,7 @@ export class Tree {
 		let labeler = tnt.tree.label.text();
 		labeler.display (  function (node, layout_type) {
 			let d = node.data();
-			let hilite = d.name.toLowerCase() in that.hilitedFeatures;
+			let hilite = d.name.toLowerCase() in that.hiliteFeatures;
 			let l = d3.select(this) // note: this is the d3js "this"
 			    .append('text')
 			    .text((d) => d.name)
@@ -192,8 +207,8 @@ export class Tree {
 		
 		// display the tree
     this._tree(this.phylogramElement);
-		if(_.keys(this.hilitedFeatures).length) {
-			this.updateLeafNodeHilite();
+		if(_.keys(this.hiliteFeatures).length) {
+			this.updateLeafNodeHilite(true);
 		}
   }
 	
@@ -269,7 +284,7 @@ export class Tree {
 		dialog.dialog('close');
 		this.node.toggle();
 		this._tree.update();
-		this.updateLeafNodeHilite();
+		this.updateLeafNodeHilite(false);
 		setTimeout(() => this.updateFilter(), this.DURATION_MS);
 	}
 
@@ -309,7 +324,7 @@ export class Tree {
     let subtree = root.subtree(leaves);
     this._tree.data(subtree.data());
     this._tree.update();
-		this.updateLeafNodeHilite();
+		this.updateLeafNodeHilite(false);
   }
 
   onLayout() {
@@ -323,7 +338,7 @@ export class Tree {
     layout.width(this.WIDTH).scale(true);
     this._tree.layout(layout);
     this._tree.update();
-		this.updateLeafNodeHilite();
+		this.updateLeafNodeHilite(false);
   }
 
   onReset() {
@@ -337,7 +352,7 @@ export class Tree {
     });
     this.hiddenLeavesNum = 0;
     this._tree.update();
-		this.updateLeafNodeHilite();
+		this.updateLeafNodeHilite(true);
     setTimeout(() => this.updateFilter(), this.DURATION_MS);
   }
 

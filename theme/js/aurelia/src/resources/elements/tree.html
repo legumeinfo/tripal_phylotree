@@ -29,13 +29,15 @@
       </fieldset>
   </form>
 	
-	<div style="margin-top: 10px"
-		    if.bind="! api.loading && hilitedFeatures">
+	<div if.bind="(! api.loading) && hiliteFeaturesCount"
+		   style="margin-top: 10px">
 		Jump to hilited feature:
-		<a repeat.for="name of hilitedFeatures | keys"
+		<a repeat.for="name of hiliteFeatures | keys"
 			 click.delegate="onScrollToHilite(name)">
-			${name}
-		</a>
+		${name}
+		</a><span
+				if.bind="hiliteFeaturesCount && $index < hiliteFeaturesCount -1">,
+		</span>
 	</div>
 		
   <div id="tree-chart" class="svg-container" ref="phylogramElement">
