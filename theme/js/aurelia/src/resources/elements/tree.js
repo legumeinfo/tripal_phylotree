@@ -306,6 +306,7 @@ export class Tree {
 		this.hiddenLeavesNum = 0;
 		this._tree.update();
 		this.updateLeafNodeHilite(false);
+		setTimeout(() => this.updateFilter(), this.DURATION_MS);
 	}
 
   updateFilter() {
