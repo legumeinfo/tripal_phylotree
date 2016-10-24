@@ -300,10 +300,10 @@ export class Tree {
 				n.toggle();
 			}
 		});
-		var newTree = root.subtree(node.get_all_leaves(true));
-		this._tree.data(newTree.data());
 		this.rootNodeDirty = true;
 		this.hiddenLeavesNum = 0;
+		this._rootNode = root.subtree(node.get_all_leaves(true));
+		this._tree.data(this._rootNode.data());
 		this._tree.update();
 		this.updateLeafNodeHilite(false);
 		setTimeout(() => this.updateFilter(), this.DURATION_MS);
@@ -336,7 +336,7 @@ export class Tree {
 
   /* update the view-model with current crossfilter results */
   update() {
-    // restore full tree from original root node
+    // restore full tree from current root node
     this._tree.data(this._rootNode);
     // get list of featurenames from crossfilter
     let data = this._dim.top(Infinity);
@@ -345,7 +345,7 @@ export class Tree {
     _.each(featureNames, n => hash[n] = true);
     // generate the tree leaves matching selected feature names
     let root = this._tree.root();
-    let leaves = root.find_all( (n) => hash[n.node_name()], true);
+    let leaves = root.find_all( n => hash[n.node_name()], true);
     // use tnt.tree api to display only the selected subtree
     let subtree = root.subtree(leaves);
     this._tree.data(subtree.data());
@@ -367,7 +367,9 @@ export class Tree {
 		this.updateLeafNodeHilite(false);
   }
 
+	// restore original root node, and reload the data, update the ui.
   onReset() {
+		this._rootNode = this.api.treeData;
     this._tree.data(this._rootNode);
     let root = this._tree.root();
     let nodes = root.get_all_nodes(true);
