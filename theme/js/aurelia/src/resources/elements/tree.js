@@ -294,7 +294,7 @@ export class Tree {
     // get leaves from the tnt.tree api. leaves counts collapsed node as leaf.
     let allLeaves = root.get_all_leaves(true);
     let visibleLeaves = root.get_all_leaves(false); // dont traverse collapsed nodes.
-    this.hiddenLeavesNum = allLeaves.length - visibleLeaves.length;
+    this.hiddenLeavesNum = allLeaves.length - visibleLeaves.length + 1;
     let visibleNodes = {};
     _.forEach(visibleLeaves, (node) => {
       let n = node.data().name;
