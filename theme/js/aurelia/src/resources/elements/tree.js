@@ -19,8 +19,9 @@ export class Tree {
 	msa = null;           // msa view-model
 	selectedLayout = 'vertical';
 	hiliteFeatures = {};
-	node = null; // clicked node for expand/collapse/other dialog options.
-	loading = false; // loading flag for use by tree node popup dialog.
+	node = null;       // clicked node for expand/collapse/other dialog options.
+	loading = false;       // loading flag for use by tree node popup dialog.
+	rootNodeDirty = false; // flag for has user refocused the tree on some node.
 	
   _rootNode = null;
   _tree = null;
@@ -288,13 +289,37 @@ export class Tree {
 		setTimeout(() => this.updateFilter(), this.DURATION_MS);
 	}
 
+	// onNodeFocusTree() : replace the tree viewer with the subtree
+	onNodeFocusTree() {
+		let dialog = $(this.nodeDialogEl);
+		dialog.dialog('close');
+		let root = this._tree.root();
+		let node = this.node;
+		node.apply( n => {
+			if(n.is_collapsed()) {
+				n.toggle();
+			}
+		});
+		var newTree = root.subtree(node.get_all_leaves(true));
+		this._tree.data(newTree.data());
+		this.rootNodeDirty = true;
+		this.hiddenLeavesNum = 0;
+		this._tree.update();
+		this.updateLeafNodeHilite(false);
+	}
+
   updateFilter() {
     // update crossfilter with currently visible nodes
     let root = this._tree.root();
     // get leaves from the tnt.tree api. leaves counts collapsed node as leaf.
     let allLeaves = root.get_all_leaves(true);
     let visibleLeaves = root.get_all_leaves(false); // dont traverse collapsed nodes.
-    this.hiddenLeavesNum = allLeaves.length - visibleLeaves.length + 1;
+    this.hiddenLeavesNum = allLeaves.length - visibleLeaves.length;
+		if(this.hiddenLeavesNum > 0) {
+			// the visibleLeaves count includes 1 collapsed node
+			this.hiddenLeavesNum += 1;
+		}
+		
     let visibleNodes = {};
     _.forEach(visibleLeaves, (node) => {
       let n = node.data().name;
@@ -351,6 +376,7 @@ export class Tree {
       }
     });
     this.hiddenLeavesNum = 0;
+		this.rootNodeDirty = false;
     this._tree.update();
 		this.updateLeafNodeHilite(true);
     setTimeout(() => this.updateFilter(), this.DURATION_MS);

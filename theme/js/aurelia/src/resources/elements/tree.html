@@ -4,12 +4,16 @@
 
 	<form action="" if.bind="!api.loading">
       <fieldset>
-        <span if.bind="hiddenLeavesNum">
-          <button if.bind="hiddenLeavesNum" class="ui-button ui-corner-all"
-						click.delegate="onReset()">
-            Reset Phylogram Chart
-          </button>
-          ${hiddenLeavesNum} hidden terminal (leaf) nodes |
+        <button if.bind="hiddenLeavesNum || rootNodeDirty"
+					class="ui-button ui-corner-all"
+					click.delegate="onReset()">
+          Reset Phylogram Chart
+        </button>
+				<span if.bind="hiddenLeavesNum">
+					${hiddenLeavesNum} hidden terminal (leaf) nodes |
+				</span>
+        <span if.bind="rootNodeDirty">
+          You have focused on a subtree. |
         </span>
         <label for="verticalLayout">
         <input id="verticalLayout" type="radio" name="layout" value="vertical"
@@ -47,7 +51,6 @@
 
 			<div if.bind="node.is_leaf() && ! node.is_collapsed()">
 				<!-- leaf node linkouts -->
-
 				<div repeat.for="link of node.linkouts">
 					<a href.bind="link.href" tabindex="-1">
 						${link.text}
@@ -64,6 +67,13 @@
 						Collapse
 					</span>
 					subtree at this node
+				</a>
+				<br/>
+				<a class="link"
+					href="#"
+					if.bind="! node.is_collapsed()"
+					click.delegate="onNodeFocusTree()" tabindex="-1">
+					Focus on subtree at this node
 				</a>
 				<div if.bind="node.legumes.length">
 					<!-- interior node linkouts -->
