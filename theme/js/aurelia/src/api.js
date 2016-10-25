@@ -18,7 +18,7 @@ export class Api {
 
 	// the endpoint for the "family representative" links from the
 	// tripal_linkout module.
-	FAMREPS_LINKS_URL = '/famreps_links?famreps='; // +comma separated list
+	FAMREPS_LINKS_URL = '/famreps_links';
 	LEAF_LINKS_URL = '/phylotree_links/'; // genus//speciesnode.feature_name/json
 
 	// declare some observable properties for use by other vis. elements:
@@ -131,9 +131,21 @@ export class Api {
 			return promise;
 		}
 		else if(node.legumes.length > 0) {
-			let query = node.legumes.map(n => n.data().feature_name).join(',');
-			let url = this.FAMREPS_LINKS_URL + query;
-			let promise = this.http.fetch(url)
+			// for an interior node, request the familty representatives.
+			// use POST because the number of features can exceed allowed
+			// URL length. note: this is a bit of a hack because PHP 5.6
+			// barfs when receiving a POST with application/json
+			// content-type. As a workaround, send x-www-form-urlencoded
+			// instead, and specify the body parameter.
+			let url = this.FAMREPS_LINKS_URL;
+			let query = 'famreps=' + node.legumes.map(n => n.data().feature_name).join(',');
+			let promise = this.http.fetch(url, {
+				method: 'post',
+				body: query,
+				headers: {
+					'content-type': 'application/x-www-form-urlencoded'
+				}
+			})
 					.then(res => res.json());
 			return promise;
 		}
