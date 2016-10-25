@@ -142,7 +142,7 @@ export class Taxon {
       modal: false,
       width: this.DIALOG_WIDTH,
 			position: {
-				my: 'right', at: 'bottom'
+				my: 'left', at: 'bottom'
 			},
 			close: (event, ui) => this.closed() 
     };

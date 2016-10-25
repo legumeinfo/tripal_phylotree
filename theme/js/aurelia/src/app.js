@@ -9,9 +9,9 @@ export class App {
 
 	// currently shown tools in the ui
 	tools = {
-		msa : true,
-		taxon : true,
-		help : false
+		taxon : true, // taxon doubles as a legend, so show it by default.
+		msa : false, // hide by default- for consistency with past versions.
+		help : false // hide help dialog by default
 	};
 	
   treeData = null;

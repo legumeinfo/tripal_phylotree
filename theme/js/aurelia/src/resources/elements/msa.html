@@ -1,6 +1,6 @@
 <template>
 	<div id="msa-dialog" ref="msaEl">
-		<span if.bind="!api.loading">
+		<span if.bind="!api.loading && showDialog">
 			<div class="smenubar">
 			</div>
 			<button class="ui-button ui-corner-all" click.delegate="onToggleMenu()">

@@ -19,6 +19,7 @@ export class Msa {
 	
   menu = false;
   msa = null; // msa viewer component
+	msaDirty = false; // flag for whether the msa component should be reloaded
 	dialog = null;
 
   seqs = [];
@@ -39,10 +40,14 @@ export class Msa {
 
 	showDialogChanged(newValue, oldValue) {
 		this.showDialog = newValue;
-		// ignore changed events if attached() has not run yet (based on
-		// existence of dialog jquery object)
+		if(this.showDialog && ! this.msa) {
+			// lazily create the msa component
+			this.init();
+			this.updateMsa();
+		}
 		if(this.dialog) {
-			this.updateDialog();
+			// hide or show the dialog as necessary
+			this.updateDialog();			
 		}
 	}
 
@@ -82,7 +87,7 @@ export class Msa {
 	}
 
 	updateDialog() {
-		if(this.showDialog && this.msa.dirty) {
+		if(this.showDialog && this.msaDirty) {
 			// lazy update the msa component
 			this.updateMsa();
 		}
@@ -93,7 +98,7 @@ export class Msa {
 			modal: false,
 			width: this.DIALOG_WIDTH + 'px',
 			position: {
-				my: 'left', at: 'bottom'
+				my: 'right', at: 'bottom'
 			},
 			close: (event, ui) => this.closed()
 		};
@@ -121,9 +126,6 @@ export class Msa {
     this._cf = cf;
 		// create a dimension by name (keep our own instance of this dimension)
     this._dim = cf.dimension(d => d.name);
-    this.init();
-		this.updateMsa();
-		this.updateDialog();
 	}
 	
 	onCfUpdated(msg) {
@@ -132,7 +134,7 @@ export class Msa {
 				this.updateMsa();
 			}
 			else {
-				this.msa.dirty = true;
+				this.msaDirty = true;
 			}
 		}
 	}
@@ -143,7 +145,7 @@ export class Msa {
     seqs = _.sortBy(seqs, d => d.name);
     seqs.unshift(this.api.getConsensusSeq());
     this.display(seqs);
-		this.msa.dirty = false;
+		this.msaDirty = false;
   }
 
   display(seqs) {
