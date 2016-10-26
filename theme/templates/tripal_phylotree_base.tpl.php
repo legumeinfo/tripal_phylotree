@@ -14,18 +14,12 @@ if(empty($my_path)) {
 $phylotree = $variables['node']->phylotree;
 
 drupal_add_css(
-    '//cdnjs.cloudflare.com/ajax/libs/loaders.css/0.1.2/loaders.min.css',
+    '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css',
     array('type' => 'external', 'group' => CSS_THEME)
 );
-
 drupal_add_css(
     '//cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.4/nv.d3.min.css',
     array('type' => 'external', 'group' => CSS_THEME)
-);
-
-drupal_add_css(
-    $my_path . '/theme/css/ajax-spinner.css',
-    array('type' => 'file', 'group' => CSS_THEME)
 );
 drupal_add_css(
     $my_path . '/theme/css/teaser-fix.css',
@@ -64,8 +58,9 @@ if( ! empty($phylotree->comment) ) {
   </p>
 </div>
 
-<div id="ajax-spinner" class="loader-inner ball-pulse">
-    <div></div><div></div><div></div>
+<div id="ajax-spinner">
+    <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+    <span class="sr-only">Loading...</span>
 </div>
 
 <div id="au-content" aurelia-app="main">

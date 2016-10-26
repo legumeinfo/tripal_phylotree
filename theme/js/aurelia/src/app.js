@@ -24,15 +24,13 @@ export class App {
   }
 
   attached() {
-		// remove the static ajax spinner that was hardcoded in the php
-		// template the loader-anim element will display the same spinner
-		// while needed.
-		$('#ajax-spinner').remove();
-
 		this.configureHttpClient();
 		
 		// fetch the resources for this gene family
-		this.api.init();
+		this.api.init()
+			.then( () => {
+				$('#ajax-spinner').remove();				
+			})
   }
 
 	configureHttpClient() {

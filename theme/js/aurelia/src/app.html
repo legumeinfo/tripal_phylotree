@@ -1,7 +1,6 @@
 <template>
 
 	<require from="./app.css"></require>
-  <require from="resources/elements/loader-anim"></require>
   <require from="resources/elements/tree"></require>
   <require from="resources/elements/msa"></require>
   <require from="resources/elements/taxon"></require>
@@ -21,8 +20,6 @@
 			MSA visualization
 		</a>
 	</div>
-	
-  <loader-anim if.bind="api.loading"></loader-anim>
 	
 	<help show-dialog.two-way="tools.help"></help>
 	

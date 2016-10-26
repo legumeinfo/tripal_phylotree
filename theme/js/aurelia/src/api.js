@@ -40,11 +40,12 @@ export class Api {
     let p1 = this.getTreeData();
     let p2 = this.getMsaData();
     // after both resources to load, then do more setup.
-    Promise.all([p1, p2]).then(() => {
+    let p3 = Promise.all([p1, p2]).then(() => {
 			this.loading = false;
       this.postProcess();
       this.setupCrossFilter();
     });
+		return p3;
   }
 	
   // by convention, the consensus seq is the first in the msa seqs array.
