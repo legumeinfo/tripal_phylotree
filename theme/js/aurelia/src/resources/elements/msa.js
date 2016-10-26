@@ -91,7 +91,6 @@ export class Msa {
 			// lazy update the msa component
 			this.updateMsa();
 		}
-		
 		let opts = {
 			title: 'Multiple Sequence Alignment - ' + this.familyName,
 			closeOnEscape: true,
@@ -102,10 +101,13 @@ export class Msa {
 			},
 			close: (event, ui) => this.closed()
 		};
+		if(this.dialogWasOpened) {
+			delete opts.position; // allow dialog to re-open in previous location
+		}
 		this.dialog.dialog(opts);
 		let action = this.showDialog ? 'open' : 'close';
-		
 		this.dialog.dialog(action);
+		this.dialogWasOpened = true;
 	}
 
 	// callback for close dialog event

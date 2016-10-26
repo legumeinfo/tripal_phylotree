@@ -146,9 +146,13 @@ export class Taxon {
 			},
 			close: (event, ui) => this.closed() 
     };
+		if(this.dialogWasOpened) {
+			delete opts.position; // allow dialog to re-open in previous location
+		}
 		this.dialog.dialog(opts);
 		let action = this.showDialog ? 'open' : 'close';
 		this.dialog.dialog(action);
+		this.dialogWasOpened = true;
 	}
 
 	closed() {
