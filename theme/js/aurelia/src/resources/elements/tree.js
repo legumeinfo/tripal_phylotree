@@ -265,7 +265,7 @@ export class Tree {
 		let that = this;
 		this.node = node;
 		this.node.legumes = _.filter(node.get_all_leaves(true), n => {
-			this.getNodeIsLegume(n.data())
+			this.isLegume(n.data())
 		});
 		this.api.getLinkouts(node)
 			.then(data => {
