@@ -69,6 +69,14 @@ export class Tree {
 		this.hiliteFeatures = _.zipObject(keys, vals);
 		this.hiliteFeaturesCount = keys.length;
 	}
+
+	// the leaf nodes need to have a css selector, so lisTours can
+	// attach a tour step to a legume leaf node.
+	decorateLeafNodes() {
+		d3.selectAll('#phylogram .leaf.tnt_tree_node')
+			.filter((d) => this.isLegume(d))
+			.classed('legume', true);
+	}
 	
   subscribe() {
 		this.be.propertyObserver(this.api, 'cf')
@@ -134,7 +142,7 @@ export class Tree {
 	
 	/*
 	 * onScrollToHilite() : use jquery to scroll to the tree element
-	 * with selector like #tnt_tree_node_tree-chart_{id} (id is the
+	 * with selector like #tnt_tree_node_phylogram_{id} (id is the
 	 * tnt.tree generated it)
 	 */
 	onScrollToHilite(featureName) {
@@ -142,7 +150,7 @@ export class Tree {
 			return node.node_name().toLowerCase() === featureName;
 		});
 		let nodeId = node.property('_id');
-		let selector = '#tnt_tree_node_tree-chart_'+ nodeId;
+		let selector = '#tnt_tree_node_phylogram_'+ nodeId;
 		let offset = $(selector).offset();
 		$('html,body').attr('scrollTop',  offset.top - 100);
 	}
@@ -206,27 +214,34 @@ export class Tree {
 		this._tree.on('mouseover', node => this.onNodeMouseover(node));
 		this._tree.on('mouseout', node => this.onNodeMouseout(node));
 		
-		// display the tree
+		// display the tree with msa tnt.tree component
     this._tree(this.phylogramElement);
+
+		// perform final ui tweaks after rendering the tree
+		this.decorateLeafNodes();
 		if(_.keys(this.hiliteFeatures).length) {
 			this.updateLeafNodeHilite(true);
 		}
   }
 	
-	// lookup the node with jquery
-	node2jQuery(node) {
-		let nodeSelector = '#tnt_tree_node_tree-chart_'+ node.id();
+	// lookup the node with jquery and return a jquery element
+	node2jquery(node) {
+		let nodeSelector = this.node2jquerySelector(node);
 		let nodeEl = $(nodeSelector);
 		return nodeEl;
 	}
+
+	node2jquerySelector(node) {
+		return '#tnt_tree_node_phylogram_'+ node.id();		
+	}
 	
 	onNodeMouseover(node) {
-		let el = this.node2jQuery(node);
+		let el = this.node2jquery(node);
     el.attr('cursor', 'pointer');
 	}
 
 	onNodeMouseout(node) {
-		let el = this.node2jQuery(node);
+		let el = this.node2jquery(node);
     el.attr('cursor', 'default');		
 	}
 	
@@ -238,17 +253,20 @@ export class Tree {
 		}
 		// else the color will be defined by tree.css, not by a fill attribute.
 	}
+
+	isLegume(d) {
+		if( ! d.genus) { return false; }
+		let legumeGenera = this.symbology.legumes;
+		return d.genus.toLowerCase() in legumeGenera;
+	}
 	
   onTreeNodeClick(node) {
 		this.loading = true;
 		let that = this;
 		this.node = node;
-		let legumeGenera = this.symbology.legumes;
-		 this.node.legumes = _.filter(node.get_all_leaves(true), n => {
-			 let d = n.data();
-			 if(! d.genus) { return false; }
-			 return d.genus.toLowerCase() in legumeGenera;
-		 });
+		this.node.legumes = _.filter(node.get_all_leaves(true), n => {
+			this.getNodeIsLegume(n.data())
+		});
 		this.api.getLinkouts(node)
 			.then(data => {
 				that.node.linkouts = data;
@@ -260,7 +278,7 @@ export class Tree {
       closeOnEscape: true,
       modal: false,
 			position: {
-				my: 'center', at: 'center', of: this.node2jQuery(node)
+				my: 'center', at: 'center', of: this.node2jquery(node)
 			},
 			show : { effect: 'blind', direction: 'down', duration: 100 },
 			//close: (event, ui) => {}
