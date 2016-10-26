@@ -47,38 +47,40 @@
   <div id="tree-chart" class="svg-container" ref="phylogramElement">
   </div>
 		
-		<div id="node-dialog" ref="nodeDialogEl" style="display: none">
-
-			<div if.bind="node.is_leaf() && ! node.is_collapsed()">
-				<!-- leaf node linkouts -->
-				<div repeat.for="link of node.linkouts">
-					<a href.bind="link.href" tabindex="-1">
-						${link.text}
-					</a>
-				</div>
-			</div>
-			
-			<div if.bind="! node.is_leaf() || node.is_collapsed()">
-				<a class="link" href="#" click.delegate="onNodeToggle()" tabindex="-1">
-					<span if.bind="node.is_collapsed()">
-						Expand
-					</span>
-					<span if.bind="! node.is_collapsed()">
-						Collapse
-					</span>
-					subtree at this node
+	<div id="node-dialog" ref="nodeDialogEl" style="display: none">
+		<div if.bind="node.is_leaf() && ! node.is_collapsed()">
+			<!-- leaf node linkouts -->
+			<div repeat.for="link of node.linkouts">
+				<a href.bind="link.href" tabindex="-1">
+					<i class="fa fa-external-link" aria-hidden="true"></i>
+					${link.text}
 				</a>
-				<br/>
+			</div>
+		</div>
+		
+		<div if.bind="! node.is_leaf() || node.is_collapsed()">
+			<a class="link" href="#" click.delegate="onNodeToggle()" tabindex="-1">
+				<span if.bind="node.is_collapsed()">
+					<i class="fa fa-plus-square-o" aria-hidden="true"></i> Expand
+				</span>
+				<span if.bind="! node.is_collapsed()">
+					<i class="fa fa-minus-square-o" aria-hidden="true"></i> Collapse
+				</span>
+				subtree at this node
+			</a>
+			<br/>
 				<a class="link"
 					href="#"
 					if.bind="! node.is_collapsed()"
 					click.delegate="onNodeFocusTree()" tabindex="-1">
-					Focus on subtree at this node
+					<i class="fa fa-expand" aria-hidden="true"></i> Focus
+						on subtree at this node
 				</a>
 				<div if.bind="node.legumes.length">
 					<!-- interior node linkouts -->
 					<div repeat.for="link of node.linkouts">
 						<a href.bind="link.href" tabindex="-1">
+							<i class="fa fa-external-link" aria-hidden="true"></i>
 							${link.text}
 						</a>
 					</div>
@@ -86,12 +88,14 @@
 					<a id="cmtv_link_out"
 						tabindex="-1"
 						href="http://velarde.ncgr.org:7070/isys/launch?svc=org.ncgr.cmtv.isys.CompMapViewerService%40--style%40http://velarde.ncgr.org:7070/isys/bin/Components/cmtv/conf/cmtv_combined_map_style.xml%40--combined_display%40${window.location.origin}/lis_gene_families/chado/phylo/node/gff_download/${node.data().phylonode_id}">
+						<i class="fa fa-external-link" aria-hidden="true"></i>
 						View Genomic Distribution for genes in this subtree
 					</a>
 				</div>
 				<div if.bind="! node.legumes.length">
-					<small>(No additional resources are available for this
-						sub-tree. Please try another node.)</small>
+					<i class="fa fa-info-circle" aria-hidden="true"></i>
+					(No additional resources are available for this
+						sub-tree. Please try another node.)
 				</div>
 			</div>
 			<div if.bind="node.is_leaf() && ! node.is_collapsed()">
@@ -101,7 +105,8 @@
 					<a id="organism_link"
 						href="/node/${node.data().organism_node_id}"
 						tabindex="-1">
-						view organism: ${node.data().genus} ${node.data().species}
+						<i class="fa fa-external-link" aria-hidden="true"></i>
+						View organism: ${node.data().genus} ${node.data().species}
 						<span if.bind="node.data().common_name">
 							(${node.data().common_name})
 						</span>
@@ -113,7 +118,8 @@
 					<a id="feature_link"
 						href="/node/${node.data().feature_node_id}"
 						tabindex="-1">
-						view feature: ${node.data().feature_name}
+						<i class="fa fa-external-link" aria-hidden="true"></i>
+						View feature: ${node.data().feature_name}
 					</a>
 				</div>
 			</div>
