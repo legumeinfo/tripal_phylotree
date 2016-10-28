@@ -7,7 +7,7 @@ let $ = jQuery;
 @inject(Api, BindingEngine, Symbology)
 export class Tree {
 
-  WIDTH = window.innerWidth - 100;
+  WIDTH = window.innerWidth - 200; // tripal layout has a gutter, plus margins
   DURATION_MS = 300;
 	LABEL_HEIGHT = '10px';
 	LABEL_BASELINE_SHIFT = '30%';
