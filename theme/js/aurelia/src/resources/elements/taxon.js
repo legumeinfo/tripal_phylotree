@@ -78,21 +78,30 @@ export class Taxon {
 	}
 	
   onTaxonStateChange(event) {
-    // which taxa are active vs inactive.
-    let data = this._grp.all();
-    let disabled = event.disabled; // array of true/false
-    let disabledTaxa = {};
-    this.disabledTaxaNum = 0;
-    for (var i = 0; i < disabled.length; i++) {
-      let taxon = data[i].key;
-      let b = disabled[i];
-      disabledTaxa[taxon] = b;
-      if(b) {
-        this.disabledTaxaNum ++;
-      }
-    }
+    //let allTaxa = this._grp.all(); // get all the taxa names from cf.
+		
+		// the state object from the nvd3 diagram is an array of booleans
+		// (having true for disabled) which may not match the full list of
+		// taxa names.
+
+		this.disabledTaxaNum = 0;
+		let disabledTaxa = {};
+		_.each(event.disabled, (b, i) => {
+			let chartItem = this._data[i];
+			let taxon = chartItem.label;
+			disabledTaxa[taxon] = b;
+			if(b) {
+				this.disabledTaxaNum++;
+			}
+		});
     this._dim.filter(null); // filters are additive per dimension.
-    this._dim.filter( d => ! disabledTaxa[d] );
+    this._dim.filter( d => {
+			let test = disabledTaxa[d];
+			if(test === undefined || test === false) {
+				return true;
+			}
+			return false;
+		});
 		this.api.cfUpdated = { sender: this };
   }
 
@@ -166,10 +175,10 @@ export class Taxon {
     // filter out taxa having 0 value (count)
     data = _.filter(data, d => d.value > 0 );
     // transform to objects expected by nvd3 chart
-    data = _.map(data, d => {
+    this._data = _.map(data, d => {
       return { label: d.key, value: d.value };
     });
-    this.display(data);
+    this.display(this._data);
   }
 
   display(data) {

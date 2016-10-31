@@ -21,9 +21,10 @@ export class Tree {
 	hiliteFeatures = {};
 	node = null;       // clicked node for expand/collapse/other dialog options.
 	loading = false;       // loading flag for use by tree node popup dialog.
-	rootNodeDirty = false; // flag for has user refocused the tree on some node.
 	
-  _rootNode = null;
+	rootNodeDirty = false; // flag for has user refocused the tree on some node.
+  _rootNode = null; // initially _rootNode is api.treeData, but my be
+										// updated by onNodeFocusTree.
   _tree = null;
   _cf = null;
   _dims = {};
@@ -171,13 +172,13 @@ export class Tree {
   // init() : create the tnt.tree chart
   init() {
 		let that = this;
-    this._rootNode = this.api.treeData;
     this._tree = tnt.tree()
-      .data(this._rootNode)
+      .data(this.api.treeData)
       .duration(this.DURATION_MS)
       .layout(tnt.tree.layout.vertical()
 							.width(this.WIDTH)
 							.scale(true));
+		this._rootNode = this._tree.root();
 		// override the default node display props
 		let nd = this._tree.node_display();
 		nd.size(6);
@@ -311,19 +312,21 @@ export class Tree {
 	onNodeFocusTree() {
 		let dialog = $(this.nodeDialogEl);
 		dialog.dialog('close');
-		let root = this._tree.root();
+		// expand all children of the current node
 		let node = this.node;
 		node.apply( n => {
 			if(n.is_collapsed()) {
 				n.toggle();
 			}
 		});
-		this.rootNodeDirty = true;
-		this.hiddenLeavesNum = 0;
-		this._rootNode = root.subtree(node.get_all_leaves(true));
-		this._tree.data(this._rootNode.data());
+		// extract the subtree and re-root the tree visualization
+		let subtree = this._tree.root().subtree(node.get_all_leaves(true));
+		this._tree.data(subtree.data());
+		this._rootNode = this._tree.root();
 		this._tree.update();
 		this.updateLeafNodeHilite(false);
+		this.rootNodeDirty = true;
+		this.hiddenLeavesNum = 0;
 		setTimeout(() => this.updateFilter(), this.DURATION_MS);
 	}
 
@@ -355,15 +358,14 @@ export class Tree {
   /* update the view-model with current crossfilter results */
   update() {
     // restore full tree from current root node
-    this._tree.data(this._rootNode);
+    this._tree.data(this._rootNode.data());
     // get list of featurenames from crossfilter
     let data = this._dim.top(Infinity);
-    let featureNames = _.map(data, d => d.name );
-    let hash = {};
-    _.each(featureNames, n => hash[n] = true);
+    let featureNames = _.map(data, d => d.name);
+    let hash = _.keyBy(featureNames, n => n);
     // generate the tree leaves matching selected feature names
     let root = this._tree.root();
-    let leaves = root.find_all( n => hash[n.node_name()], true);
+    let leaves = root.find_all(n => hash[n.node_name()], true);
     // use tnt.tree api to display only the selected subtree
     let subtree = root.subtree(leaves);
     this._tree.data(subtree.data());
@@ -387,9 +389,8 @@ export class Tree {
 
 	// restore original root node, and reload the data, update the ui.
   onReset() {
-		this._rootNode = this.api.treeData;
-    this._tree.data(this._rootNode);
-    let root = this._tree.root();
+    this._tree.data(this.api.treeData);
+    let root = this._rootNode = this._tree.root();
     let nodes = root.get_all_nodes(true);
     _.forEach(nodes, n => {
       if(n.is_collapsed()) {
