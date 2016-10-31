@@ -60,14 +60,22 @@ export class Api {
   }
 	
   getTreeData() {
-    let promise = this.http.fetch(this.TREE_URL)
-        .then(res => res.json())
-        .then(data => {
-          this.treeData = data;
-          this.parseTree(data);
-          return this.treeData;
-        });
-    return promise;
+		if(treeData) {
+			// have global var from the php template
+			this.treeData = treeData;
+			this.parseTree(treeData);
+			return Promise.resolve(treeData);
+		}
+		else {
+			let promise = this.http.fetch(this.TREE_URL)
+					.then(res => res.json())
+					.then(data => {
+						this.treeData = data;
+						this.parseTree(data);
+						return this.treeData;
+					});
+			return promise;
+		}
   }
 	
   getMsaData() {

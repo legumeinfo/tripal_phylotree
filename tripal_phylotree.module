@@ -122,7 +122,7 @@ function tripal_phylotree_menu() {
   
    // route for viewing json of all phylonodes having this phylotree_id
    $items['chado_phylotree/%/json'] = array(
-    'page callback' => 'phylotree_json',
+    'page callback' => 'phylotree_json_endpoint',
     'page arguments' => array(1),
     'access callback' => TRUE // allow all anonymous http clients
    );

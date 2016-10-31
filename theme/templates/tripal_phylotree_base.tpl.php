@@ -45,6 +45,13 @@ printf("var API = {
        $phylotree->phylotree_id,
        $phylotree->name
 );
+
+// write the tree data into the template as js var (saving one ajax
+// get for json)
+printf("var treeData = %s;\n",
+       json_encode(phylotree_by_id($phylotree->phylotree_id))
+);
+
 ?>
 </script>
 

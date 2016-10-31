@@ -473,15 +473,14 @@ SQL;
 }
 
 /**
- * phylotree_json
- *  Get json representation of a phylotree id. See menu item for JSON service 
- *  endpoint.
+ * phylotree_by_id
+ *  Get json representation of a phylotree id.
  *
  * @param int $phylotree_id
- * @return string json
+ * @return data structure of tree
  * @ingroup tripal_phylotree
  */
-function phylotree_json($phylotree_id) {
+function phylotree_by_id($phylotree_id) {
   
   //getting the name of the tree will allow construction of links to MSAs
   //TODO: might be better to have this function accept the name as its param
@@ -564,8 +563,21 @@ SQL;
       $root_phylonode_ref['phylotree_name'] = $phylotree_name;
     }
   }
-  // dump datastructure as json to browser. drupal sets the mime-type correctly.
-  drupal_json_output( $root_phylonode_ref );
+  return $root_phylonode_ref;
+}
+
+
+/**
+ * phylotree_json_endpoint
+ *  Get json representation of a phylotree id, send http response.
+ *
+ * @param int $phylotree_id
+ * @return string json
+ * @ingroup tripal_phylotree
+ */
+function phylotree_json_endpoint($phylotree_id) {
+  $tree = phylotree_by_id($phylotree_id);
+  drupal_json_output($tree);
 }
 
 /**
