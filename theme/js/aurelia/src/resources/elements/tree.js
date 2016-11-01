@@ -11,6 +11,8 @@ export class Tree {
   DURATION_MS = 300;
 	LABEL_HEIGHT = '10px';
 	LABEL_BASELINE_SHIFT = '30%';
+	AXIS_TICKS = 12;
+	AXIS_SAMPLE_PX = 30; // pixels
 	
 	@bindable familyName; // family-name attribute of <tree> element
 	@bindable msaEl;      // reference to <msa> element
@@ -218,12 +220,46 @@ export class Tree {
 		// display the tree with msa tnt.tree component
     this._tree(this.phylogramElement);
 
+		// use tnt.tree api to calculate intergenic distance over some screen dist.
+		let distance = this._tree.scale_bar(this.AXIS_SAMPLE_PX, 'pixel');
+		if(distance === undefined) {
+			// this occurs for some trees
+			console.error('failed to lookup intergenic distance for tree:');
+			console.log(this.api.treeData);
+		}
+		else {
+			d3.select(this.phylogramAxisElement)
+				.insert('svg')
+				.attr('width', this.WIDTH)
+				.attr('height', 40)
+				.append('g')
+				.attr('transform', 'translate(20,20)')
+				.attr('class', 'x axis')
+				.call(this.getXAxis());
+		}
+		
 		// perform final ui tweaks after rendering the tree
 		this.decorateLeafNodes();
 		if(_.keys(this.hiliteFeatures).length) {
 			this.updateLeafNodeHilite(true);
 		}
   }
+
+	getXAxis() {
+		let distance = this._tree.scale_bar(this.AXIS_SAMPLE_PX, 'pixel');
+		let scale = d3.scale.linear()
+				.domain([0, distance * this.WIDTH/this.AXIS_SAMPLE_PX ])
+				.range([0, this.WIDTH]);
+		let axis = d3.svg.axis()
+				.scale(scale)
+				.ticks(this.AXIS_TICKS)
+				.orient('bottom');
+		return axis;
+	}
+	
+	updateXAxis() {
+		d3.selectAll('#phylogram-axis g.x.axis').call(this.getXAxis());
+	}
 	
 	// lookup the node with jquery and return a jquery element
 	node2jquery(node) {
@@ -385,6 +421,7 @@ export class Tree {
     this._tree.layout(layout);
     this._tree.update();
 		this.updateLeafNodeHilite(false);
+		setTimeout(() => this.updateXAxis(), this.DURATION_MS);
   }
 
 	// restore original root node, and reload the data, update the ui.

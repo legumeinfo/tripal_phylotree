@@ -109,22 +109,20 @@ export class Api {
     let that = this;
 		
     if (! node.name) {
-            node.name = '';
+      node.name = '';
     }
     else {
       this.index[node.name] = node;
     }
-		
-    if (node.length) {
-      // add a property expected by tnt.tree
+    if ('length' in node) {
+       // add a property expected by tnt.tree- contrary to docs saying
+       // it will work with the length property.
       node.branch_length = node.length;
     }
-		
     if (! node.children || node.children.length === 0) {
       this.flatData.push(node);
       return;
     }
-		
     _.each(node.children, function (d) {
       d.parent = node;
       that.parseTree(d);
