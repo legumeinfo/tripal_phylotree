@@ -342,7 +342,9 @@ export class Tree {
 		this.node.toggle();
 		this._tree.update();
 		this.updateLeafNodeHilite(false);
-		setTimeout(() => this.updateFilter(), this.DURATION_MS);
+		setTimeout(() => {
+			this.updateXAxis(); this.updateFilter();
+		}, this.DURATION_MS);
 	}
 
 	// onNodeFocusTree() : replace the tree viewer with the subtree
@@ -364,7 +366,9 @@ export class Tree {
 		this.updateLeafNodeHilite(false);
 		this.rootNodeDirty = true;
 		this.hiddenLeavesNum = 0;
-		setTimeout(() => this.updateFilter(), this.DURATION_MS);
+		setTimeout(() => {
+			this.updateXAxis(); this.updateFilter();
+		}, this.DURATION_MS);
 	}
 
   updateFilter() {
@@ -408,6 +412,7 @@ export class Tree {
     this._tree.data(subtree.data());
     this._tree.update();
 		this.updateLeafNodeHilite(false);
+		this.updateXAxis();
   }
 
   onLayout() {
@@ -439,7 +444,9 @@ export class Tree {
 		this.rootNodeDirty = false;
     this._tree.update();
 		this.updateLeafNodeHilite(true);
-    setTimeout(() => this.updateFilter(), this.DURATION_MS);
+		setTimeout(() => {
+			this.updateXAxis(); this.updateFilter();
+		}, this.DURATION_MS);
   }
 
 	onExportNewick() {
