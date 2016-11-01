@@ -14,6 +14,8 @@ export class Msa {
 	
 	@bindable familyName;
 	@bindable showDialog; // two-way databinding for toggling dialog in app.js
+	@bindable treeEl;
+	
   @observable selectedFeatureNames = {};
   @observable selectedFeatureNum = 0; // count of selected features
 	
@@ -21,7 +23,7 @@ export class Msa {
   msa = null; // msa viewer component
 	msaDirty = false; // flag for whether the msa component should be reloaded
 	dialog = null;
-
+	tree = null; // tree view-model
   seqs = [];
   index = {}
   _dim = null; // crossfilter dimension
@@ -33,6 +35,9 @@ export class Msa {
   }
 
   attached() {
+		// aurelia bound the <tree> element to a variable, but we need the
+		// tree's view-model (tree.js)
+		this.tree = this.treeEl.au.controller.viewModel;
 		// the dom is ready, so use jquery to get reference to dialog div.
 		this.dialog = $("#msa-dialog");
     this.subscribe();
@@ -144,7 +149,8 @@ export class Msa {
   updateMsa() {
     let data = this._dim.top(Infinity);
     let seqs = _.map(data, d => d.msa);
-    seqs = _.sortBy(seqs, d => d.name);
+		let order = this.tree.getSortOrder();
+    seqs = _.sortBy(seqs, d => order.indexOf(d.name));
     seqs.unshift(this.api.getConsensusSeq());
     this.display(seqs);
 		this.msaDirty = false;

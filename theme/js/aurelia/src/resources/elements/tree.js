@@ -441,6 +441,12 @@ export class Tree {
     setTimeout(() => this.updateFilter(), this.DURATION_MS);
   }
 
+	/* return array of feature names. this can be used elsewhere like
+	 * the msa component */
+	getSortOrder() {
+		let leaves = this._tree.root().get_all_leaves();
+		return _.map(leaves, n => n.node_name());
+	}
 }
 
 export class KeysValueConverter {
