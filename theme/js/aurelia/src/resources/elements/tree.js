@@ -235,7 +235,7 @@ export class Tree {
 				.append('g')
 				.attr('transform', 'translate(20,20)')
 				.attr('class', 'x axis')
-				.call(this.getXAxis());
+				.call(this.getXAxis(distance));
 		}
 		
 		// perform final ui tweaks after rendering the tree
@@ -245,8 +245,8 @@ export class Tree {
 		}
   }
 
-	getXAxis() {
-		let distance = this._tree.scale_bar(this.AXIS_SAMPLE_PX, 'pixel');
+	getXAxis(d) {
+		let distance = d || this._tree.scale_bar(this.AXIS_SAMPLE_PX, 'pixel');
 		let scale = d3.scale.linear()
 				.domain([0, distance * this.WIDTH/this.AXIS_SAMPLE_PX ])
 				.range([0, this.WIDTH]);
