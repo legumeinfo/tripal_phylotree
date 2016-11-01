@@ -4,6 +4,7 @@
 			<div class="smenubar">
 			</div>
 			<button class="ui-button ui-corner-all" click.delegate="onToggleMenu()">
+				<i class="fa fa-bars" aria-hidden="true"></i>
 				<span if.bind="! menu">Show</span>
 				<span if.bind="menu">Hide</span>
 				MSA Menu
@@ -11,6 +12,7 @@
 			<button class="ui-button ui-corner-all"
 				disabled.bind="! selectedFeatureNum"
 				click.delegate="onClearSelection()">
+				<i class="fa fa-refresh" aria-hidden="true"></i>
 				Reset MSA Selection
 			</button>
 		</span>
