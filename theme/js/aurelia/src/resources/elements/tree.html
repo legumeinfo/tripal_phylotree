@@ -44,6 +44,24 @@
 		</span>
 	</div>
 
+	<div id="newick-export" if.bind="newickExport">
+		<h3>Newick representation of your selection
+ 			<button class="ui-button ui-corner-all"
+				data-clipboard-target="#newick-code">
+				<i class="fa fa-clipboard" aria-hidden="true"></i>
+				Copy to clipboard
+			</button>
+ 			<button class="ui-button ui-corner-all"
+				click.delegate="newickExport=null">
+				<i class="fa fa-times" aria-hidden="true"></i>
+				Dismiss
+			</button>
+		</h3>
+		<code id="newick-code">
+     ${newickExport}
+    </code>
+	</div>
+	
 	<div id="phylogram-axis" ref="phylogramAxisElement">
   </div>
 	
@@ -62,71 +80,81 @@
 		</div>
 		
 		<div if.bind="! node.is_leaf() || node.is_collapsed()">
-			<a class="link" href="#" click.delegate="onNodeToggle()" tabindex="-1">
-				<span if.bind="node.is_collapsed()">
-					<i class="fa fa-plus-square-o" aria-hidden="true"></i> Expand
-				</span>
-				<span if.bind="! node.is_collapsed()">
-					<i class="fa fa-minus-square-o" aria-hidden="true"></i> Collapse
-				</span>
-				subtree at this node
-			</a>
-			<br/>
+			<div>
+				<a class="link" href="#" click.delegate="onNodeToggle()" tabindex="-1">
+					<span if.bind="node.is_collapsed()">
+						<i class="fa fa-plus-square-o" aria-hidden="true"></i> Expand
+					</span>
+					<span if.bind="! node.is_collapsed()">
+						<i class="fa fa-minus-square-o" aria-hidden="true"></i> Collapse
+					</span>
+					subtree at this node
+				</a>
+			</div>
+			<div>
 				<a class="link"
 					href="#"
 					if.bind="! node.is_collapsed()"
 					click.delegate="onNodeFocusTree()" tabindex="-1">
 					<i class="fa fa-expand" aria-hidden="true"></i> Focus
-						on subtree at this node
+					on subtree at this node
 				</a>
-				<div if.bind="node.legumes.length">
-					<!-- interior node linkouts -->
-					<div repeat.for="link of node.linkouts">
-						<a href.bind="link.href" tabindex="-1">
-							<i class="fa fa-external-link" aria-hidden="true"></i>
-							${link.text}
-						</a>
-					</div>
-					<!-- cmtv link out -->
-					<a id="cmtv_link_out"
-						tabindex="-1"
-						href="http://velarde.ncgr.org:7070/isys/launch?svc=org.ncgr.cmtv.isys.CompMapViewerService%40--style%40http://velarde.ncgr.org:7070/isys/bin/Components/cmtv/conf/cmtv_combined_map_style.xml%40--combined_display%40${window.location.origin}/lis_gene_families/chado/phylo/node/gff_download/${node.data().phylonode_id}">
-						<i class="fa fa-external-link" aria-hidden="true"></i>
-						View Genomic Distribution for genes in this subtree
-					</a>
-				</div>
-				<div if.bind="! node.legumes.length">
-					<i class="fa fa-info-circle" aria-hidden="true"></i>
-					(No additional resources are available for this
-						sub-tree. Please try another node.)
-				</div>
 			</div>
-			<div if.bind="node.is_leaf() && ! node.is_collapsed()">
-				<!-- add a tripal organism link, if this is a leaf node and
-				organism is known. -->
-				<div if.bind="node.data().organism_node_id">
-					<a id="organism_link"
-						href="/node/${node.data().organism_node_id}"
-						tabindex="-1">
-						<i class="fa fa-external-link" aria-hidden="true"></i>
-						View organism: ${node.data().genus} ${node.data().species}
-						<span if.bind="node.data().common_name">
-							(${node.data().common_name})
-						</span>
-					</a>
-				</div>
-				<!--  add a tripal feature link, if this is a leaf node and the
-				feature is known. -->
-				<div if.bind="node.data().feature_node_id">
-					<a id="feature_link"
-						href="/node/${node.data().feature_node_id}"
-						tabindex="-1">
-						<i class="fa fa-external-link" aria-hidden="true"></i>
-						View feature: ${node.data().feature_name}
-					</a>
-				</div>
+			<div>
+				<a class="link" href="#" click.delegate="onExportNewick()"
+					 tabindex="-1">
+					<i class="fa fa-save" aria-hidden="true"></i>
+					Export subtree in Newick format
+				</a>
 			</div>
-			<loader-anim if.bind="loading"></loader-anim>
+			<div if.bind="node.legumes.length">
+				<!-- interior node linkouts -->
+				<div repeat.for="link of node.linkouts">
+					<a href.bind="link.href" tabindex="-1">
+						<i class="fa fa-external-link" aria-hidden="true"></i>
+						${link.text}
+					</a>
+				</div>
+				<!-- cmtv link out -->
+				<a id="cmtv_link_out"
+					tabindex="-1"
+					href="http://velarde.ncgr.org:7070/isys/launch?svc=org.ncgr.cmtv.isys.CompMapViewerService%40--style%40http://velarde.ncgr.org:7070/isys/bin/Components/cmtv/conf/cmtv_combined_map_style.xml%40--combined_display%40${window.location.origin}/lis_gene_families/chado/phylo/node/gff_download/${node.data().phylonode_id}">
+					<i class="fa fa-external-link" aria-hidden="true"></i>
+					View Genomic Distribution for genes in this subtree
+				</a>
+			</div>
+			<div if.bind="! node.legumes.length">
+				<i class="fa fa-info-circle" aria-hidden="true"></i>
+				(No additional resources are available for this
+				sub-tree. Please try another node.)
+			</div>
 		</div>
+		<div if.bind="node.is_leaf() && ! node.is_collapsed()">
+			<!-- add a tripal organism link, if this is a leaf node and
+			organism is known. -->
+			<div if.bind="node.data().organism_node_id">
+				<a id="organism_link"
+					href="/node/${node.data().organism_node_id}"
+					tabindex="-1">
+					<i class="fa fa-external-link" aria-hidden="true"></i>
+					View organism: ${node.data().genus} ${node.data().species}
+					<span if.bind="node.data().common_name">
+						(${node.data().common_name})
+					</span>
+				</a>
+			</div>
+			<!--  add a tripal feature link, if this is a leaf node and the
+			feature is known. -->
+			<div if.bind="node.data().feature_node_id">
+				<a id="feature_link"
+					href="/node/${node.data().feature_node_id}"
+					tabindex="-1">
+					<i class="fa fa-external-link" aria-hidden="true"></i>
+					View feature: ${node.data().feature_name}
+				</a>
+			</div>
+		</div>
+		<loader-anim if.bind="loading"></loader-anim>
+	</div>
 			
 </template>

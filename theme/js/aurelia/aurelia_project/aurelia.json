@@ -94,7 +94,6 @@
 						"name": "fetch",
 						"path": "../node_modules/whatwg-fetch",
 						"main": "fetch"
-						          
 					},
 					"raf",
 					"performance-now",
@@ -124,12 +123,6 @@
             "path": "../node_modules/aurelia-templating-resources/dist/amd",
             "main": "aurelia-templating-resources"
           },
-          {
-            "name": "aurelia-testing",
-            "path": "../node_modules/aurelia-testing/dist/amd",
-            "main": "aurelia-testing",
-            "env": "dev"
-          },
 					{
 						"name": "crossfilter2",
 						"path": "../node_modules/crossfilter2/crossfilter"	          
@@ -137,7 +130,17 @@
 					{
 						"name" : "tnt.tree",
 						"path" : "../node_modules/tnt.tree/build/tnt.tree.min"
-					}	  
+					},
+					{
+						"name" : "biojs-io-newick",
+						"path" : "../node_modules/biojs-io-newick/src/newick"
+					},
+          {
+            "name": "aurelia-testing",
+            "path": "../node_modules/aurelia-testing/dist/amd",
+            "main": "aurelia-testing",
+            "env": "dev"
+          }
         ]
       }
     ]

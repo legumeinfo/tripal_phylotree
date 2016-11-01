@@ -11,4 +11,9 @@
 
 .ui-widget, .ui-widget button {
 		font-size: 10px;
+		padding: 2px;
+}
+
+button.ui-button {
+		padding: 2px;
 }

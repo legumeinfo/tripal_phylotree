@@ -1,6 +1,7 @@
 import {inject, bindable, parseQueryString, BindingEngine} from 'aurelia-framework';
 import {Api} from 'api';
 import {Symbology} from 'symbology';
+import * as newick from 'biojs-io-newick';
 
 let $ = jQuery;
 
@@ -23,7 +24,7 @@ export class Tree {
 	hiliteFeatures = {};
 	node = null;       // clicked node for expand/collapse/other dialog options.
 	loading = false;       // loading flag for use by tree node popup dialog.
-	
+	newickExport = null;
 	rootNodeDirty = false; // flag for has user refocused the tree on some node.
   _rootNode = null; // initially _rootNode is api.treeData, but my be
 										// updated by onNodeFocusTree.
@@ -441,6 +442,15 @@ export class Tree {
     setTimeout(() => this.updateFilter(), this.DURATION_MS);
   }
 
+	onExportNewick() {
+		let d = this.node.data();
+		this.newickExport = newick.parse_json(d);
+		let dialog = $(this.nodeDialogEl);
+		dialog.dialog('close');
+		$('html,body').attr('scrollTop', 0);
+		new Clipboard('#newick-export button');
+	}
+	
 	/* return array of feature names. this can be used elsewhere like
 	 * the msa component */
 	getSortOrder() {

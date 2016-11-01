@@ -103,8 +103,11 @@ drupal_add_js(
 );
 drupal_add_js(
     '//cdnjs.cloudflare.com/ajax/libs/chroma-js/1.2.1/chroma.min.js',
-    $js_config
-    
+    $js_config    
+);
+drupal_add_js(
+    '//cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.15/clipboard.min.js',
+    $js_config    
 );
 
 drupal_add_library('system', 'ui.dialog');
