@@ -1,17 +1,17 @@
-tripal_phylotree
-================
-A tripal module for Chado phylogeny tables, developed for
-http://legumeinfo.org/ 
+# tripal_phylotree
 
-Requirements
-------------
+A tripal module for Chado phylogeny schema, developed for LIS
+http://legumeinfo.org .
+An example gene family:
+http://legumeinfo.org/chado_phylotree/phytozome_10_2.59027077
+
+## Server Requirements
 * Tripal 2 http://tripal.info/
 * Chado http://gmod.org/wiki/Chado_Phylogeny_Module
 * Drupal 7 https://www.drupal.org/
 
-Quickstart
-----------
-* git clone repos into drupal/sites/all/modules/tripal
+## Server Quickstart
+* git clone repository into drupal/sites/all/modules/tripal
 * drush pm-enable tripal_phylotree (or enable via drupal ui admin interface)
 * see in browser admin/modules, and enable tripal_phylotree permissions:
   add 'View Phylotree' permission to all Roles
@@ -20,5 +20,29 @@ Quickstart
 * sync phylotrees
 * sync organisms
 * sync features of type = 'polypeptide'
-* default view for searching and browsing is chado/phylotree
+* browse to /chado_phylotree/{family}, e.g. /chado_phylotree/phytozome_10_2.59026827
 
+## Javascript Build Steps
+The coordinated UI views of the phylogram, the taxa pie chart, and the msa
+visualization are implemented using several javascript libraries. To build and
+bundle the javascript application you will need:
+
+* Node 4 or newer
+* Npm 3 or newer
+* Git
+
+```
+# install aurelia-cli so the au command is on your path
+npm install aurelia-cli -g
+
+# install the javascript dependencies from the package.json manifest
+cd theme/js/aurelia/
+npm install
+
+# build for development
+au run --watch
+
+# build for production (produces minified javascript)
+au build --env prod
+```
+warning: on freebsd, you may have to repeat the `npm install` 2-3 times until all the packages are in place.
