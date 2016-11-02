@@ -498,10 +498,9 @@ SQL;
   // reminder: the chado_xxxx tables are tripal/drupal's linking tables
   $sql = <<<SQL
   SELECT n.phylonode_id, n.parent_phylonode_id, n.label AS name,
-  ROUND(CAST(n.distance AS numeric), 2) AS length,
-  f.feature_id, f.name AS feature_name, cvt.name AS cvterm_name,
-  o.organism_id, o.common_name, o.abbreviation, o.genus, o.species,
-  cf.nid AS feature_node_id, co.nid AS organism_node_id
+  distance AS length, f.feature_id, f.name AS feature_name,
+  cvt.name AS cvterm_name, o.organism_id, o.common_name, o.abbreviation,
+  o.genus, o.species, cf.nid AS feature_node_id, co.nid AS organism_node_id
   FROM chado.phylonode n
   LEFT OUTER JOIN chado.cvterm cvt ON n.type_id = cvt.cvterm_id
   LEFT OUTER JOIN chado.feature f ON n.feature_id = f.feature_id
