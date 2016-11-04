@@ -86,15 +86,15 @@ export class Tree {
 	
 	// add a css class to all singleton nodes, so they can be themed or hidden.
 	decorateSingletonNodes() {
-			if(this.rootNodeDirty) {
-				// add css classes to singleton nodes
-				d3.selectAll('#phylogram .inner.tnt_tree_node')
-					.classed('singleton-node', (d) =>  {
-						d.singleton = d.children && d.children.length === 1;
-						return d.singleton;
-					})
-					.filter((d) => d.singleton)
-					.classed('singleton-node-visible', this.showSingletonNodes);
+		if(this.rootNodeDirty) {
+			// add css classes to singleton nodes
+			d3.selectAll('#phylogram .inner.tnt_tree_node')
+				.classed('singleton-node', (d) =>  {
+					d.singleton = d.children && d.children.length === 1;
+					return d.singleton;
+				})
+				.filter((d) => d.singleton)
+				.classed('singleton-node-visible', this.showSingletonNodes);
 		}
 		else {
 			// remove classes from singleton nodes
@@ -422,7 +422,6 @@ export class Tree {
     });
     this._dim.filterAll(); // filters are additive per dimension, so clear out previous
     this._dim.filterFunction((d) => visibleNodes[d]);
-		
 		this.api.cfUpdated = { sender: this };
   }
 
@@ -443,6 +442,7 @@ export class Tree {
     this._tree.data(subtree.data());
     this._tree.update();
 		this.updateLeafNodeHilite(false);
+		this.decorateSingletonNodes();
 		this.updateXAxis();
   }
 
