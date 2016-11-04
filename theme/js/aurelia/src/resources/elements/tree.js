@@ -359,7 +359,9 @@ export class Tree {
 			}
 		});
 		// extract the subtree and re-root the tree visualization
-		let subtree = this._tree.root().subtree(node.get_all_leaves(true));
+		let includeChildren, includeSingletonNodes = true;
+		let leaves = node.get_all_leaves(includeChildren);
+		let subtree = this._tree.root().subtree(leaves, includeSingletonNodes);
 		this._tree.data(subtree.data());
 		this._rootNode = this._tree.root();
 		this._tree.update();
@@ -376,7 +378,7 @@ export class Tree {
     let root = this._tree.root();
     // get leaves from the tnt.tree api. leaves counts collapsed node as leaf.
     let allLeaves = root.get_all_leaves(true);
-    let visibleLeaves = root.get_all_leaves(false); // dont traverse collapsed nodes.
+    let visibleLeaves = root.get_all_leaves(false); // omit collapsed nodes
     this.hiddenLeavesNum = allLeaves.length - visibleLeaves.length;
 		if(this.hiddenLeavesNum > 0) {
 			// the visibleLeaves count includes 1 collapsed node
@@ -408,7 +410,8 @@ export class Tree {
     let root = this._tree.root();
     let leaves = root.find_all(n => hash[n.node_name()], true);
     // use tnt.tree api to display only the selected subtree
-    let subtree = root.subtree(leaves);
+		let includeSingletonNodes = true;
+    let subtree = root.subtree(leaves, includeSingletonNodes);
     this._tree.data(subtree.data());
     this._tree.update();
 		this.updateLeafNodeHilite(false);
