@@ -26,7 +26,9 @@ export class Tree {
 	loading = false;       // loading flag for use by tree node popup dialog.
 	newickExport = null;
 	rootNodeDirty = false; // flag for has user refocused the tree on some node.
-  _rootNode = null; // initially _rootNode is api.treeData, but my be
+	showSingletonNodes = true; // when refocused on a subtree.
+	
+  _rootNode = null; // initially _rootNode is same as api.treeData, but my be
 										// updated by onNodeFocusTree.
   _tree = null;
   _cf = null;
@@ -80,6 +82,31 @@ export class Tree {
 		d3.selectAll('#phylogram .leaf.tnt_tree_node')
 			.filter((d) => this.isLegume(d))
 			.classed('legume', true);
+	}
+	
+	// add a css class to all singleton nodes, so they can be themed or hidden.
+	decorateSingletonNodes() {
+			if(this.rootNodeDirty) {
+				// add css classes to singleton nodes
+				d3.selectAll('#phylogram .inner.tnt_tree_node')
+					.classed('singleton-node', (d) =>  {
+						d.singleton = d.children && d.children.length === 1;
+						return d.singleton;
+					})
+					.filter((d) => d.singleton)
+					.classed('singleton-node-visible', this.showSingletonNodes);
+		}
+		else {
+			// remove classes from singleton nodes
+			d3.selectAll('#phylogram g.singleton-node')
+				.classed('singleton-node', false)
+				.classed('singleton-node-visible', false)
+		}
+	}
+
+	onShowSingletonNodes(show) {
+		d3.selectAll('#phylogram .singleton-node')
+			.classed('singleton-node-visible', show);
 	}
 	
   subscribe() {
@@ -364,9 +391,10 @@ export class Tree {
 		let subtree = this._tree.root().subtree(leaves, includeSingletonNodes);
 		this._tree.data(subtree.data());
 		this._rootNode = this._tree.root();
+		this.rootNodeDirty = true;
 		this._tree.update();
 		this.updateLeafNodeHilite(false);
-		this.rootNodeDirty = true;
+		this.decorateSingletonNodes();
 		this.hiddenLeavesNum = 0;
 		setTimeout(() => {
 			this.updateXAxis(); this.updateFilter();
@@ -447,6 +475,7 @@ export class Tree {
 		this.rootNodeDirty = false;
     this._tree.update();
 		this.updateLeafNodeHilite(true);
+		this.decorateSingletonNodes();
 		setTimeout(() => {
 			this.updateXAxis(); this.updateFilter();
 		}, this.DURATION_MS);
@@ -467,6 +496,7 @@ export class Tree {
 		let leaves = this._tree.root().get_all_leaves();
 		return _.map(leaves, n => n.node_name());
 	}
+
 }
 
 export class KeysValueConverter {

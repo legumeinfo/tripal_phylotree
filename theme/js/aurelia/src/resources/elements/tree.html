@@ -11,10 +11,20 @@
           Reset Phylogram Chart
         </button>
 				<span if.bind="hiddenLeavesNum">
-					${hiddenLeavesNum} hidden terminal (leaf) nodes |
+					${hiddenLeavesNum} hidden terminal (leaf) nodes
+					|
 				</span>
         <span if.bind="rootNodeDirty">
-          You have focused on a subtree. |
+          You have focused on a subtree.
+					|
+					<label for="singletonToggle">
+						<input id="singletonToggle"
+							type="checkbox"
+							checked.bind="showSingletonNodes"
+							change.delegate="onShowSingletonNodes(showSingletonNodes)">
+						<span class="label body">Show singleton nodes</span>
+					</label>
+					|
         </span>
         <label for="verticalLayout">
         <input id="verticalLayout" type="radio" name="layout" value="vertical"

@@ -2,7 +2,7 @@
 		margin-bottom: 100px;
 }
 
-#au-content > tree > form > fieldset > label, legend {
+#au-content > tree > form > fieldset label, legend {
     font-weight: normal;
     display: inline;
 }
@@ -58,4 +58,15 @@
 		stroke: grey;
 }
 
+
+g.singleton-node > circle {
+		visibility: hidden;
+}
+
+g.singleton-node.singleton-node-visible > circle {
+		visibility: visible;
+		stroke: black;
+		fill: grey;
+		r: 4;
+}
 
