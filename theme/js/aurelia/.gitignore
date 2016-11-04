@@ -1,0 +1,5 @@
+scripts/*bundle*
+*.map
+node_modules
+.idea
+.DS_STORE

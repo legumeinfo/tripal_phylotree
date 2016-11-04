@@ -93,14 +93,15 @@ function tripal_phylotree_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 2
   );
-  
+
+  // menu hook to fetch gene tree by name
    $items['chado_phylotree/%'] = array(
     'page callback' => 'phylotree_by_name',
     'page arguments' => array(1),
     'access callback' => TRUE // allow all anonymous http clients
    );
 
-   // a menu hook to redirect to gene tree and hilight corresponding
+   // A menu hook to redirect to gene tree and hilight corresponding
    // node name (polypeptide) for the given gene name
    // /chado_gene_phylotree_v2?gene_name=C.cajan_38960_gene
    // or comma seperated list of gene names
@@ -119,13 +120,21 @@ function tripal_phylotree_menu() {
     'access callback' => TRUE // allow all anonymous http clients
    );
   
-   // create a route for viewing json of all phylonodes having this phylotree_id
+   // route for viewing json of all phylonodes having this phylotree_id
    $items['chado_phylotree/%/json'] = array(
-    'page callback' => 'phylotree_json',
+    'page callback' => 'phylotree_json_endpoint',
     'page arguments' => array(1),
     'access callback' => TRUE // allow all anonymous http clients
    );
-  return $items;
+
+   // route for static scripts/ content; this is the aurelia-cli build folder.
+   $items['chado_phylotree/scripts/%'] = array(
+       'page callback' => 'phylotree_static_scripts',
+       'page arguments' => array(2),
+       'access callback' => TRUE // allow all anonymous http requests
+   );
+   
+   return $items;
 }
 
 /**
@@ -187,18 +196,6 @@ function tripal_phylotree_theme($existing, $type, $theme, $path) {
     'tripal_phylotree_base' => array(
       'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_base',
-      'path' => "$path/theme/templates",
-    ),
-    // partial for organisms block
-    'tripal_phylotree_organisms' => array(
-      'variables' => array('node' => NULL),
-      'template' => 'tripal_phylotree_organisms',
-      'path' => "$path/theme/templates",
-    ),
-    // partial for phylotree radial block
-    'tripal_phylotree_radial' => array(
-      'variables' => array('node' => NULL),
-      'template' => 'tripal_phylotree_radial',
       'path' => "$path/theme/templates",
     ),
     // partial for cross references block

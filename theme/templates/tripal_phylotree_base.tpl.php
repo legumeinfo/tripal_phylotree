@@ -1,31 +1,59 @@
 <?php
 $my_path = path_to_theme();
 if(empty($my_path)) {
-  // on lis-dev, path_to_theme() is returning empty string, just hardcoding it;
-  // this is a problem on lis-stage too, probably all the lis servers. Would
-  // be good to figure this out, as the recent rename of the git repos to
-  // tripal_phylogeny broke this once, and in general we can't really know where
-  // it will be installed
+  // on lis-dev, path_to_theme() is returning empty string. this is a
+  // problem on lis-stage too, probably all the lis servers. Would be
+  // good to figure this out, as the recent rename of the git repos to
+  // tripal_phylogeny broke this once, and in general we can't really
+  // know where it will be installed. workaround: hardcode the path to
+  // the theme.
   $my_path = 'sites/all/modules/tripal/tripal_phylogeny';
+  // note: there is no leading '/' because that is the format used by
+  // path_to_theme(), even though this is effectively an absolute url.
 }
-drupal_add_css($my_path . '/theme/css/phylogram.css');
-
 $phylotree = $variables['node']->phylotree;
+
+drupal_add_css(
+    '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css',
+    array('type' => 'external', 'group' => CSS_THEME)
+);
+drupal_add_css(
+    '//cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.4/nv.d3.min.css',
+    array('type' => 'external', 'group' => CSS_THEME)
+);
+drupal_add_css(
+    $my_path . '/theme/css/teaser-fix.css',
+    array('type' => 'file', 'group' => CSS_THEME)
+);
+
 ?>
+
 <script>
 <?php
-// write js var having URL of json data source for charting
-printf('var phylotreeDataURL = "/chado_phylotree/%d/json";',
-  $phylotree->phylotree_id );
+// write js var with gene family name
+printf("var FAMILY_NAME = '%s';\n", $phylotree->name);
+
 // write js var with path to our theme, for use below by javascript functions.
 // prefix path to theme with / because drupal returns it as a relative URL.
-printf('var pathToTheme = "/%s";', $my_path);
+printf("var THEME_PATH = '/%s';\n", $my_path);
 
-printf('var familyName = "%s";', $phylotree->name);
+// write js var having URL of json and gff data sources
+printf("var API = {
+  tree: \"/chado_phylotree/%s/json\",
+  msa: \"/lis_gene_families/chado/msa/%s-consensus/download/\"
+};\n",
+       $phylotree->phylotree_id,
+       $phylotree->name
+);
+
+// write the tree data into the template as js var (saving one ajax
+// get for json)
+printf("var treeData = %s;\n",
+       json_encode(phylotree_by_id($phylotree->phylotree_id))
+);
+
 ?>
-
 </script>
-
 
 <div class="tripal_phylotree-data-block-desc tripal-data-block-desc">
   <p><b><?php print $phylotree->name ?></b>:
@@ -34,132 +62,69 @@ if( ! empty($phylotree->comment) ) {
   print $phylotree->comment;
 }
 ?>
-</p>
-</div>
-
-<div>
-  <a href="#" class="button phylogeny-help phylogeny-help-btn">
-    <img src="/sites/all/modules/tripal/tripal_phylogeny/image/help.png"/>
-    Gene Family Help
-  </a>
-  <a id="msa-toggle" href="#" class="button" onclick="phylogeny_msa.toggle()">
-    View Multiple Sequence Alignment (MSA)
-  </a>
-  <a href="#" class="button organism-legend-show" style="display: none">
-    Show Legend
-  </a>
-</div>
-
-<div id="msa-viewer-wrapper" style="display: none; padding: 10px;">
-    <div id="msa-spinner">
-    <img src="/<?php print $my_path ?>/image/ajax-loader.gif"/>
-    </div>
-    <div id="msa-viewer">
-        <!-- biojs msa viewer will load div -->
-    </div>
-</div>
-
-<div id="phylogram">
-    <!-- d3js will add svg to this div, and remove the loader gif
-     prefix with / for absolute url -->
-  <img src="/<?php print $my_path ?>/image/ajax-loader.gif"
-       class="phylogram-ajax-loader"/>
-</div>
-
-<div style="display: none" id="phylogeny-help-dlg">
-  <p style="font-size: 0.9rem" id="tour-link">
-    <a href="#"
-       onclick="lisTours.go('phylotree'); jQuery('#phylogeny-help-dlg').dialog('close');"
-       style="text-decoration: underline">
-    View Quick Tour
-    </a>
-  </p>
-
-  <p style="font-size: 0.9rem">
-    <a href="/search/phylotree/userinfo" target="_blank"
-    style="text-decoration: underline">
-    View complete help on searching gene families...</a>
   </p>
 </div>
 
-<div id="organism-legend-dialog" style="display: none">
-  <!-- d3js will add content to this div -->
-  <div class="organism-legend">
-  </div>
+<div id="ajax-spinner">
+    <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+    <span class="sr-only">Loading...</span>
 </div>
 
-<div id="phylonode_popup_dialog" style="display: none;">
+<div id="au-content" aurelia-app="main">
 </div>
-
 
 <?php
 /*
- * this template depends on a few javascript libraries, but i am not
- * putting it into tripal_phylotree.info scripts[] because that results
- * in the script getting loaded *on every drupal request* which is wasteful
+ * this template depends on a few javascript libraries, but we are not
+ * putting it into tripal_phylotree.info scripts[] because that
+ * results in the script getting loaded *on every drupal request*
+ * across the site, which is waste of resources.
  */
 
-drupal_add_js($my_path . '/theme/js/msa/dist/msa-1_0.min.js',
-              array(
-                  'type' => 'file',
-                  'group' => JS_LIBRARY,
-              ));
-drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js',
-              array(
-                  'type' => 'external',
-                  'group' => JS_LIBRARY,
-              ));
-drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/URI.js/1.18.1/URI.min.js',
-              array(
-                  'type' => 'external',
-                  'group' => JS_LIBRARY,
-              ));
-drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.14.1/lodash.min.js',
-              array(
-                  'type' => 'external',
-                  'group' => JS_LIBRARY,
-              ));
-drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.2/js.cookie.min.js',
-              array(
-                  'type' => 'external',
-                  'group' => JS_LIBRARY,
-              ));
-drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/chroma-js/1.2.1/chroma.min.js',
-              array(
-                  'type' => 'external',
-                  'group' => JS_LIBRARY,
-              ));
-drupal_add_js('/'. $my_path . '/theme/js/taxon-chroma.js',
-              array(
-                  'type' => 'file',
-                  'group' => JS_DEFAULT,
-              ));
-drupal_add_js('/'. $my_path . '/theme/js/d3.phylogram.js',
-              array(
-                  'type' => 'file',
-                  'group' => JS_DEFAULT,
-              ));
-drupal_add_js('/'. $my_path . '/theme/js/organism-bubble-plot.js',
-              array(
-                  'type' => 'file',
-                  'group' => JS_DEFAULT,
-              ));
-drupal_add_js('/'. $my_path . '/theme/js/phylotree.js',
-              array(
-                  'type' => 'file',
-                  'group' => JS_DEFAULT,
-              ));
-drupal_add_js('/'. $my_path . '/theme/js/phylogeny-msa.js',
-              array(
-                  'type' => 'file',
-                  'group' => JS_DEFAULT,
-              ));
-drupal_add_js('/'. $my_path . '/theme/js/tour.js',
-              array(
-                  'type' => 'file',
-                  'group' => JS_DEFAULT,
-              ));
+//
+// library group/level of scripts
+//
+$js_config = array('type' => 'external', 'group' => JS_LIBRARY);
+drupal_add_js(
+    '//cdn.bio.sh/msa/1.0/msa.min.gz.js',
+    $js_config    
+);
+drupal_add_js(
+    '//cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js',
+    $js_config
+);
+drupal_add_js(
+    '//cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.4/nv.d3.min.js',
+    $js_config
+);
+drupal_add_js(
+    '//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.4/lodash.min.js',
+    $js_config
+);
+drupal_add_js(
+    '//cdnjs.cloudflare.com/ajax/libs/chroma-js/1.2.1/chroma.min.js',
+    $js_config    
+);
+drupal_add_js(
+    '//cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.15/clipboard.min.js',
+    $js_config    
+);
 
 drupal_add_library('system', 'ui.dialog');
 
+//
+// default group/level javascripts (loads after library group)
+//
+$js_dir = '/'. $my_path . '/theme/js';
+drupal_add_js(
+    $js_dir . '/tour-autolauncher.js',
+    array('type' => 'file', 'group' => JS_DEFAULT)
+);
+
+// finally, use a regular script tag to inject the aurelia boostrapper
+// it will populate the aurelia-app div, above.
+printf('<script src="%s/aurelia/scripts/vendor-bundle.js" data-main="aurelia-bootstrapper"></script>',
+       $js_dir)
+
 ?>
+

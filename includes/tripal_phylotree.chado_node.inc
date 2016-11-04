@@ -59,18 +59,6 @@ function tripal_phylotree_node_view($node, $view_mode, $langcode) {
       '#tripal_toc_title' => 'Phylogram',
       '#weight' => -100,
     );
-    $node->content['tripal_phylotree_radial'] = array(
-      '#markup' => theme('tripal_phylotree_radial', array('node' => $node)),
-      '#tripal_toc_id'    => 'phylotree_circ_dendrogram',
-      '#tripal_toc_title' => 'Circular Dendrogram',
-      '#weight' => -95,
-    );
-    $node->content['tripal_phylotree_organisms'] = array(
-      '#markup' => theme('tripal_phylotree_organisms', array('node' => $node)),
-      '#tripal_toc_id'    => 'phylotree_organisms',
-      '#tripal_toc_title' => 'Organisms',
-      '#weight' => -90,
-    );
     $node->content['tripal_phylotree_references'] = array(
       '#markup' => theme('tripal_phylotree_references', array('node' => $node)),
       '#tripal_toc_id'    => 'phylotree_references',
@@ -485,15 +473,14 @@ SQL;
 }
 
 /**
- * phylotree_json
- *  Get json representation of a phylotree id. See menu item for JSON service 
- *  endpoint.
+ * phylotree_by_id
+ *  Get json representation of a phylotree id.
  *
  * @param int $phylotree_id
- * @return string json
+ * @return data structure of tree
  * @ingroup tripal_phylotree
  */
-function phylotree_json($phylotree_id) {
+function phylotree_by_id($phylotree_id) {
   
   //getting the name of the tree will allow construction of links to MSAs
   //TODO: might be better to have this function accept the name as its param
@@ -511,10 +498,9 @@ SQL;
   // reminder: the chado_xxxx tables are tripal/drupal's linking tables
   $sql = <<<SQL
   SELECT n.phylonode_id, n.parent_phylonode_id, n.label AS name,
-  n.distance AS length, f.feature_id, f.name AS feature_name,
-  cvt.name AS cvterm_name,
-  o.organism_id, o.common_name, o.abbreviation, o.genus, o.species,
-  cf.nid AS feature_node_id, co.nid AS organism_node_id
+  distance AS length, f.feature_id, f.name AS feature_name,
+  cvt.name AS cvterm_name, o.organism_id, o.common_name, o.abbreviation,
+  o.genus, o.species, cf.nid AS feature_node_id, co.nid AS organism_node_id
   FROM chado.phylonode n
   LEFT OUTER JOIN chado.cvterm cvt ON n.type_id = cvt.cvterm_id
   LEFT OUTER JOIN chado.feature f ON n.feature_id = f.feature_id
@@ -576,8 +562,21 @@ SQL;
       $root_phylonode_ref['phylotree_name'] = $phylotree_name;
     }
   }
-  // dump datastructure as json to browser. drupal sets the mime-type correctly.
-  drupal_json_output( $root_phylonode_ref );
+  return $root_phylonode_ref;
+}
+
+
+/**
+ * phylotree_json_endpoint
+ *  Get json representation of a phylotree id, send http response.
+ *
+ * @param int $phylotree_id
+ * @return string json
+ * @ingroup tripal_phylotree
+ */
+function phylotree_json_endpoint($phylotree_id) {
+  $tree = phylotree_by_id($phylotree_id);
+  drupal_json_output($tree);
 }
 
 /**
@@ -606,4 +605,20 @@ function phylotree_feature_summary($phylotree_id) {
     $summary[$r->abbreviation] = $r->count;
   }
   return $summary;
+}
+
+/**
+ * phylotree_static_scripts
+ * workaround for drupal having terrible support for serving up static content.
+ * js/aurelia/scripts is the build folder for `au build` script.
+ *
+ * @param string filename
+ * @ingroup tripal_phylotree
+ */
+function phylotree_static_scripts($file) {
+    $my_path = drupal_get_path('module', 'tripal_phylotree');
+    $file = "$my_path/theme/js/aurelia/scripts/$file";
+    drupal_add_http_header('Content-Type', 'application/javascript');
+    readfile($file);
+    drupal_exit();
 }

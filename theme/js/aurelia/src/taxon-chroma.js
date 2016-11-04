@@ -107,3 +107,6 @@ var taxonChroma = {};
   }
   
 }.call(taxonChroma));
+
+export { taxonChroma };
+
