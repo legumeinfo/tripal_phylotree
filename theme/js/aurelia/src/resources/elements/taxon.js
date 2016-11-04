@@ -20,7 +20,7 @@ export class Taxon {
   _dim = null; // crossfilter dimension
   _grp = null; // crossfilter group
 
-  disabledTaxaNum = 0;
+  chartDirty = false; // a flag for whether the pie chart can be reset.
 
   constructor(app, api, sym, be) {
 		this.app = app;       // app.js
@@ -67,34 +67,38 @@ export class Taxon {
       return chart;
 		});
 	}
+	
+  subscribe() {
+		this.be.propertyObserver(this.api, 'cf')
+		 	.subscribe( o => this.onCfCreated(o));
+		this.be.propertyObserver(this.api, 'cfUpdated')
+		 	.subscribe( o => this.onCfUpdated(o));
+  }
 
-	showDialogChanged(newValue, oldValue) {
-		this.showDialog = newValue;
-		// ignore changed events if attached() has not run yet (based on
-		// existence of dialog jquery object)
-		if(this.dialog) {
-			this.updateDialog();
-		}
-	}
+  setupCrossfilter() {
+    // create a dimension for the taxon
+    this._dim = this._cf.dimension(
+      d => d.species ? d.genus + ' ' + d.species : ''
+    );
+    this._grp = this._dim.group();
+  }
 	
   onTaxonStateChange(event) {
-    //let allTaxa = this._grp.all(); // get all the taxa names from cf.
-		
 		// the state object from the nvd3 diagram is an array of booleans
 		// (having true for disabled) which may not match the full list of
 		// taxa names.
-
-		this.disabledTaxaNum = 0;
+		this.chartDirty = false;
 		let disabledTaxa = {};
 		_.each(event.disabled, (b, i) => {
 			let chartItem = this._data[i];
 			let taxon = chartItem.label;
 			disabledTaxa[taxon] = b;
 			if(b) {
-				this.disabledTaxaNum++;
+				// have at least one disabled item, so chart is reset-able.
+				this.chartDirty = true;
 			}
 		});
-    this._dim.filter(null); // filters are additive per dimension.
+    this._dim.filter(null); // clear filter, they are additive per dimension.
     this._dim.filter( d => {
 			let test = disabledTaxa[d];
 			if(test === undefined || test === false) {
@@ -103,14 +107,6 @@ export class Taxon {
 			return false;
 		});
 		this.api.cfUpdated = { sender: this };
-  }
-
-	
-  subscribe() {
-		this.be.propertyObserver(this.api, 'cf')
-		 	.subscribe( o => this.onCfCreated(o));
-		this.be.propertyObserver(this.api, 'cfUpdated')
-		 	.subscribe( o => this.onCfUpdated(o));
   }
 
 	onCfCreated(cf) {
@@ -125,22 +121,11 @@ export class Taxon {
 			if(this.showDialog) {
 				this.updateTaxaChart();
 			}
-			else {
-				this._chart.dirty = true;
-			}
 		}
 	}
 
-  setupCrossfilter() {
-    // create a dimension for the taxon
-    this._dim = this._cf.dimension(
-      d => d.species ? d.genus + ' ' + d.species : ''
-    );
-    this._grp = this._dim.group();
-  }
-
 	updateDialog() {
-		if(this.showDialog && this._chart.dirty) {
+		if(this.showDialog) {
 			// lazy update the taxa component
 			this.updateTaxaChart();
 		}
@@ -163,9 +148,18 @@ export class Taxon {
 		this.dialog.dialog(action);
 		this.dialogWasOpened = true;
 	}
+	
+	showDialogChanged(newValue, oldValue) {
+		this.showDialog = newValue;
+		// ignore changed events if attached() has not run yet (based on
+		// existence of dialog jquery object)
+		if(this.dialog) {
+			this.updateDialog();
+		}
+	}
 
 	closed() {
-		this.onClearSelection();
+		this.onResetChart();
 		this.showDialog = false;
 	}
 	
@@ -178,19 +172,15 @@ export class Taxon {
     this._data = _.map(data, d => {
       return { label: d.key, value: d.value };
     });
-    this.display(this._data);
-  }
-
-  display(data) {
     d3.select(this.taxonSvgEl)
-      .datum(data)
+      .datum(this._data)
 			.transition().duration(this.ANIM_MS)
       .call(this._chart);
     this._chart.legend.updateState();
+		this.chartDirty = false;
   }
 
-  onClearSelection() {
-    this.disabledTaxaNum = 0;
+  onResetChart() {
     this._dim.filter(null);
     this.updateTaxaChart();
 		this.api.cfUpdated = { sender: this };		

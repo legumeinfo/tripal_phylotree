@@ -2,9 +2,9 @@
   <require from="./taxon.css"></require>
 	<div id="taxa-dialog" ref="taxonEl">
 		<span if.bind="! api.loading">
-			<button disabled.bind="! disabledTaxaNum"
+			<button disabled.bind="! chartDirty"
 				class="ui-button ui-corner-all"
-				click.delegate="onClearSelection()">
+				click.delegate="onResetChart()">
 				<i class="fa fa-refresh" aria-hidden="true"></i>
 				Reset Taxa Selection
 			</button>
