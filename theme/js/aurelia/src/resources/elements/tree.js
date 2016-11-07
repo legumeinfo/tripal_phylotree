@@ -250,21 +250,14 @@ export class Tree {
 
 		// use tnt.tree api to calculate intergenic distance over some screen dist.
 		let distance = this._tree.scale_bar(this.AXIS_SAMPLE_PX, 'pixel');
-		if(distance === undefined) {
-			// this occurs for some trees
-			console.error('failed to lookup intergenic distance for tree:');
-			console.log(this.api.treeData);
-		}
-		else {
-			d3.select(this.phylogramAxisElement)
-				.insert('svg')
-				.attr('width', this.WIDTH)
-				.attr('height', 40)
-				.append('g')
-				.attr('transform', 'translate(20,20)')
-				.attr('class', 'x axis')
-				.call(this.getXAxis(distance));
-		}
+		d3.select(this.phylogramAxisElement)
+			.insert('svg')
+			.attr('width', this.WIDTH)
+			.attr('height', 40)
+			.append('g')
+			.attr('transform', 'translate(20,20)')
+			.attr('class', 'x axis')
+			.call(this.getXAxis(distance));
 		
 		// perform final ui tweaks after rendering the tree
 		this.decorateLeafNodes();
