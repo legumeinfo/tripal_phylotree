@@ -129,7 +129,7 @@
 					},
 					{
 						"name" : "tnt.tree",
-						"path" : "../node_modules/tnt.tree/build/tnt.tree.min"
+						"path" : "../node_modules/tnt.tree/build/tnt.tree"
 					},
 					{
 						"name" : "biojs-io-newick",
