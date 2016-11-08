@@ -87,7 +87,7 @@
         "name": "vendor-bundle.js",
         "prepend": [
           "node_modules/bluebird/js/browser/bluebird.core.js",
-          "scripts/require.js"
+          "node_modules/requirejs/require.js"
         ],
         "dependencies": [
 					{
@@ -97,6 +97,7 @@
 					},
 					"raf",
 					"performance-now",
+					"text",
           "aurelia-binding",
           "aurelia-bootstrapper",
           "aurelia-dependency-injection",
@@ -115,10 +116,6 @@
           "aurelia-templating",
           "aurelia-templating-binding",
           {
-            "name": "text",
-            "path": "../scripts/text"
-          },
-          {
             "name": "aurelia-templating-resources",
             "path": "../node_modules/aurelia-templating-resources/dist/amd",
             "main": "aurelia-templating-resources"
@@ -134,13 +131,7 @@
 					{
 						"name" : "biojs-io-newick",
 						"path" : "../node_modules/biojs-io-newick/src/newick"
-					},
-          {
-            "name": "aurelia-testing",
-            "path": "../node_modules/aurelia-testing/dist/amd",
-            "main": "aurelia-testing",
-            "env": "dev"
-          }
+					}
         ]
       }
     ]

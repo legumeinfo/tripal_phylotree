@@ -27,6 +27,7 @@ export class Tree {
 	newickExport = null;
 	rootNodeDirty = false; // flag for has user refocused the tree on some node.
 	showSingletonNodes = true; // when refocused on a subtree.
+	singletonNodeNum = 0;
 	
   _rootNode = null; // initially _rootNode is same as api.treeData, but my be
 										// updated by onNodeFocusTree.
@@ -86,17 +87,20 @@ export class Tree {
 	
 	// add a css class to all singleton nodes, so they can be themed or hidden.
 	decorateSingletonNodes() {
-		if(this.rootNodeDirty) {
-			// add css classes to singleton nodes
-			d3.selectAll('#phylogram .inner.tnt_tree_node')
-				.classed('singleton-node', (d) =>  {
-					d.singleton = d.children && d.children.length === 1;
-					return d.singleton;
-				})
-				.filter((d) => d.singleton)
-				.classed('singleton-node-visible', this.showSingletonNodes);
-		}
-		else {
+		// add css classes to singleton nodes, and count the number of singleton
+		// nodes along the way.
+		this.singletonNodeNum = 0;
+		d3.selectAll('#phylogram .inner.tnt_tree_node')
+			.classed('singleton-node', (d) =>  {
+				d.singleton = d.children && d.children.length === 1;
+				if(d.singleton) {
+					this.singletonNodeNum += 1;
+				}
+				return d.singleton;
+			})
+			.filter((d) => d.singleton)
+			.classed('singleton-node-visible', this.showSingletonNodes);
+		if(this.singletonNodeNum === 0) {
 			// remove classes from singleton nodes
 			d3.selectAll('#phylogram g.singleton-node')
 				.classed('singleton-node', false)
