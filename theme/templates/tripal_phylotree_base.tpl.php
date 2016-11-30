@@ -57,19 +57,53 @@ printf("var treeData = %s;\n",
 
 <div class="tripal_phylotree-data-block-desc tripal-data-block-desc">
   <p><b><?php print $phylotree->name ?></b>:
+    <span id="phylotree-comment">
 <?php
 if( ! empty($phylotree->comment) ) {
   print $phylotree->comment;
 }
 ?>
+    </span>
   </p>
 </div>
 
+<div id="ahrd-dialog" style="display:none; font-size: 0.8rem">
+    
+AHRD's quality-code consists of a four character string, where each
+character is either &quot;<strong>*</strong>&quot; if the respective
+criteria is met or &quot;<strong>-</strong>&quot; otherwise. Their
+meaning is explained in the following table:
+
+<table><tbody>
+<tr>
+<th> Position </th>
+<th> Criteria </th>
+</tr>
+<tr>
+<td> 1 </td>
+<td> Bit score of the blast result is &gt;50 and e-value is &lt;e-10 </td>
+</tr>
+<tr>
+<td> 2 </td>
+<td> Overlap of the blast result is &gt;60% </td>
+</tr>
+<tr>
+<td> 3 </td>
+<td> Top token score of assigned HRD is &gt;0.5 </td>
+</tr>
+<tr>
+<td> 4 </td>
+<td> Gene ontology terms found in description line </td>
+</tr>
+</tbody></table>
+
+</div>
+    
 <div id="ajax-spinner">
     <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
     <span class="sr-only">Loading...</span>
 </div>
-
+    
 <div id="au-content" aurelia-app="main">
 </div>
 
@@ -118,6 +152,10 @@ drupal_add_library('system', 'ui.dialog');
 $js_dir = '/'. $my_path . '/theme/js';
 drupal_add_js(
     $js_dir . '/tour-autolauncher.js',
+    array('type' => 'file', 'group' => JS_DEFAULT)
+);
+drupal_add_js(
+    $js_dir . '/ahrd-descriptor.js',
     array('type' => 'file', 'group' => JS_DEFAULT)
 );
 
