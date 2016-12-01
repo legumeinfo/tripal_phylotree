@@ -69,7 +69,9 @@ if( ! empty($phylotree->comment) ) {
 
 <div id="ahrd-dialog" style="display:none; font-size: 0.8rem">
     
-AHRD's quality-code consists of a four character string, where each
+<a href="https://github.com/groupschoof/AHRD"
+   class="ext" tabindex="-1">AHRD's<span class="ext"></span></a>
+quality-code consists of a four character string, where each
 character is either &quot;<strong>*</strong>&quot; if the respective
 criteria is met or &quot;<strong>-</strong>&quot; otherwise. Their
 meaning is explained in the following table:
