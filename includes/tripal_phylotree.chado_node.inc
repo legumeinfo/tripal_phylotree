@@ -341,8 +341,13 @@ function phylotree_by_name($name) {
 SQL;
 
     $args = array(':name' => $name);
-    $result = chado_query( $sql, $args );
+    $result = chado_query( $sql, $args );    
     $nid = $result->fetchField();
+    if(empty($nid)) {
+        drupal_add_http_header('Status', '404 Not Found');
+        printf("Error: No gene tree has been built for the family '%s' with available sequences in LIS.", $name);
+        drupal_exit();
+    }
     drupal_set_title(sprintf('Gene Family | %s', $name));
     $html = drupal_render(node_view(node_load($nid))); 
     print drupal_render_page($html);
