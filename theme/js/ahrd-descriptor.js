@@ -13,11 +13,17 @@ jQuery(document).ready( function($) {
 				' <i class="fa fa-question-circle" aria-hidden="true"></i></a>' +
 				', description from: ';
 		commentEl.html(comment.replace(code, link));
-		var linkEl = $('#ahrd-help');
-		linkEl.click(function() {
-			$('#ahrd-dialog').dialog({
-				title: 'AHRD quality-code: ' + code
+
+		// add a click handler to open dialog on the new ahrd help link
+		// but after delay in case any other scripts modify the comments
+		// html.
+		setTimeout(function() {
+			var linkEl = $('#ahrd-help');
+			linkEl.click(function() {
+				$('#ahrd-dialog').dialog({
+					title: 'AHRD quality-code: ' + code
+				});
 			});
-		})
+		});
 	}
 });

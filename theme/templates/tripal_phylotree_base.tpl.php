@@ -157,6 +157,10 @@ drupal_add_js(
     array('type' => 'file', 'group' => JS_DEFAULT)
 );
 drupal_add_js(
+    $js_dir . '/interpro-linkout.js',
+    array('type' => 'file', 'group' => JS_DEFAULT)
+);
+drupal_add_js(
     $js_dir . '/ahrd-descriptor.js',
     array('type' => 'file', 'group' => JS_DEFAULT)
 );
