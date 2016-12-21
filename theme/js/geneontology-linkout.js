@@ -1,4 +1,4 @@
-/* add linkout to intepro IPRxxxxxx codes in the description. */
+/* add linkout to geneontology GO:XXXXXXX codes in the description. */
 
 'use strict';
 
