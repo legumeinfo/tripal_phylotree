@@ -48,9 +48,17 @@ printf("var API = {
 
 // write the tree data into the template as js var (saving one ajax
 // get for json)
-printf("var treeData = %s;\n",
-       json_encode(phylotree_by_id($phylotree->phylotree_id))
-);
+if (!isset($_POST["json"]))
+{
+	printf("var treeData = %s;\n",
+        json_encode(phylotree_by_id($phylotree->phylotree_id))
+	);
+}
+else
+{
+    printf("var treeData = %s;;\n",$_POST["json"]);
+}
+
 
 ?>
 </script>
