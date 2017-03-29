@@ -50,6 +50,7 @@ var taxonChroma = {};
     phaseolus :    '#e377c2',
     pisum :        '#f7b6d2',
     trifolium :    moreBrewerColors[2],
+    user :      "#990000",
     vicia :        moreBrewerColors[4],
     vigna :        '#d62728',
   };
