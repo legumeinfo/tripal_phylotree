@@ -82,8 +82,8 @@ export class Api {
     let promise = this.http.fetch(this.MSA_URL)
         .then(res => res.text())
         .then(data => {
-          this.msaFasta = data;
-          this.msaSeqs = fasta.parse(data);
+          this.msaFasta = data.trim(); // because ajax call to drupal has an initial empty line
+          this.msaSeqs = fasta.parse(this.msaFasta);
           return this.msaSeqs;
         });
     return promise;
