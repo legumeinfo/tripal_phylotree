@@ -37,20 +37,40 @@ printf("var FAMILY_NAME = '%s';\n", $phylotree->name);
 // prefix path to theme with / because drupal returns it as a relative URL.
 printf("var THEME_PATH = '/%s';\n", $my_path);
 
-// write js var having URL of json and gff data sources
-printf("var API = {
-  tree: \"/chado_phylotree/%s/json\",
-  msa: \"/lis_gene_families/chado/msa/%s-consensus/download/\"
-};\n",
-       $phylotree->phylotree_id,
-       $phylotree->name
-);
 
 // write the tree data into the template as js var (saving one ajax
 // get for json)
-printf("var treeData = %s;\n",
-       json_encode(phylotree_by_id($phylotree->phylotree_id))
-);
+// if the tree has been provided as post data, write that instead. 
+// in that case there should also be an url provided to get the MSA. 
+if (!isset($_POST["json"]))
+{
+	// write js var having URL of json and gff data sources
+	printf("var API = {
+	  tree: \"/chado_phylotree/%s/json\",
+	  msa: \"/lis_gene_families/chado/msa/%s-consensus/download/\"
+	};\n",
+		   $phylotree->phylotree_id,
+		   $phylotree->name
+	);
+
+	printf("var treeData = %s;\n",
+        json_encode(phylotree_by_id($phylotree->phylotree_id))
+	);
+}
+else
+{
+	// write js var having URL of json and gff data sources
+	printf("var API = {
+	  tree: \"/chado_phylotree/%s/json\",
+	  msa: \"%s\"
+	};\n",
+		   $phylotree->phylotree_id,
+		   $_POST["msa"]
+	);
+
+    printf("var treeData = %s;;\n",$_POST["json"]);
+}
+
 
 ?>
 </script>
