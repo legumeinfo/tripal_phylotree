@@ -75,6 +75,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         'glyma_count' => 'glyma_count',
         'phavu_count' => 'phavu_count',
         'cajca_count' => 'cajca_count',
+        'vigun_count' => 'vigun_count',
         'vigra_count' => 'vigra_count',
         'vigan_count' => 'vigan_count',
         'aradu_count' => 'aradu_count',
@@ -161,6 +162,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
             'empty_column' => 0,
         ),
         'cajca_count' => array(
+            'sortable' => 1,
+            'default_sort_order' => 'asc',
+            'align' => '',
+            'separator' => '',
+            'empty_column' => 0,
+        ),
+        'vigun_count' => array(
             'sortable' => 1,
             'default_sort_order' => 'asc',
             'align' => '',
@@ -281,6 +289,12 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['cajca_count']['field'] = 'cajca_count';
     $handler->display->display_options['fields']['cajca_count']['alter']['make_link'] = TRUE;
     $handler->display->display_options['fields']['cajca_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=cajca';
+    /* Field: phylotree_count: Vigun count */
+    $handler->display->display_options['fields']['vigun_count']['id'] = 'vigun_count';
+    $handler->display->display_options['fields']['vigun_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['fields']['vigun_count']['field'] = 'vigun_count';
+    $handler->display->display_options['fields']['vigun_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['vigun_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=vigun';
     /* Field: phylotree_count: Vigra count */
     $handler->display->display_options['fields']['vigra_count']['id'] = 'vigra_count';
     $handler->display->display_options['fields']['vigra_count']['table'] = 'phylotree_count';
@@ -519,6 +533,22 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['filters']['cajca_count']['expose']['operator'] = 'cajca_count_op';
     $handler->display->display_options['filters']['cajca_count']['expose']['identifier'] = 'cajca_count';
     $handler->display->display_options['filters']['cajca_count']['expose']['remember_roles'] = array(
+        2 => '2',
+        1 => 0,
+        4 => 0,
+    );
+    /* Filter criterion: phylotree_count: Vigun count */
+    $handler->display->display_options['filters']['vigun_count']['id'] = 'vigun_count';
+    $handler->display->display_options['filters']['vigun_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['filters']['vigun_count']['field'] = 'vigun_count';
+    $handler->display->display_options['filters']['vigun_count']['group'] = 1;
+    $handler->display->display_options['filters']['vigun_count']['exposed'] = TRUE;
+    $handler->display->display_options['filters']['vigun_count']['expose']['operator_id'] = 'vigun_count_op';
+    $handler->display->display_options['filters']['vigun_count']['expose']['label'] = 'Vigun count';
+    $handler->display->display_options['filters']['vigun_count']['expose']['use_operator'] = TRUE;
+    $handler->display->display_options['filters']['vigun_count']['expose']['operator'] = 'vigun_count_op';
+    $handler->display->display_options['filters']['vigun_count']['expose']['identifier'] = 'vigun_count';
+    $handler->display->display_options['filters']['vigun_count']['expose']['remember_roles'] = array(
         2 => '2',
         1 => 0,
         4 => 0,
