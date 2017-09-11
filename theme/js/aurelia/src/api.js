@@ -50,7 +50,7 @@ export class Api {
 	
   // by convention, the consensus seq is the first in the msa seqs array.
   getConsensusSeq() {
-    return this.msaSeqs[0];
+    return (this.msaSeqs[0].name.endsWith("-consensus") ? this.msaSeqs[0] : undefined);
   }
 	
   setupCrossFilter() {
