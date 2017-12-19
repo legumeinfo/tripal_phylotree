@@ -44,8 +44,8 @@ if($phylotree->dbxref_id->db_id->urlprefix) {
 
 $rows = array(
   array( 'data' => array(
-    ($db_linkout ? $db_linkout : $db),
-    ($item_linkout ? $item_linkout : $accession)
+    (!empty($db_linkout) ? $db_linkout : $db),
+    (!empty($item_linkout) ? $item_linkout : $accession)
   )));
 
 $table = array(
