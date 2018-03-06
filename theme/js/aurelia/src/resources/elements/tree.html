@@ -43,7 +43,7 @@
         </div>
       </fieldset>
   </form>
-	
+
 	<div if.bind="(! api.loading) && hiliteFeaturesCount"
 		   style="margin-top: 10px">
 		Jump to hilited feature:
@@ -72,13 +72,13 @@
      ${newickExport}
     </code>
 	</div>
-	
+
 	<div id="phylogram-axis" ref="phylogramAxisElement">
   </div>
-	
+
   <div id="phylogram" style="margin-bottom: 100px" ref="phylogramElement">
   </div>
-		
+
 	<div id="node-dialog" ref="nodeDialogEl" style="display: none">
 		<div if.bind="node.is_leaf() && ! node.is_collapsed()">
 			<!-- leaf node linkouts -->
@@ -89,7 +89,7 @@
 				</a>
 			</div>
 		</div>
-		
+
 		<div if.bind="! node.is_leaf() || node.is_collapsed()">
 			<div>
 				<a class="link" href="#" click.delegate="onNodeToggle()" tabindex="-1">
@@ -167,5 +167,5 @@
 		</div>
 		<loader-anim if.bind="loading"></loader-anim>
 	</div>
-			
+
 </template>

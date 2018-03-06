@@ -14,11 +14,11 @@ export class Tree {
 	LABEL_BASELINE_SHIFT = '30%';
 	AXIS_TICKS = 12;
 	AXIS_SAMPLE_PX = 30; // pixels
-	
+
 	@bindable familyName; // family-name attribute of <tree> element
 	@bindable msaEl;      // reference to <msa> element
 	@bindable showDialog; // two-way databinding for toggling dialog in app.js
-	
+
 	msa = null;           // msa view-model
 	selectedLayout = 'vertical';
 	hiliteFeatures = {};
@@ -28,7 +28,7 @@ export class Tree {
 	rootNodeDirty = false; // flag for has user refocused the tree on some node.
 	showSingletonNodes = true; // when refocused on a subtree.
 	singletonNodeNum = 0;
-	
+
   _rootNode = null; // initially _rootNode is same as api.treeData, but my be
 										// updated by onNodeFocusTree.
   _tree = null;
@@ -84,7 +84,7 @@ export class Tree {
 			.filter((d) => this.isLegume(d))
 			.classed('legume', true);
 	}
-	
+
 	// add a css class to all singleton nodes, so they can be themed or hidden.
 	decorateSingletonNodes() {
 		// add css classes to singleton nodes, and count the number of singleton
@@ -112,7 +112,7 @@ export class Tree {
 		d3.selectAll('#phylogram .singleton-node')
 			.classed('singleton-node-visible', show);
 	}
-	
+
   subscribe() {
 		this.be.propertyObserver(this.api, 'cf')
 		 	.subscribe(o => this.onCfCreated(o));
@@ -134,11 +134,11 @@ export class Tree {
 		this.hiliteFeatures = _.zipObject(names, vals);
 		this.hiliteFeaturesCount = names.length;
 		this._tree.update_nodes(); // use tree api to refersh tree nodes & labels.
-		this.updateLeafNodeHilite(false); 
+		this.updateLeafNodeHilite(false);
 	}
 
 	// tnt.tree api does not support selections or hiliting that I can
-	// see, so use d3 to decorate the currently selected features with a 
+	// see, so use d3 to decorate the currently selected features with a
 	// hilited css style.
 	updateLeafNodeHilite(scroll) {
 		let that = this;
@@ -174,7 +174,7 @@ export class Tree {
 			$('html,body').attr('scrollTop',  top - 100);
 		}
 	}
-	
+
 	/*
 	 * onScrollToHilite() : use jquery to scroll to the tree element
 	 * with selector like #tnt_tree_node_phylogram_{id} (id is the
@@ -189,20 +189,20 @@ export class Tree {
 		let offset = $(selector).offset();
 		$('html,body').attr('scrollTop',  offset.top - 100);
 	}
-	
+
 	onCfCreated(cf) {
     this._cf = cf;
 		// create a dimension by name (keep our own instance of this dimension)
     this._dim = cf.dimension(d => d.name);
     this.init();
 	}
-	
+
 	onCfUpdated(msg) {
 		if(msg.sender != this) {
 			this.update();
 		}
 	}
-	
+
   // init() : create the tnt.tree chart
   init() {
 		let that = this;
@@ -248,7 +248,7 @@ export class Tree {
 		this._tree.on('click', node => this.onTreeNodeClick(node) );
 		this._tree.on('mouseover', node => this.onNodeMouseover(node));
 		this._tree.on('mouseout', node => this.onNodeMouseout(node));
-		
+
 		// display the tree with msa tnt.tree component
     this._tree(this.phylogramElement);
 
@@ -262,7 +262,7 @@ export class Tree {
 			.attr('transform', 'translate(20,20)')
 			.attr('class', 'x axis')
 			.call(this.getXAxis(distance));
-		
+
 		// perform final ui tweaks after rendering the tree
 		this.decorateLeafNodes();
 		if(_.keys(this.hiliteFeatures).length) {
@@ -281,11 +281,11 @@ export class Tree {
 				.orient('bottom');
 		return axis;
 	}
-	
+
 	updateXAxis() {
 		d3.selectAll('#phylogram-axis g.x.axis').call(this.getXAxis());
 	}
-	
+
 	// lookup the node with jquery and return a jquery element
 	node2jquery(node) {
 		let nodeSelector = this.node2jquerySelector(node);
@@ -294,9 +294,9 @@ export class Tree {
 	}
 
 	node2jquerySelector(node) {
-		return '#tnt_tree_node_phylogram_'+ node.id();		
+		return '#tnt_tree_node_phylogram_'+ node.id();
 	}
-	
+
 	onNodeMouseover(node) {
 		let el = this.node2jquery(node);
     el.attr('cursor', 'pointer');
@@ -304,9 +304,9 @@ export class Tree {
 
 	onNodeMouseout(node) {
 		let el = this.node2jquery(node);
-    el.attr('cursor', 'default');		
+    el.attr('cursor', 'default');
 	}
-	
+
 	// get the fill color of each node
 	getNodeColor(node) {
 		if(node.is_leaf() && ! node.is_collapsed()) {
@@ -321,7 +321,7 @@ export class Tree {
 		let legumeGenera = this.symbology.legumes;
 		return d.genus.toLowerCase() in legumeGenera;
 	}
-	
+
   onTreeNodeClick(node) {
 		this.loading = true;
 		let that = this;
@@ -409,7 +409,7 @@ export class Tree {
 			// the visibleLeaves count includes 1 collapsed node
 			this.hiddenLeavesNum += 1;
 		}
-		
+
     let visibleNodes = {};
     _.forEach(visibleLeaves, (node) => {
       let n = node.data().name;
@@ -486,7 +486,7 @@ export class Tree {
 		$('html,body').attr('scrollTop', 0);
 		new Clipboard('#newick-export button');
 	}
-	
+
 	/* return array of feature names. this can be used elsewhere like
 	 * the msa component */
 	getSortOrder() {
