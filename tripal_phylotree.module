@@ -119,7 +119,7 @@ function tripal_phylotree_menu() {
     'page arguments' => array(1),
     'access callback' => TRUE // allow all anonymous http clients
    );
-  
+
    // route for viewing json of all phylonodes having this phylotree_id
    $items['chado_phylotree/%/json'] = array(
     'page callback' => 'phylotree_json_endpoint',
@@ -133,7 +133,7 @@ function tripal_phylotree_menu() {
        'page arguments' => array(2),
        'access callback' => TRUE // allow all anonymous http requests
    );
-   
+
    return $items;
 }
 
@@ -192,7 +192,7 @@ function tripal_phylotree_theme($existing, $type, $theme, $path) {
       'base hook' => 'node',
       'path' => "$core_path/theme/templates",
     ),
-    // base template for this page (default tab) includes the phylogram 
+    // base template for this page (default tab) includes the phylogram
     'tripal_phylotree_base' => array(
       'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_base',
@@ -228,20 +228,29 @@ function tripal_phylotree_theme($existing, $type, $theme, $path) {
 * */
 
 function tripal_phylotree_form_alter(&$form, &$form_state, $form_id) {
-//drupal_set_message("Form ID is: $form_id"); ?~@~S uncomment to verify form name
-if ($form_id == 'views_exposed_form') { $form['#validate'][] = 'tripal_phylotree_form_validate';
-//drupal_set_message("Validation is set to " . var_export($form['#validate'], true)); -- uncomment to verify validator was added 
- }
+    //drupal_set_message("Form ID is: $form_id"); ?~@~S uncomment to verify form name
+    if ($form_id == 'views_exposed_form') {
+        $form['#validate'][] = 'tripal_phylotree_form_validate';
+        //drupal_set_message("Validation is set to " . var_export($form['#validate'], true)); -- uncomment to verify validator was added
+    }
 }
 /**
   * Form validator for search form.
   * Use this to trim whitespace from text fields.
   */
 function tripal_phylotree_form_validate($form, &$form_state) {
-//drupal_set_message("Form values are " . var_export($form_state['values'], true)); -- uncomment to see form field names 
-$form_state['values']['phylotree_name'] = trim($form_state['values']['phylotree_name']);
-$form_state['values']['phylotree_comment'] = trim($form_state['values']['phylotree_comment']);
-$form_state['values']['domains_con'] = trim($form_state['values']['domains_con']);
+    //drupal_set_message("Form values are " . var_export($form_state['values'], true)); -- uncomment to see form field names
+    if (isset($form_state['values']['phylotree_name'])) {
+        $form_state['values']['phylotree_name'] = trim($form_state['values']['phylotree_name']);
+    }
+
+    if (isset($form_state['values']['phylotree_comment'])) {
+        $form_state['values']['phylotree_comment'] = trim($form_state['values']['phylotree_comment']);
+    }
+
+    if (isset($form_state['values']['domains_con'])) {
+        $form_state['values']['domains_con'] = trim($form_state['values']['domains_con']);
+    }
 }
 
 

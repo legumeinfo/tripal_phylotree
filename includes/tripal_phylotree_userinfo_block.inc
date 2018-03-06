@@ -1,10 +1,10 @@
 <?php
 
 /**
- *@ Userinfo block and content: 
+ *@ Userinfo block and content:
  *  A block (with guide text) at the top of module view with an optional link to detailed help in another drupal path.
  *  The detailed help drupal path is defined here via altering hook_menu and contents populated by a template by altering hook_theme.
- *  These routines avoid embedding any code inside the hook_menu and hook_theme in the .module file.  
+ *  These routines avoid embedding any code inside the hook_menu and hook_theme in the .module file.
  *  Hence can stay independent of the main module code.
  */
 
@@ -16,7 +16,7 @@ function tripal_phylotree_block_info() {
   $blocks['tripal_phylotree_userinfo_block'] = array(  //the block-id (prefix with module name to avoid namespace conflict)
     'info' => t('User info block at top of tripal_phylotree view.'),
     'status' => TRUE,
-    'region' => 'highlighted', 
+    'region' => 'highlighted',
     'weight' => 0,
     'visibility' => BLOCK_VISIBILITY_LISTED, // appears only in listed paths
     'pages' => "search/phylotree", // block appears only in this path
@@ -27,11 +27,11 @@ function tripal_phylotree_block_info() {
 
 /**
  * Implements hook_block_view().
- *   The block content 
+ *   The block content
  */
 function tripal_phylotree_block_view($delta='') {
   $block = array();
-  switch ($delta) { 
+  switch ($delta) {
     case 'tripal_phylotree_userinfo_block':  //if this is the block-ID
       //a heading
       $block['subject'] = t('<span align="center" style="font-size:100%">Phylotree: Gene Family Search</span>');
@@ -44,7 +44,7 @@ function tripal_phylotree_block_view($delta='') {
 
 
 /**
-  * the userinfo block content 
+  * the userinfo block content
   * return string
   */
 function tripal_phylotree_userinfo_block_contents() {
@@ -71,7 +71,7 @@ function tripal_phylotree_menu_alter(&$items) {
 function tripal_phylotree_theme_registry_alter(&$theme_registry) {
 //Userinfo template
     // Very Imp that you declare the module path here. Path works differently in hook_theme vs. hook_theme_registry_alter
-    $module_path = drupal_get_path('module', 'tripal_phylotree'); 
+    $module_path = drupal_get_path('module', 'tripal_phylotree');
     $theme_registry['tripal_phylotree_userinfo'] = array(
       'variables' => array('node' => NULL),
       'template' => 'tripal_phylotree_userinfo',
@@ -86,6 +86,3 @@ function userinfo_content() {
 }
 
 /* End: The detailed help path with contents  */
-
-
-

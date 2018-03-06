@@ -122,7 +122,7 @@
           },
 					{
 						"name": "crossfilter2",
-						"path": "../node_modules/crossfilter2/crossfilter"	          
+						"path": "../node_modules/crossfilter2/crossfilter"
 					},
 					{
 						"name" : "tnt.tree",

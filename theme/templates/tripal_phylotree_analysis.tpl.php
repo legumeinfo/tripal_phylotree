@@ -25,7 +25,7 @@ $rows = array();
 
 if($analysis) {
   $analysis = chado_expand_var($analysis, 'field', 'analysis.description');
-  $rows[] = array($analysis->name, $analysis->description, 
+  $rows[] = array($analysis->name, $analysis->description,
       sprintf('%s %s %s %s %s %s %s',
           $analysis->program,
           $analysis->programversion,
@@ -39,7 +39,7 @@ else {
   // degrade gracefully if no analysis is present
   $rows[] = array('n/a','','');
 }
-   
+
 $table = array(
   'header' => $header,
   'rows' => $rows,

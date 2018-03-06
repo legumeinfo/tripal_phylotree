@@ -11,6 +11,7 @@ if(empty($my_path)) {
   // note: there is no leading '/' because that is the format used by
   // path_to_theme(), even though this is effectively an absolute url.
 }
+
 $phylotree = $variables['node']->phylotree;
 
 drupal_add_css(
@@ -40,8 +41,8 @@ printf("var THEME_PATH = '/%s';\n", $my_path);
 
 // write the tree data into the template as js var (saving one ajax
 // get for json)
-// if the tree has been provided as post data, write that instead. 
-// in that case there should also be an url provided to get the MSA. 
+// if the tree has been provided as post data, write that instead.
+// in that case there should also be an url provided to get the MSA.
 if (!isset($_POST["json"]))
 {
 	// write js var having URL of json and gff data sources
@@ -88,7 +89,7 @@ if( ! empty($phylotree->comment) ) {
 </div>
 
 <div id="ahrd-dialog" style="display:none; font-size: 0.8rem">
-    
+
 <a href="https://github.com/groupschoof/AHRD"
    class="ext" tabindex="-1">AHRD's<span class="ext"></span></a>
 quality-code consists of a four character string, where each
@@ -120,12 +121,12 @@ meaning is explained in the following table:
 </tbody></table>
 
 </div>
-    
+
 <div id="ajax-spinner">
     <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
     <span class="sr-only">Loading...</span>
 </div>
-    
+
 <div id="au-content" aurelia-app="main">
 </div>
 
@@ -143,7 +144,7 @@ meaning is explained in the following table:
 $js_config = array('type' => 'external', 'group' => JS_LIBRARY);
 drupal_add_js(
     '//cdn.bio.sh/msa/1.0/msa.min.gz.js',
-    $js_config    
+    $js_config
 );
 drupal_add_js(
     '//cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js',
@@ -159,11 +160,11 @@ drupal_add_js(
 );
 drupal_add_js(
     '//cdnjs.cloudflare.com/ajax/libs/chroma-js/1.2.1/chroma.min.js',
-    $js_config    
+    $js_config
 );
 drupal_add_js(
     '//cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.15/clipboard.min.js',
-    $js_config    
+    $js_config
 );
 
 drupal_add_library('system', 'ui.dialog');
