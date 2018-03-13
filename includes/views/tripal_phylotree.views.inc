@@ -80,6 +80,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         'vigan_count' => 'vigan_count',
         'aradu_count' => 'aradu_count',
         'araip_count' => 'araip_count',
+        'arahy_count' => 'arahy_count',
         'lupan_count' => 'lupan_count',
     );
     $handler->display->display_options['style_options']['default'] = '-1';
@@ -148,6 +149,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
             'empty_column' => 0,
         ),
         'araip_count' => array(
+            'sortable' => 1,
+            'default_sort_order' => 'asc',
+            'align' => '',
+            'separator' => '',
+            'empty_column' => 0,
+        ),
+        'arahy_count' => array(
             'sortable' => 1,
             'default_sort_order' => 'asc',
             'align' => '',
@@ -321,6 +329,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['araip_count']['alter']['make_link'] = TRUE;
     $handler->display->display_options['fields']['araip_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=araip';
     $handler->display->display_options['fields']['araip_count']['alter']['absolute'] = TRUE;
+    /* Field: phylotree_count: Arahy count */
+    $handler->display->display_options['fields']['arahy_count']['id'] = 'arahy_count';
+    $handler->display->display_options['fields']['arahy_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['fields']['arahy_count']['field'] = 'arahy_count';
+    $handler->display->display_options['fields']['arahy_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['arahy_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=arahy';
+    $handler->display->display_options['fields']['arahy_count']['alter']['absolute'] = TRUE;
     /* Field: phylotree_count: Lupan count */
     $handler->display->display_options['fields']['lupan_count']['id'] = 'lupan_count';
     $handler->display->display_options['fields']['lupan_count']['table'] = 'phylotree_count';
@@ -613,6 +628,22 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['filters']['araip_count']['expose']['operator'] = 'araip_count_op';
     $handler->display->display_options['filters']['araip_count']['expose']['identifier'] = 'araip_count';
     $handler->display->display_options['filters']['araip_count']['expose']['remember_roles'] = array(
+        2 => '2',
+        1 => 0,
+        4 => 0,
+    );
+    /* Filter criterion: phylotree_count: Arahy count */
+    $handler->display->display_options['filters']['arahy_count']['id'] = 'arahy_count';
+    $handler->display->display_options['filters']['arahy_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['filters']['arahy_count']['field'] = 'arahy_count';
+    $handler->display->display_options['filters']['arahy_count']['group'] = 1;
+    $handler->display->display_options['filters']['arahy_count']['exposed'] = TRUE;
+    $handler->display->display_options['filters']['arahy_count']['expose']['operator_id'] = 'arahy_count_op';
+    $handler->display->display_options['filters']['arahy_count']['expose']['label'] = 'Arahy count';
+    $handler->display->display_options['filters']['arahy_count']['expose']['use_operator'] = TRUE;
+    $handler->display->display_options['filters']['arahy_count']['expose']['operator'] = 'arahy_count_op';
+    $handler->display->display_options['filters']['arahy_count']['expose']['identifier'] = 'arahy_count';
+    $handler->display->display_options['filters']['arahy_count']['expose']['remember_roles'] = array(
         2 => '2',
         1 => 0,
         4 => 0,
