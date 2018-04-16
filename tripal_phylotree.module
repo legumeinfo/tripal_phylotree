@@ -104,7 +104,7 @@ function tripal_phylotree_menu() {
    // A menu hook to redirect to gene tree and hilight corresponding
    // node name (polypeptide) for the given gene name
    // /chado_gene_phylotree_v2?gene_name=C.cajan_38960_gene
-   // or comma seperated list of gene names
+   // or comma separated list of gene names
    // /chado_gene_phylotree_v2?gene_name=Araip.8X95G,Araip.JJJ8N,Araip.B0L4D
    $items['chado_gene_phylotree_v2'] = array(
     'page callback' => 'phylotree_redirect_by_gene',
@@ -133,6 +133,15 @@ function tripal_phylotree_menu() {
        'page arguments' => array(2),
        'access callback' => TRUE // allow all anonymous http requests
    );
+
+   // route for getting text of msa
+   $items['chado_phylotree_msa/%/text'] = array(
+    'page callback' => 'phylotree_msa_download',
+    'delivery callback' => 'tripal_phylotree_text_deliver',
+    'page arguments' => array(1),
+    'access callback' => TRUE // allow all anonymous http clients
+   );
+
    
    return $items;
 }

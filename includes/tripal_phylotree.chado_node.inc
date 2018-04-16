@@ -613,6 +613,36 @@ function phylotree_feature_summary($phylotree_id) {
 }
 
 /**
+ * phylotree_msa_download
+ * Get MSA for gene family, formatted as gapped multi-fasta
+ *
+ * @param string consensus_name
+ * @return string
+ * @ingroup tripal_phylotree
+ */
+function phylotree_msa_download($consensus_name) {
+  
+  $sql = 'SELECT feature_id, residues FROM feature WHERE uniquename = :consensus_name';
+  $args = array(':consensus_name' => $consensus_name);
+  $result = chado_query($sql, $args);
+  $retval = '>'.$consensus_name."\n";
+  foreach($result as $r) {
+    $retval .= $r->residues . "\n";
+    $consensus_id = $r->feature_id;
+  }
+  $sql = 'SELECT name, residue_info FROM feature, featureloc WHERE srcfeature_id = :consensus_id'
+    . ' AND feature.feature_id = featureloc.feature_id';
+  $args = array(':consensus_id' => $consensus_id);
+  $result = chado_query($sql, $args);
+  foreach($result as $r) {
+    $retval .= '>' . $r->name . "\n";
+    $retval .= $r->residue_info . "\n";
+  }
+  return $retval;
+}
+
+
+/**
  * phylotree_static_scripts
  * workaround for drupal having terrible support for serving up static content.
  * js/aurelia/scripts is the build folder for `au build` script.

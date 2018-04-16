@@ -47,7 +47,7 @@ if (!isset($_POST["json"]))
 	// write js var having URL of json and gff data sources
 	printf("var API = {
 	  tree: \"/chado_phylotree/%s/json\",
-	  msa: \"/lis_gene_families/chado/msa/%s-consensus/download/\"
+	  msa: \"/chado_phylotree_msa/%s-consensus/text\"
 	};\n",
 		   $phylotree->phylotree_id,
 		   $phylotree->name
