@@ -1,0 +1,10 @@
+/* .form-text {width: 150px; float: left;} */
+
+#edit-phylotree-name { width: 220px; }
+#edit-phylotree-comment { width: 220px; }
+#edit-domains-con { width: 220px; }
+
+.form-text { width: 200px; }
+.views-exposed-widget.views-submit-button { float: left !important; display: block; }
+
+.row-of-inputs { float: left; clear: both; }
