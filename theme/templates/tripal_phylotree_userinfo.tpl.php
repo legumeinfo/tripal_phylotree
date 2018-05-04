@@ -3,7 +3,11 @@
 <h1>HOW TO: Gene Family Search</h1>
 (<a href="/search/phylotree">Go to</a> gene family search)
 <div>
-<p>This page lets you search for gene families starting from a Phytozome gene family ID (e.g., phytozome_10_2.59192412) or words from the description of the gene family (e.g., iron homeostasis or chlorophyll binding protein); family descriptions are derived from homology-based functional analysis of the hidden markov model representing the known sequences in the family, and include Interpro and Gene Ontology identifiers which may be included in the search.  You may leave any of the search fields blank if you don't care about the field, or specify several criteria together (all filters will be ANDed together). The gene families are based on <a href="http://phytozome.jgi.doe.gov/pz/portal.html" target="_blank">Phytozome version 10.2</a>.  You can further refine or restrict the search results by family size or species composition by choosing the count fields under different species (e.g. the maximum number of members in a particular species).</p>
+<p>
+This page lets you search for gene families starting from a legume gene family ID (e.g., legfed_v1_0.L_2951WH) or words from the description of the gene family (e.g., iron homeostasis or chlorophyll binding protein); family descriptions are derived from homology-based functional analysis of the hidden markov model representing the known sequences in the family, and include Interpro and Gene Ontology identifiers which may be included in the search. You may leave any of the search fields blank if you don't care about the field, or specify several criteria together (all filters will be ANDed together). The gene families were calculated in 2018, as part of the LegumeFederation project. The full family set is <a href="/data/public/Gene_families/">available here.</a>
+</p>
+
+
 
 <h2>The result table</h2>
 <p>The resulting table shows the Family ID and description along with the membership counts in different species. The table can be sorted by clicking on the column headers (clicking a header again will reverse the order of the sort).
@@ -30,12 +34,22 @@ The <u>phylogram</u> page displays a phylogenetic tree that has branch spans pro
     Click on internal (white) nodes to view the "genomic context" for the legume genes included in the subtree for that node. The genomic context viewer shows flanking genes colored by gene family assignment and allows exploration of syntenic regions from all included legume genomes. The genomic context view works only if there are legume genes in the subtree.
   </li>
   <li>
-    The root node click also gives an option to view the Multiple Sequence Alignment** for this gene family.
+    The root node click also gives an option to view the Multiple Sequence Alignment for this gene family.
   </li>
 </ul>
-**The MSA viewer (Jalview) requires Java WebStart support.
+
+
 <h2>The Analysis</h2>
-The gene families at LegumeInfo were built on the Phytozome 10.2 Angiosperm-level gene family models. Sequences from each species were placed in families based on best Hidden Markov Model match (using hmmsearch from the Hmmer package, v 3.1b2), with a minimum E-value match threshold of 0.1. Sequences in each family were realigned to the family's HMM using hmmalign, and then trimmed to include only match-state characters. Trees were generated using FastTree, and descriptors for the families were created using AHRD (Automatic assignment of human readable descriptions) on the consensus representation of the family generated with hmmemit.
+<p>
+The gene families at LegumeInfo were calculated as part of the <a href="https://legumefederation.org">NSF LegumeFederation</a> project, as follows (to be described in more detail in a paper anticipated for late 2018). Clustering was done on the basis of gene pairs filtered for per-species Ks values. These were clustered using Markov clustering. Sequence match scores of each sequence in a family were used to identify outliers, on the basis of score value relative to the median score for the family. Remaining sequences were re-clustered, added to the HMM set. Then all sequences were searched against all HMMs, realigned, re-screened relative to median match score, and finally used to generate alignments and phylogenetic trees (using RAxML). The trees are rooted, when possible, using the closest outgroup from among five outgroup species: Arabidopsis thaliana, Prunus persica, Cucumis sativa, Solanum lycopersicum, and Vitis vinifera.
+</p>
+
+<p>
+Note: These current gene families at LegumeInfo replace (as of May, 2018) an older set families that were built on the Phytozome 10.2 Angiosperm-level gene family models. The Phytozome-based families are still accessible by direct URL (for researchers who may have referenced particular families). The URL form for such families has the form: /chado_phylotree/phytozome_10_2.59192412
+</p>
+
+
+
 
 </div>
 

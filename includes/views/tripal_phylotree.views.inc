@@ -351,7 +351,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['filters']['phylotree_name']['exposed'] = TRUE;
     $handler->display->display_options['filters']['phylotree_name']['expose']['operator_id'] = 'phylotree_name_op';
     $handler->display->display_options['filters']['phylotree_name']['expose']['label'] = 'Family ID';
-    $handler->display->display_options['filters']['phylotree_name']['expose']['description'] = '(e.g. [is equal to]: phytozome_10_2.59192412)';
+    $handler->display->display_options['filters']['phylotree_name']['expose']['description'] = '(e.g. [is equal to]: legfed_v1_0.L_2951WH)';
     $handler->display->display_options['filters']['phylotree_name']['expose']['use_operator'] = TRUE;
     $handler->display->display_options['filters']['phylotree_name']['expose']['operator'] = 'phylotree_name_op';
     $handler->display->display_options['filters']['phylotree_name']['expose']['identifier'] = 'phylotree_name';
