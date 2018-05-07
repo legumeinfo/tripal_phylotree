@@ -30,10 +30,8 @@ The <u>phylogram</u> page displays a phylogenetic tree that has branch spans pro
   </li>
   <li>
     Click on internal (white) nodes to get options pertaining to the legume genes included in the subtree for that node. For example, the "View Multi-aligned Genome Contexts" option will take the set of genes in the subtree and retrieve a set of flanking genes, align the segments based on gene family context and allows exploration of syntenic regions from all included legume genomes. Other options include creating lists of the subtended genes in LegumeMine for further analyses.
-  </li>
-    A viewer for the multiple sequence alignment from which the tree was derived can be toggled using the "MSA visualization" button. The viewer is interactive and will be updated when filtering is performed on the tree (e.g. if a subtree focus is chosen from an internal node, the MSA will display only the subset of proteins in the subtree).
   <li>
-
+    A viewer for the multiple sequence alignment from which the tree was derived can be toggled using the "MSA visualization" button. The viewer is interactive and will be updated when filtering is performed on the tree (e.g. if a subtree focus is chosen from an internal node, the MSA will display only the subset of proteins in the subtree).
   </li>
 </ul>
 
