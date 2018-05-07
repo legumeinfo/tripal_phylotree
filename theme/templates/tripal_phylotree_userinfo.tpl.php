@@ -1,5 +1,3 @@
-<!-- This is a test page under development -->
-
 <h1>HOW TO: Gene Family Search</h1>
 (<a href="/search/phylotree">Go to</a> gene family search)
 <div>
@@ -16,7 +14,7 @@ This page lets you search for gene families starting from a legume gene family I
     The <u>Family ID links to a page displaying a phylogram</u> of all its members (a phylogenetic tree that has branch spans proportional to the amount of character change), including both legumes and non-legumes, and helps reveal a probable evolutionary history leading to the current set of genes in the family (e.g. orthology and paralogy relationships).
   </li>
   <li>
-    The <u>counts under a given species are linked to the 'Genes page'</u> and lists the gene IDs (gene models) of the species that are members of this gene family. There is an opportunity to build a gene list or basket of gene IDs here for further analysis (in future).
+    The <u>counts under a given species are linked to the 'Genes search'</u> and lists the gene IDs (gene models) of the species that are members of this gene family. From here, details pertaining to the genes can be explored further using the typical gene search results capabilities.
   </li>
   <li>
     The <u>total counts</u> are also linked to the 'Genes page' listing only the legume genes that are currently in the LIS database (note that the number displayed for the total count includes the genes for all species included in the tree, and will typically be somewhat larger than the count of the legume genes retrieved in this way).
@@ -24,17 +22,18 @@ This page lets you search for gene families starting from a legume gene family I
 </ul>
 
 <h2>The phylogram</h2>
-The <u>phylogram</u> page displays a phylogenetic tree that has branch spans proportional to the amount of character change, including both legumes and selected non-legumes. Alternatively, you can also display the tree in the form of a <u>circular dendrogram</u> (when a large number of genes are in the tree, this view will not allow you to see the fine details, but does give a concise overview of the topology of the tree and how gene content from different species is distributed throughout). Click the <u>Organism</u> link to display the membership counts per species in a diagram illustrating their relative abundances (helpful for very large families). You can <u>access the Phytozome family through the "Cross Reference" tab</u>. 
+The <u>phylogram</u> page displays a phylogenetic tree that has branch spans proportional to the amount of character change, including both legumes and selected non-legumes. Alternatively, you can also display the tree in the form of a <u>circular dendrogram</u> (when a large number of genes are in the tree, this view will not allow you to see the fine details, but does give a concise overview of the topology of the tree and how gene content from different species is distributed throughout). The "Taxa and Legend" button will toggle the display diagram illustrating their relative abundances (helpful for very large families); the legend is interactive, and the set of taxa that are displayed in the tree can be filtered by clicking on the legend entries for the taxa.
 
 <ul>
   <li>
-    Click on colored terminal nodes to get more information about legume genes at LIS including its sequence, genome browser view, links to information at external sites, etc. Non-legume genes have minimal information stored in LIS and so only provide links to external sites.
+    Click on colored leaf nodes to get more information about legume genes at LIS including its sequence, genome browser view, links to information at external sites, etc. Non-legume genes have minimal information stored in LIS and so only provide links to external sites.
   </li>
   <li>
-    Click on internal (white) nodes to view the "genomic context" for the legume genes included in the subtree for that node. The genomic context viewer shows flanking genes colored by gene family assignment and allows exploration of syntenic regions from all included legume genomes. The genomic context view works only if there are legume genes in the subtree.
+    Click on internal (white) nodes to get options pertaining to the legume genes included in the subtree for that node. For example, the "View Multi-aligned Genome Contexts" option will take the set of genes in the subtree and retrieve a set of flanking genes, align the segments based on gene family context and allows exploration of syntenic regions from all included legume genomes. Other options include creating lists of the subtended genes in LegumeMine for further analyses.
   </li>
+    A viewer for the multiple sequence alignment from which the tree was derived can be toggled using the "MSA visualization" button. The viewer is interactive and will be updated when filtering is performed on the tree (e.g. if a subtree focus is chosen from an internal node, the MSA will display only the subset of proteins in the subtree).
   <li>
-    The root node click also gives an option to view the Multiple Sequence Alignment for this gene family.
+
   </li>
 </ul>
 
