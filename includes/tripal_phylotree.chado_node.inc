@@ -345,12 +345,15 @@ SQL;
     $nid = $result->fetchField();
     if(empty($nid)) {
         drupal_add_http_header('Status', '404 Not Found');
-        printf("Error: No gene tree has been built for the family '%s' with available sequences in LIS.", $name);
-        drupal_exit();
+        $html = sprintf("Error: No gene tree has been built for the family '%s' with available sequences in LIS.", $name);
+        print drupal_render_page($html);
+       // drupal_exit();
     }
-    drupal_set_title(sprintf('Gene Family | %s', $name));
-    $html = drupal_render(node_view(node_load($nid))); 
-    print drupal_render_page($html);
+    else {
+        drupal_set_title(sprintf('Gene Family | %s', $name));
+        $html = drupal_render(node_view(node_load($nid))); 
+        print drupal_render_page($html);
+    }
 }
 
 /**
