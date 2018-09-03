@@ -118,7 +118,7 @@
 					Export subtree in Newick format
 				</a>
 			</div>
-			<div if.bind="node.legumes.length">
+			<div >
 				<!-- interior node linkouts -->
 				<div repeat.for="link of node.linkouts">
 					<a href.bind="link.href" tabindex="-1">
@@ -127,18 +127,21 @@
 					</a>
 				</div>
 				<!-- cmtv link out -->
+                <!-- 
 				<a id="cmtv_link_out"
 					tabindex="-1"
 					href="http://velarde.ncgr.org:7070/isys/launch?svc=org.ncgr.cmtv.isys.CompMapViewerService%40--style%40http://velarde.ncgr.org:7070/isys/bin/Components/cmtv/conf/cmtv_combined_map_style.xml%40--combined_display%40${window.location.origin}/lis_gene_families/chado/phylo/node/gff_download/${node.data().phylonode_id}">
 					<i class="fa fa-external-link" aria-hidden="true"></i>
 					View Genomic Distribution for genes in this subtree
-				</a>
+				</a> -->
 			</div>
+            <!--
 			<div if.bind="! node.legumes.length">
 				<i class="fa fa-info-circle" aria-hidden="true"></i>
 				(No additional resources are available for this
 				sub-tree. Please try another node.)
 			</div>
+            -->
 		</div>
 		<div if.bind="node.is_leaf() && ! node.is_collapsed()">
 			<!-- add a tripal organism link, if this is a leaf node and

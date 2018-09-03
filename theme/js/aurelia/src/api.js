@@ -137,7 +137,7 @@ export class Api {
 					.then(res => res.json());
 			return promise;
 		}
-		else if(node.legumes.length > 0) {
+		else {
 			// for an interior node, request the familty representatives.
 			// use POST because the number of features can exceed allowed
 			// URL length. note: this is a bit of a hack because PHP 5.6
@@ -145,7 +145,7 @@ export class Api {
 			// content-type. As a workaround, send x-www-form-urlencoded
 			// instead, and specify the body parameter.
 			let url = this.FAMREPS_LINKS_URL;
-			let query = 'famreps=' + node.legumes.map(n => n.data().feature_name).join(',');
+			let query = 'famreps=' + node.get_all_leaves(true).map(n => n.data().feature_name).join(',');
 			let promise = this.http.fetch(url, {
 				method: 'post',
 				body: query,
@@ -155,9 +155,6 @@ export class Api {
 			})
 					.then(res => res.json());
 			return promise;
-		}
-		else {
-			return Promise.resolve([]);
 		}
 	}
 }
