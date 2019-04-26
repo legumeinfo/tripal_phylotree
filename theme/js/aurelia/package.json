@@ -17,6 +17,8 @@
     "raf": "^3.3.0",
     "requirejs": "^2.3.2",
     "text": "github:requirejs/text#latest",
+    "lodash": "^4.16.4",
+    "msa": "github:legumeinfo/msa",
     "tnt.tree": "^0.1.12",
     "whatwg-fetch": "^1.0.0"
   },

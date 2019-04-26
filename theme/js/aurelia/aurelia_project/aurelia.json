@@ -131,6 +131,14 @@
 					{
 						"name" : "biojs-io-newick",
 						"path" : "../node_modules/biojs-io-newick/src/newick"
+					},
+					{
+						"name" : "msa",
+						"path" : "../node_modules/msa/dist/msa"
+					},
+					{
+						"name" : "lodash",
+						"path" : "../node_modules/lodash/lodash"
 					}
         ]
       }

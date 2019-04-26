@@ -142,19 +142,11 @@ meaning is explained in the following table:
 //
 $js_config = array('type' => 'external', 'group' => JS_LIBRARY);
 drupal_add_js(
-    '//cdn.bio.sh/msa/1.0/msa.min.gz.js',
-    $js_config    
-);
-drupal_add_js(
     '//cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js',
     $js_config
 );
 drupal_add_js(
     '//cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.4/nv.d3.min.js',
-    $js_config
-);
-drupal_add_js(
-    '//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.4/lodash.min.js',
     $js_config
 );
 drupal_add_js(
@@ -191,7 +183,7 @@ drupal_add_js(
 
 // finally, use a regular script tag to inject the aurelia boostrapper
 // it will populate the aurelia-app div, above.
-printf('<script src="%s/aurelia/scripts/vendor-bundle.js" data-main="aurelia-bootstrapper"></script>',
+printf('<script src="%s/aurelia/scripts/vendor-bundle-079148f0aa.js" data-main="aurelia-bootstrapper"></script>',
        $js_dir)
 
 ?>
