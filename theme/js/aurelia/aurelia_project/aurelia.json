@@ -90,18 +90,18 @@
           "node_modules/requirejs/require.js"
         ],
         "dependencies": [
-					{
-						"name": "fetch",
-						"path": "../node_modules/whatwg-fetch",
-						"main": "fetch"
-					},
-					"raf",
-					"performance-now",
-					"text",
+          {
+            "name": "fetch",
+            "path": "../node_modules/whatwg-fetch",
+            "main": "fetch"
+          },
+          "raf",
+          "performance-now",
+          "text",
           "aurelia-binding",
           "aurelia-bootstrapper",
           "aurelia-dependency-injection",
-					"aurelia-fetch-client",
+          "aurelia-fetch-client",
           "aurelia-framework",
           "aurelia-loader",
           "aurelia-loader-default",
@@ -120,26 +120,27 @@
             "path": "../node_modules/aurelia-templating-resources/dist/amd",
             "main": "aurelia-templating-resources"
           },
-					{
-						"name": "crossfilter2",
-						"path": "../node_modules/crossfilter2/crossfilter"	          
-					},
-					{
-						"name" : "tnt.tree",
-						"path" : "../node_modules/tnt.tree/build/tnt.tree"
-					},
-					{
-						"name" : "biojs-io-newick",
-						"path" : "../node_modules/biojs-io-newick/src/newick"
-					},
-					{
-						"name" : "msa",
-						"path" : "../node_modules/msa/dist/msa"
-					},
-					{
-						"name" : "lodash",
-						"path" : "../node_modules/lodash/lodash"
-					}
+          {
+            "name": "crossfilter2",
+            "path": "../node_modules/crossfilter2/",
+            "main": "crossfilter"
+          },
+          {
+            "name" : "tnt.tree",
+            "path" : "../node_modules/tnt.tree/build/tnt.tree"
+          },
+          {
+            "name" : "biojs-io-newick",
+            "path" : "../node_modules/biojs-io-newick/src/newick"
+          },
+          {
+            "name" : "msa",
+            "path" : "../node_modules/msa/dist/msa"
+          },
+          {
+            "name" : "lodash",
+            "path" : "../node_modules/lodash/lodash"
+          }
         ]
       }
     ]
