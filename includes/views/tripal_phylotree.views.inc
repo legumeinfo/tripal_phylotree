@@ -69,6 +69,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         'phylotree_comment' => 'phylotree_comment',
         'total_count' => 'total_count',
         'medtr_count' => 'medtr_count',
+        'pissa_count' => 'pissa_count',
         'tripr_count' => 'tripr_count',
         'lotja_count' => 'lotja_count',
         'cicar_count' => 'cicar_count',
@@ -107,6 +108,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
             'empty_column' => 0,
         ),
         'medtr_count' => array(
+            'sortable' => 1,
+            'default_sort_order' => 'asc',
+            'align' => '',
+            'separator' => '',
+            'empty_column' => 0,
+        ),
+        'pissa_count' => array(
             'sortable' => 1,
             'default_sort_order' => 'asc',
             'align' => '',
@@ -257,6 +265,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['medtr_count']['alter']['make_link'] = TRUE;
     $handler->display->display_options['fields']['medtr_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=medtr';
     $handler->display->display_options['fields']['medtr_count']['alter']['absolute'] = TRUE;
+    /* Field: phylotree_count: Pissa count */
+    $handler->display->display_options['fields']['pissa_count']['id'] = 'pissa_count';
+    $handler->display->display_options['fields']['pissa_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['fields']['pissa_count']['field'] = 'pissa_count';
+    $handler->display->display_options['fields']['pissa_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['pissa_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=pissa';
+    $handler->display->display_options['fields']['pissa_count']['alter']['absolute'] = TRUE;
     /* Field: phylotree_count: Tripr count */
     $handler->display->display_options['fields']['tripr_count']['id'] = 'tripr_count';
     $handler->display->display_options['fields']['tripr_count']['table'] = 'phylotree_count';
@@ -452,6 +467,22 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['filters']['medtr_count']['expose']['operator'] = 'medtr_count_op';
     $handler->display->display_options['filters']['medtr_count']['expose']['identifier'] = 'medtr_count';
     $handler->display->display_options['filters']['medtr_count']['expose']['remember_roles'] = array(
+        2 => '2',
+        1 => 0,
+        4 => 0,
+    );
+    /* Filter criterion: phylotree_count: Pissa count */
+    $handler->display->display_options['filters']['pissa_count']['id'] = 'pissa_count';
+    $handler->display->display_options['filters']['pissa_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['filters']['pissa_count']['field'] = 'pissa_count';
+    $handler->display->display_options['filters']['pissa_count']['group'] = 1;
+    $handler->display->display_options['filters']['pissa_count']['exposed'] = TRUE;
+    $handler->display->display_options['filters']['pissa_count']['expose']['operator_id'] = 'pissa_count_op';
+    $handler->display->display_options['filters']['pissa_count']['expose']['label'] = 'Pissa count';
+    $handler->display->display_options['filters']['pissa_count']['expose']['use_operator'] = TRUE;
+    $handler->display->display_options['filters']['pissa_count']['expose']['operator'] = 'pissa_count_op';
+    $handler->display->display_options['filters']['pissa_count']['expose']['identifier'] = 'pissa_count';
+    $handler->display->display_options['filters']['pissa_count']['expose']['remember_roles'] = array(
         2 => '2',
         1 => 0,
         4 => 0,

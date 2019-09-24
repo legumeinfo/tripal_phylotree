@@ -189,6 +189,7 @@ function tripal_phylotree_add_domainless_mview(){
 
         $sql_query="WITH count_genes as (select count(*) count, t.phylotree_id from phylotree t, phylonode n where n.phylotree_id=t.phylotree_id and n.label is not null group by t.phylotree_id),
 count_medtr_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'medtr.%' group by t.phylotree_id),
+count_pissa_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'pissa.%' group by t.phylotree_id),
 count_tripr_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'tripr.%' group by t.phylotree_id),
 count_lotja_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'lotja.%' group by t.phylotree_id),
 count_cicar_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'cicar.%' group by t.phylotree_id),
@@ -209,6 +210,7 @@ phylotree.name AS phylotree_name,
 phylotree.comment AS phylotree_comment,
 count_genes.count as total_count,
 count_medtr_genes.count as medtr_count,
+coalesce(count_pissa_genes.count,0) as pissa_count,
 coalesce(count_tripr_genes.count,0) as tripr_count,
 count_lotja_genes.count as lotja_count,
 count_cicar_genes.count as cicar_count,
@@ -226,6 +228,7 @@ FROM chado.phylotree phylotree
 LEFT JOIN chado_phylotree chado_phylotree ON phylotree.phylotree_id = chado_phylotree.phylotree_id
 LEFT JOIN count_genes count_genes ON phylotree.phylotree_id = count_genes.phylotree_id
 LEFT JOIN count_medtr_genes ON phylotree.phylotree_id = count_medtr_genes.phylotree_id
+LEFT JOIN count_pissa_genes ON phylotree.phylotree_id = count_pissa_genes.phylotree_id
 LEFT JOIN count_tripr_genes ON phylotree.phylotree_id = count_tripr_genes.phylotree_id
 LEFT JOIN count_lotja_genes ON phylotree.phylotree_id = count_lotja_genes.phylotree_id
 LEFT JOIN count_cicar_genes ON phylotree.phylotree_id = count_cicar_genes.phylotree_id
@@ -265,6 +268,10 @@ WHERE ct.name='is_current'
                     'not null' => TRUE,
                 ),
                 'medtr_count' => array(
+                    'type' => 'int',
+                    'not null' => TRUE,
+                ),
+                'pissa_count' => array(
                     'type' => 'int',
                     'not null' => TRUE,
                 ),
@@ -397,6 +404,7 @@ function tripal_phylotree_add_mview(){
 
    $sql_query="WITH count_genes as (select count(*) count, t.phylotree_id from phylotree t, phylonode n where n.phylotree_id=t.phylotree_id and n.label is not null group by t.phylotree_id),
 count_medtr_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'medtr.%' group by t.phylotree_id),
+count_pissa_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'pissa.%' group by t.phylotree_id),
 count_tripr_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'tripr.%' group by t.phylotree_id),
 count_lotja_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'lotja.%' group by t.phylotree_id),
 count_cicar_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'cicar.%' group by t.phylotree_id),
@@ -418,6 +426,7 @@ phylotree.name AS phylotree_name,
 phylotree.comment AS phylotree_comment, 
 count_genes.count as total_count, 
 count_medtr_genes.count as medtr_count, 
+coalesce(count_pissa_genes.count,0) as pissa_count,
 coalesce(count_tripr_genes.count,0) as tripr_count,
 count_lotja_genes.count as lotja_count, 
 count_cicar_genes.count as cicar_count, 
@@ -437,6 +446,7 @@ LEFT JOIN consensus2domain c2d ON phylotree.phylotree_id = c2d.phylotree_id
 LEFT JOIN chado_phylotree chado_phylotree ON phylotree.phylotree_id = chado_phylotree.phylotree_id
 LEFT JOIN count_genes count_genes ON phylotree.phylotree_id = count_genes.phylotree_id
 LEFT JOIN count_medtr_genes ON phylotree.phylotree_id = count_medtr_genes.phylotree_id
+LEFT JOIN count_pissa_genes ON phylotree.phylotree_id = count_pissa_genes.phylotree_id
 LEFT JOIN count_tripr_genes ON phylotree.phylotree_id = count_tripr_genes.phylotree_id
 LEFT JOIN count_lotja_genes ON phylotree.phylotree_id = count_lotja_genes.phylotree_id
 LEFT JOIN count_cicar_genes ON phylotree.phylotree_id = count_cicar_genes.phylotree_id
@@ -475,6 +485,10 @@ WHERE ct.name='is_current'";
         'not null' => TRUE, 
       ),
       'medtr_count' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'pissa_count' => array(
         'type' => 'int',
         'not null' => TRUE,
       ),
@@ -752,6 +766,32 @@ function tripal_phylotree_integrate_view(){
           'name' => 'medtr_count',
           'title' => 'Medtr count',
           'description' => 'Medtr count',
+          'type' => 'int',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'views_handler_filter_numeric',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_numeric',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+
+      'pissa_count' => array (
+          'name' => 'pissa_count',
+          'title' => 'Pissa count',
+          'description' => 'Pissa count',
           'type' => 'int',
           'handlers' => array (
               'filter' => array (
