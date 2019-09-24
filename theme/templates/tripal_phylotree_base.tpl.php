@@ -183,7 +183,7 @@ drupal_add_js(
 
 // finally, use a regular script tag to inject the aurelia boostrapper
 // it will populate the aurelia-app div, above.
-printf('<script src="%s/aurelia/scripts/vendor-bundle-079148f0aa.js" data-main="aurelia-bootstrapper"></script>',
+printf('<script src="%s/aurelia/scripts/vendor-bundle.js" data-main="aurelia-bootstrapper"></script>',
        $js_dir)
 
 ?>
