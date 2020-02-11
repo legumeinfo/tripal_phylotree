@@ -83,6 +83,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
         'araip_count' => 'araip_count',
         'arahy_count' => 'arahy_count',
         'lupan_count' => 'lupan_count',
+        'lupal_count' => 'lupal_count',
     );
     $handler->display->display_options['style_options']['default'] = '-1';
     $handler->display->display_options['style_options']['info'] = array(
@@ -171,6 +172,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
             'empty_column' => 0,
         ),
         'lupan_count' => array(
+            'sortable' => 1,
+            'default_sort_order' => 'asc',
+            'align' => '',
+            'separator' => '',
+            'empty_column' => 0,
+        ),
+        'lupal_count' => array(
             'sortable' => 1,
             'default_sort_order' => 'asc',
             'align' => '',
@@ -358,6 +366,13 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['fields']['lupan_count']['alter']['make_link'] = TRUE;
     $handler->display->display_options['fields']['lupan_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=lupan';
     $handler->display->display_options['fields']['lupan_count']['alter']['absolute'] = TRUE;
+    /* Field: phylotree_count: Lupal count */
+    $handler->display->display_options['fields']['lupal_count']['id'] = 'lupal_count';
+    $handler->display->display_options['fields']['lupal_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['fields']['lupal_count']['field'] = 'lupal_count';
+    $handler->display->display_options['fields']['lupal_count']['alter']['make_link'] = TRUE;
+    $handler->display->display_options['fields']['lupal_count']['alter']['path'] = 'search/gene?gene_family=[phylotree_name]&abbreviation=lupal';
+    $handler->display->display_options['fields']['lupal_count']['alter']['absolute'] = TRUE;
     /* Filter criterion: phylotree_count: Family ID */
     $handler->display->display_options['filters']['phylotree_name']['id'] = 'phylotree_name';
     $handler->display->display_options['filters']['phylotree_name']['table'] = 'phylotree_count';
@@ -691,6 +706,22 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['filters']['lupan_count']['expose']['operator'] = 'lupan_count_op';
     $handler->display->display_options['filters']['lupan_count']['expose']['identifier'] = 'lupan_count';
     $handler->display->display_options['filters']['lupan_count']['expose']['remember_roles'] = array(
+        2 => '2',
+        1 => 0,
+        4 => 0,
+    );
+    /* Filter criterion: phylotree_count: Lupal count */
+    $handler->display->display_options['filters']['lupal_count']['id'] = 'lupal_count';
+    $handler->display->display_options['filters']['lupal_count']['table'] = 'phylotree_count';
+    $handler->display->display_options['filters']['lupal_count']['field'] = 'lupal_count';
+    $handler->display->display_options['filters']['lupal_count']['group'] = 1;
+    $handler->display->display_options['filters']['lupal_count']['exposed'] = TRUE;
+    $handler->display->display_options['filters']['lupal_count']['expose']['operator_id'] = 'lupal_count_op';
+    $handler->display->display_options['filters']['lupal_count']['expose']['label'] = 'Lupan count';
+    $handler->display->display_options['filters']['lupal_count']['expose']['use_operator'] = TRUE;
+    $handler->display->display_options['filters']['lupal_count']['expose']['operator'] = 'lupal_count_op';
+    $handler->display->display_options['filters']['lupal_count']['expose']['identifier'] = 'lupal_count';
+    $handler->display->display_options['filters']['lupal_count']['expose']['remember_roles'] = array(
         2 => '2',
         1 => 0,
         4 => 0,

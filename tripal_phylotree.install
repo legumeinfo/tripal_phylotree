@@ -203,6 +203,7 @@ count_araip_genes as (select count(n.phylonode_id) count, t.phylotree_id from ph
 count_arahy_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'arahy.%' group by t.phylotree_id),
 -- count_arahy_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'arahy.%' group by t.phylotree_id),
 count_lupan_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'lupan.%' group by t.phylotree_id),
+count_lupal_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'lupal.%' group by t.phylotree_id),
 count_glyma_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'glyma.%' group by t.phylotree_id)
 SELECT
 phylotree.phylotree_id AS phylotree_phylotree_id,
@@ -223,7 +224,8 @@ coalesce(count_vigan_genes.count,0) as vigan_count,
 count_aradu_genes.count as aradu_count,
 count_araip_genes.count as araip_count,
 coalesce(count_arahy_genes.count,0) as arahy_count,
-coalesce(count_lupan_genes.count,0) as lupan_count
+coalesce(count_lupan_genes.count,0) as lupan_count,
+coalesce(count_lupal_genes.count,0) as lupal_count
 FROM chado.phylotree phylotree
 LEFT JOIN chado_phylotree chado_phylotree ON phylotree.phylotree_id = chado_phylotree.phylotree_id
 LEFT JOIN count_genes count_genes ON phylotree.phylotree_id = count_genes.phylotree_id
@@ -242,6 +244,7 @@ LEFT JOIN count_aradu_genes ON phylotree.phylotree_id = count_aradu_genes.phylot
 LEFT JOIN count_araip_genes ON phylotree.phylotree_id = count_araip_genes.phylotree_id
 LEFT JOIN count_arahy_genes ON phylotree.phylotree_id = count_arahy_genes.phylotree_id
 LEFT JOIN count_lupan_genes ON phylotree.phylotree_id = count_lupan_genes.phylotree_id
+LEFT JOIN count_lupal_genes ON phylotree.phylotree_id = count_lupal_genes.phylotree_id
 JOIN analysis a ON phylotree.analysis_id=a.analysis_id JOIN analysisprop ap ON ap.analysis_id=a.analysis_id JOIN cvterm ct ON ap.type_id=ct.cvterm_id
 WHERE ct.name='is_current'
 ";
@@ -327,6 +330,10 @@ WHERE ct.name='is_current'
                     'type' => 'int',
                     'not null' => TRUE,
                 ),
+                'lupal_count' => array(
+                    'type' => 'int',
+                    'not null' => TRUE,
+                ),
             ),
             'primary key' => array('phylotree_phylotree_id'),
         );
@@ -404,6 +411,7 @@ function tripal_phylotree_add_mview(){
 
    $sql_query="WITH count_genes as (select count(*) count, t.phylotree_id from phylotree t, phylonode n where n.phylotree_id=t.phylotree_id and n.label is not null group by t.phylotree_id),
 count_medtr_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'medtr.%' group by t.phylotree_id),
+count_lupal_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'lupal.%' group by t.phylotree_id),
 count_pissa_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'pissa.%' group by t.phylotree_id),
 count_tripr_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'tripr.%' group by t.phylotree_id),
 count_lotja_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'lotja.%' group by t.phylotree_id),
@@ -440,6 +448,7 @@ count_aradu_genes.count as aradu_count,
 count_araip_genes.count as araip_count,
 coalesce(count_arahy_genes.count,0) as arahy_count,
 coalesce(count_lupan_genes.count,0) as lupan_count,
+coalesce(count_lupal_genes.count,0) as lupal_count,
 c2d.domains_con || ' ' || coalesce(c2d.ipr2, '') as domains_con
 FROM chado.phylotree phylotree
 LEFT JOIN consensus2domain c2d ON phylotree.phylotree_id = c2d.phylotree_id
@@ -460,6 +469,7 @@ LEFT JOIN count_aradu_genes ON phylotree.phylotree_id = count_aradu_genes.phylot
 LEFT JOIN count_araip_genes ON phylotree.phylotree_id = count_araip_genes.phylotree_id
 LEFT JOIN count_arahy_genes ON phylotree.phylotree_id = count_arahy_genes.phylotree_id
 LEFT JOIN count_lupan_genes ON phylotree.phylotree_id = count_lupan_genes.phylotree_id
+LEFT JOIN count_lupal_genes ON phylotree.phylotree_id = count_lupal_genes.phylotree_id
 JOIN analysis a ON phylotree.analysis_id=a.analysis_id JOIN analysisprop ap ON ap.analysis_id=a.analysis_id JOIN cvterm ct ON ap.type_id=ct.cvterm_id
 WHERE ct.name='is_current'";
 
@@ -541,6 +551,10 @@ WHERE ct.name='is_current'";
           'not null' => TRUE,
       ),
       'lupan_count' => array(
+          'type' => 'int',
+          'not null' => TRUE,
+      ),
+      'lupal_count' => array(
           'type' => 'int',
           'not null' => TRUE,
       ),
@@ -1131,6 +1145,32 @@ function tripal_phylotree_integrate_view(){
           'name' => 'lupan_count',
           'title' => 'Lupan count',
           'description' => 'Lupan count',
+          'type' => 'int',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'views_handler_filter_numeric',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_numeric',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+
+      'lupal_count' => array (
+          'name' => 'lupal_count',
+          'title' => 'Lupal count',
+          'description' => 'Lupal count',
           'type' => 'int',
           'handlers' => array (
               'filter' => array (
