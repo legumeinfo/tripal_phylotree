@@ -717,7 +717,7 @@ function tripal_phylotree_defaultvalue_user_phylotrees() {
     $handler->display->display_options['filters']['lupal_count']['group'] = 1;
     $handler->display->display_options['filters']['lupal_count']['exposed'] = TRUE;
     $handler->display->display_options['filters']['lupal_count']['expose']['operator_id'] = 'lupal_count_op';
-    $handler->display->display_options['filters']['lupal_count']['expose']['label'] = 'Lupan count';
+    $handler->display->display_options['filters']['lupal_count']['expose']['label'] = 'Lupal count';
     $handler->display->display_options['filters']['lupal_count']['expose']['use_operator'] = TRUE;
     $handler->display->display_options['filters']['lupal_count']['expose']['operator'] = 'lupal_count_op';
     $handler->display->display_options['filters']['lupal_count']['expose']['identifier'] = 'lupal_count';
