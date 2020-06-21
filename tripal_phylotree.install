@@ -46,7 +46,7 @@ tripal_phylotree_grant_permissions (DRUPAL_AUTHENTICATED_RID, $permissions_admin
 
 function tripal_phylotree_install() {
   $sql_count ="select count(f.feature_id) as count
-        from feature f left join cvterm cvt
+        from {feature} f left join {cvterm} cvt
         on f.type_id=cvt.cvterm_id
       where cvt.name = :name";
 
