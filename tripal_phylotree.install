@@ -198,6 +198,7 @@ count_vigun_genes as (select count(fp.value) count, t.phylotree_id from phylotre
 count_vigra_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'vigra.%' group by t.phylotree_id),
 count_vigan_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'vigan.%' group by t.phylotree_id),
 count_phavu_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'phavu.%' group by t.phylotree_id),
+count_phalu_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'phalu.%' group by t.phylotree_id),
 count_aradu_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'aradu.%' group by t.phylotree_id),
 count_araip_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'araip.%' group by t.phylotree_id),
 count_arahy_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'arahy.%' group by t.phylotree_id),
@@ -217,8 +218,9 @@ count_lotja_genes.count as lotja_count,
 count_cicar_genes.count as cicar_count,
 count_glyma_genes.count as glyma_count,
 count_phavu_genes.count as phavu_count,
+coalesce(count_phalu_genes.count,0) as phalu_count,
 count_cajca_genes.count as cajca_count,
-count_vigun_genes.count as vigun_count,
+coalesce(count_vigun_genes.count,0) as vigun_count,
 count_vigra_genes.count as vigra_count,
 coalesce(count_vigan_genes.count,0) as vigan_count,
 count_aradu_genes.count as aradu_count,
@@ -236,6 +238,7 @@ LEFT JOIN count_lotja_genes ON phylotree.phylotree_id = count_lotja_genes.phylot
 LEFT JOIN count_cicar_genes ON phylotree.phylotree_id = count_cicar_genes.phylotree_id
 LEFT JOIN count_glyma_genes ON phylotree.phylotree_id = count_glyma_genes.phylotree_id
 LEFT JOIN count_phavu_genes ON phylotree.phylotree_id = count_phavu_genes.phylotree_id
+LEFT JOIN count_phalu_genes ON phylotree.phylotree_id = count_phalu_genes.phylotree_id
 LEFT JOIN count_cajca_genes ON phylotree.phylotree_id = count_cajca_genes.phylotree_id
 LEFT JOIN count_vigun_genes ON phylotree.phylotree_id = count_vigun_genes.phylotree_id
 LEFT JOIN count_vigra_genes ON phylotree.phylotree_id = count_vigra_genes.phylotree_id
@@ -295,6 +298,10 @@ WHERE ct.name='is_current'
                     'not null' => TRUE,
                 ),
                 'phavu_count' => array(
+                    'type' => 'int',
+                    'not null' => TRUE,
+                ),
+                'phalu_count' => array(
                     'type' => 'int',
                     'not null' => TRUE,
                 ),
@@ -421,6 +428,7 @@ count_vigun_genes as (select count(fp.value) count, t.phylotree_id from phylotre
 count_vigra_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'vigra.%' group by t.phylotree_id),
 count_vigan_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'vigan.%' group by t.phylotree_id),
 count_phavu_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'phavu.%' group by t.phylotree_id),
+count_phalu_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'phalu.%' group by t.phylotree_id),
 count_aradu_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'aradu.%' group by t.phylotree_id),
 count_araip_genes as (select count(n.phylonode_id) count, t.phylotree_id from phylotree t left outer join phylonode n on n.phylotree_id=t.phylotree_id and n.label like 'araip.%' group by t.phylotree_id),
 count_arahy_genes as (select count(fp.value) count, t.phylotree_id from phylotree t left outer join featureprop fp on fp.value=t.name inner join feature f on fp.feature_id=f.feature_id and f.name like 'arahy.%' group by t.phylotree_id),
@@ -440,6 +448,7 @@ count_lotja_genes.count as lotja_count,
 count_cicar_genes.count as cicar_count, 
 count_glyma_genes.count as glyma_count, 
 count_phavu_genes.count as phavu_count, 
+coalesce(count_phalu_genes.count,0) as phalu_count,
 count_cajca_genes.count as cajca_count, 
 coalesce(count_vigun_genes.count,0) as vigun_count,
 count_vigra_genes.count as vigra_count, 
@@ -461,6 +470,7 @@ LEFT JOIN count_lotja_genes ON phylotree.phylotree_id = count_lotja_genes.phylot
 LEFT JOIN count_cicar_genes ON phylotree.phylotree_id = count_cicar_genes.phylotree_id
 LEFT JOIN count_glyma_genes ON phylotree.phylotree_id = count_glyma_genes.phylotree_id
 LEFT JOIN count_phavu_genes ON phylotree.phylotree_id = count_phavu_genes.phylotree_id
+LEFT JOIN count_phalu_genes ON phylotree.phylotree_id = count_phalu_genes.phylotree_id
 LEFT JOIN count_cajca_genes ON phylotree.phylotree_id = count_cajca_genes.phylotree_id
 LEFT JOIN count_vigun_genes ON phylotree.phylotree_id = count_vigun_genes.phylotree_id
 LEFT JOIN count_vigra_genes ON phylotree.phylotree_id = count_vigra_genes.phylotree_id
@@ -519,6 +529,10 @@ WHERE ct.name='is_current'";
         'not null' => TRUE,
       ),
       'phavu_count' => array(
+          'type' => 'int',
+          'not null' => TRUE,
+      ),
+      'phalu_count' => array(
           'type' => 'int',
           'not null' => TRUE,
       ),
@@ -936,6 +950,32 @@ function tripal_phylotree_integrate_view(){
           'name' => 'phavu_count',
           'title' => 'Phavu count',
           'description' => 'Phavu count',
+          'type' => 'int',
+          'handlers' => array (
+              'filter' => array (
+                  'name' => 'views_handler_filter_numeric',
+              ),
+              'field' => array (
+                  'name' => 'views_handler_field',
+              ),
+              'sort' => array (
+                  'name' => 'views_handler_sort',
+              ),
+              'argument' => array (
+                  'name' => 'views_handler_argument_numeric',
+              ),
+              'relationship' => array (
+                  'name' => 'views_handler_relationship',
+              ),
+          ),
+          'joins' => array (
+          ),
+      ),
+
+      'phalu_count' => array (
+          'name' => 'phalu_count',
+          'title' => 'Phalu count',
+          'description' => 'Phalu count',
           'type' => 'int',
           'handlers' => array (
               'filter' => array (
